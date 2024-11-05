@@ -1,0 +1,67 @@
+package com.example.goodfood;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.widget.ImageButton;
+import android.widget.TextView;
+
+import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+import androidx.viewpager2.widget.ViewPager2;
+
+public class DashboardActivity extends AppCompatActivity {
+
+    ViewPager2 viewPager2;
+    ViewPagerAdapter vpAdapter;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_dashboard);
+
+        // set content for fragments : either "Today" or "This Month"
+        ViewPager2 viewPager = findViewById(R.id.viewpager);
+        String code = getIntent().getStringExtra("code");
+        ViewPagerAdapter adapter = new ViewPagerAdapter(this, code);
+        viewPager.setAdapter(adapter);
+
+        // set title for fragment : either "Today" or "This Month"
+        TextView dashboardTitle = findViewById(R.id.dashboardTitle);
+        if("today".equals(code)){
+            dashboardTitle.setText(R.string.dashboardTodayTitle);
+        } else {
+            dashboardTitle.setText(R.string.dashboardThisMonthTitle);
+        }
+
+        // navigation buttons functionality
+        ImageButton homeButton = findViewById(R.id.homeButton);
+        ImageButton cameraButton = findViewById(R.id.cameraButton);
+        ImageButton profileButton = findViewById(R.id.profileButton);
+
+        homeButton.setImageResource(R.drawable.home_colored);
+
+        homeButton.setOnClickListener(v -> {
+            Intent intent = new Intent(DashboardActivity.this, MainActivity.class);
+            startActivity(intent);
+            overridePendingTransition(0, 0);
+            finish();
+        });
+
+//        cameraButton.setOnClickListener(v -> {
+//            Intent intent = new Intent(DashboardActivity.this, CameraActivity.class);
+//            startActivity(intent);
+//            overridePendingTransition(0, 0);
+//            finish();
+//        });
+//
+//        profileButton.setOnClickListener(v -> {
+//            Intent intent = new Intent(DashboardActivity.this, ProfileActivity.class);
+//            startActivity(intent);
+//            overridePendingTransition(0, 0);
+//            finish();
+//        });
+    }
+}
