@@ -1,6 +1,12 @@
 package com.example.goodfood;
 
+import static com.example.goodfood.R.*;
+
+import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
@@ -19,6 +25,15 @@ public class ExtractIngredient extends AppCompatActivity {
         String ingredient1 = getIntent().getStringExtra("ingredient1");
         String ingredient2 = getIntent().getStringExtra("ingredient2");
         String ingredient3 = getIntent().getStringExtra("ingredient3");
+
+        Button CalcCalorieBtn = findViewById(R.id.CalcCalorieBtn);
+        CalcCalorieBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ExtractIngredient.this, Calories.class);
+                startActivity(intent);
+            }
+        });
 
         // Display these ingredients in a TextView (assuming you have a TextView with id ingredientTextView)
         TextView IngredientTextView = findViewById(R.id.IngredientsTextView);
