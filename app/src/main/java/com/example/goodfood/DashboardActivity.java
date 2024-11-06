@@ -10,6 +10,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.viewpager2.widget.ViewPager2;
 
 public class DashboardActivity extends AppCompatActivity {
@@ -22,18 +25,16 @@ public class DashboardActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard);
 
-        // set content for fragments : either "Today" or "This Month"
-        ViewPager2 viewPager = findViewById(R.id.viewpager);
         String code = getIntent().getStringExtra("code");
-        ViewPagerAdapter adapter = new ViewPagerAdapter(this, code);
-        viewPager.setAdapter(adapter);
 
         // set title for fragment : either "Today" or "This Month"
         TextView dashboardTitle = findViewById(R.id.dashboardTitle);
         if("today".equals(code)){
             dashboardTitle.setText(R.string.dashboardTodayTitle);
+            replaceFragment(new TodayFragment());
         } else {
             dashboardTitle.setText(R.string.dashboardThisMonthTitle);
+            replaceFragment(new ThisMonthFragment());
         }
 
         // navigation buttons functionality
@@ -63,5 +64,13 @@ public class DashboardActivity extends AppCompatActivity {
 //            overridePendingTransition(0, 0);
 //            finish();
 //        });
+    }
+
+    private void replaceFragment(Fragment fragment) {
+        // to replace the fragment displayed in the middle
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.fragmentContainer, fragment);
+        fragmentTransaction.commit();
     }
 }
