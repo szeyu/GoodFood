@@ -4,7 +4,6 @@
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
-
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -15,6 +14,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.GoodFood"
         tools:targetApi="31">
+        <activity
+            android:name=".ExtractIngredient"
+            android:exported="false" />
         <activity
             android:name=".FoodScanner"
             android:exported="false" />
