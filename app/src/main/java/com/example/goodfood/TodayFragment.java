@@ -11,9 +11,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import androidx.appcompat.app.AppCompatActivity;
-import android.graphics.Color;
-import android.os.Bundle;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 

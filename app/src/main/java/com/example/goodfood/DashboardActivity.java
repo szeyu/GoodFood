@@ -44,16 +44,14 @@ public class DashboardActivity extends AppCompatActivity {
         homeButton.setOnClickListener(v -> {
             Intent intent = new Intent(DashboardActivity.this, MainActivity.class);
             startActivity(intent);
-//            overridePendingTransition(0, 0);
             finish();
         });
 
-//        cameraButton.setOnClickListener(v -> {
-//            Intent intent = new Intent(DashboardActivity.this, CameraActivity.class);
-//            startActivity(intent);
-//            overridePendingTransition(0, 0);
-//            finish();
-//        });
+        cameraButton.setOnClickListener(v -> {
+            Intent intent = new Intent(DashboardActivity.this, FoodScanner.class);
+            startActivity(intent);
+            finish();
+        });
 //
 //        profileButton.setOnClickListener(v -> {
 //            Intent intent = new Intent(DashboardActivity.this, ProfileActivity.class);
