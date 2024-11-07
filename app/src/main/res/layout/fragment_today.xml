@@ -20,11 +20,69 @@
                 android:id="@+id/todayCalorieIntakeText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
                 android:fontFamily="@font/poppins_medium"
                 android:padding="8dp"
                 android:text="@string/calorieIntakeText"
                 android:textSize="24sp"
                 android:textStyle="bold" />
+
+            <LinearLayout
+                android:id="@+id/todayCalorieLinearLayout"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:orientation="horizontal">
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/todayNutrientIntakeText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/poppins_medium"
+                android:padding="8dp"
+                android:text="@string/nutrientIntakeText"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:layout_marginStart="16dp"/>
+
+            <com.github.mikephil.charting.charts.BarChart
+                android:id="@+id/todayBarChart"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_centerInParent="true"
+                android:layout_marginLeft="24dp"
+                android:layout_marginRight="24dp"
+                android:layout_marginBottom="24dp"
+                android:padding="16dp"
+                android:background="@drawable/rounded_border"/>
+
+            <TextView
+                android:id="@+id/todayMealHistoryText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/poppins_medium"
+                android:padding="8dp"
+                android:text="@string/mealHistoryText"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:layout_marginStart="16dp"/>
+
+            <LinearLayout
+                android:id="@+id/todayMealHistoryLinearLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="24dp"
+                android:layout_marginRight="24dp"
+                android:background="@drawable/rounded_orange_container"
+                android:orientation="vertical">
+
+                <View
+                    android:id="@+id/todayEmptyViewForSeparation"
+                    android:layout_width="match_parent"
+                    android:layout_height="16dp"/>
+
+            </LinearLayout>
 
         </LinearLayout>
     </ScrollView>

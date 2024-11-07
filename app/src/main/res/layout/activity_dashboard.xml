@@ -33,20 +33,6 @@
             app:layout_constraintVertical_bias="0.733" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-<!--    <androidx.viewpager2.widget.ViewPager2-->
-<!--        android:id="@+id/viewpager"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="match_parent"-->
-<!--        android:layout_above="@id/bottomNavBar"-->
-<!--        android:layout_below="@id/header"-->
-<!--        android:layout_marginTop="0dp"-->
-<!--        android:background="#FFFFFF"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintTop_toTopOf="parent">-->
-
-<!--    </androidx.viewpager2.widget.ViewPager2>-->
-
     <FrameLayout
         android:id="@+id/fragmentContainer"
         android:layout_width="match_parent"
@@ -58,8 +44,7 @@
         android:id="@+id/bottomNavBar"
         android:layout_width="match_parent"
         android:layout_height="100dp"
-        android:layout_alignParentBottom="true"
-        android:background="@color/white">
+        android:layout_alignParentBottom="true">
 
         <ImageButton
             android:id="@+id/homeButton"

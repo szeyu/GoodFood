@@ -9,4 +9,6 @@
     <string name="nutrientIntakeText">Nutrient Intake</string>
     <string name="mealHistoryText">Meal History</string>
     <string name="popularMealsText">Popular Meals</string>
+    <string name="name">Name</string>
+    <string name="calories">Calories</string>
 </resources>

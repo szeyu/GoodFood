@@ -17,9 +17,6 @@ import androidx.viewpager2.widget.ViewPager2;
 
 public class DashboardActivity extends AppCompatActivity {
 
-    ViewPager2 viewPager2;
-    ViewPagerAdapter vpAdapter;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,7 +44,7 @@ public class DashboardActivity extends AppCompatActivity {
         homeButton.setOnClickListener(v -> {
             Intent intent = new Intent(DashboardActivity.this, MainActivity.class);
             startActivity(intent);
-            overridePendingTransition(0, 0);
+//            overridePendingTransition(0, 0);
             finish();
         });
 
