@@ -1,8 +1,5 @@
 package com.example.goodfood;
 
-import static com.example.goodfood.R.*;
-
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -17,16 +14,19 @@ import androidx.core.view.WindowInsetsCompat;
 
 public class ExtractIngredient extends AppCompatActivity {
 
+    Button CalcCalorieBtn;
+    Button backFromExtractIngredientBtn;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_extract_ingredient);
-        String ingredient1 = getIntent().getStringExtra("ingredient1");
-        String ingredient2 = getIntent().getStringExtra("ingredient2");
-        String ingredient3 = getIntent().getStringExtra("ingredient3");
+        String ingredients = getIntent().getStringExtra("ingredients");
 
-        Button CalcCalorieBtn = findViewById(R.id.CalcCalorieBtn);
+        CalcCalorieBtn = findViewById(R.id.CalcCalorieBtn);
+        backFromExtractIngredientBtn = findViewById(R.id.backFromExtractIngredientButton);
+
         CalcCalorieBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -35,13 +35,22 @@ public class ExtractIngredient extends AppCompatActivity {
             }
         });
 
+        backFromExtractIngredientBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
+
         // Display these ingredients in a TextView (assuming you have a TextView with id ingredientTextView)
         TextView IngredientTextView = findViewById(R.id.IngredientsTextView);
-        IngredientTextView.setText("Ingredients:\n" + ingredient1 + "\n" + ingredient2 + "\n" + ingredient3);
+        IngredientTextView.setText("Ingredients:\n" + ingredients + "\n");
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+
     }
 }
