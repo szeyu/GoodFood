@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -24,27 +25,110 @@
                 android:fontFamily="@font/poppins_medium"
                 android:padding="8dp"
                 android:text="@string/calorieIntakeText"
+                android:textColor="@color/black"
                 android:textSize="24sp"
                 android:textStyle="bold" />
 
-            <LinearLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/todayCalorieLinearLayout"
                 android:layout_width="match_parent"
-                android:layout_height="200dp"
+                android:layout_height="110dp">
+
+                <TextView
+                    android:id="@+id/todayPercentSymbol"
+                    android:layout_width="51dp"
+                    android:layout_height="46dp"
+                    android:layout_marginStart="72dp"
+                    android:fontFamily="@font/poppins_medium"
+                    android:text="%"
+                    android:textAlignment="viewStart"
+                    android:textColor="@android:color/black"
+                    android:textSize="34sp"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/todayProgressBar"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.343" />
+
+                <ProgressBar
+                    android:id="@+id/todayProgressBar"
+                    style="@android:style/Widget.ProgressBar.Horizontal"
+                    android:layout_width="253dp"
+                    android:layout_height="52dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_weight="1"
+                    android:indeterminateDrawable="@android:drawable/progress_indeterminate_horizontal"
+                    android:max="100"
+                    android:padding="5dp"
+                    android:progress="0"
+                    android:progressDrawable="@drawable/rounded_grey_container"
+                    android:progressTint="@color/red"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/todayPercentageText"
+                    android:layout_width="51dp"
+                    android:layout_height="46dp"
+                    android:layout_marginStart="20dp"
+                    android:fontFamily="@font/poppins_medium"
+                    android:text="0%"
+                    android:textAlignment="textEnd"
+                    android:textColor="@android:color/black"
+                    android:textSize="34sp"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/todayProgressBar"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.343" />
+
+                <TextView
+                    android:id="@+id/todayCalorieText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginStart="28dp"
+                    android:layout_marginTop="8dp"
+                    android:fontFamily="@font/poppins_semibold"
+                    android:text="0 / 1000 cal"
+                    android:textColor="@android:color/black"
+                    android:textSize="16sp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/todayProgressBar" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <LinearLayout
+                android:id="@+id/thisMonthNutrientIntakeLayout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:orientation="horizontal">
 
-            </LinearLayout>
+                <TextView
+                    android:id="@+id/todayNutrientIntakeText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:fontFamily="@font/poppins_medium"
+                    android:padding="8dp"
+                    android:text="@string/nutrientIntakeText"
+                    android:textColor="@color/black"
+                    android:textSize="24sp"
+                    android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/todayNutrientIntakeText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/poppins_medium"
-                android:padding="8dp"
-                android:text="@string/nutrientIntakeText"
-                android:textSize="24sp"
-                android:textStyle="bold"
-                android:layout_marginStart="16dp"/>
+                <ImageButton
+                    android:id="@+id/todayNutrientIntakeInfoButton"
+                    android:layout_width="32dp"
+                    android:layout_height="30dp"
+                    android:layout_marginStart="140dp"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginEnd="16dp"
+                    android:background="@android:color/transparent"
+                    android:contentDescription="Information"
+                    android:padding="32dp"
+                    android:src="@drawable/info_square" />
+            </LinearLayout>
 
             <com.github.mikephil.charting.charts.BarChart
                 android:id="@+id/todayBarChart"
@@ -61,12 +145,13 @@
                 android:id="@+id/todayMealHistoryText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
                 android:fontFamily="@font/poppins_medium"
                 android:padding="8dp"
                 android:text="@string/mealHistoryText"
+                android:textColor="@color/black"
                 android:textSize="24sp"
-                android:textStyle="bold"
-                android:layout_marginStart="16dp"/>
+                android:textStyle="bold" />
 
             <LinearLayout
                 android:id="@+id/todayMealHistoryLinearLayout"
@@ -80,7 +165,7 @@
                 <View
                     android:id="@+id/todayEmptyViewForSeparation"
                     android:layout_width="match_parent"
-                    android:layout_height="16dp"/>
+                    android:layout_height="8dp"/>
 
             </LinearLayout>
 

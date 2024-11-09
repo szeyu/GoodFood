@@ -1,5 +1,7 @@
 package com.example.goodfood;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.graphics.Typeface;
 import android.os.Bundle;
 
@@ -11,7 +13,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.BarChart;
@@ -31,6 +35,8 @@ public class TodayFragment extends Fragment {
 
     private LinearLayout mealHistoryLinearLayout;
 
+    private ImageButton nutrientIntakeInfoButton;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -40,6 +46,30 @@ public class TodayFragment extends Fragment {
 
         todayBarChart = view.findViewById(R.id.todayBarChart);
         mealHistoryLinearLayout = view.findViewById(R.id.todayMealHistoryLinearLayout);
+        nutrientIntakeInfoButton = view.findViewById(R.id.todayNutrientIntakeInfoButton);
+
+        // listener for nutrient intake info button
+        nutrientIntakeInfoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showAlertDialog();
+            }
+        });
+
+        int caloriesTaken = 800;
+        int caloriesSuggested = 1000;
+
+        // Calculate percentage
+        int percentage = (int) ((double) caloriesTaken / caloriesSuggested * 100);
+
+        // Update ProgressBar and TextViews
+        ProgressBar progressBar = view.findViewById(R.id.todayProgressBar);
+        TextView percentageText = view.findViewById(R.id.todayPercentageText);
+        TextView calorieText = view.findViewById(R.id.todayCalorieText);
+
+        progressBar.setProgress(percentage);
+        percentageText.setText(Integer.toString(percentage));
+        calorieText.setText(caloriesTaken + " / " + caloriesSuggested + " cal");
 
         // Create an ArrayList with simulated nutrients data
         ArrayList<Nutrient> nutrients = new ArrayList<>();
@@ -79,6 +109,23 @@ public class TodayFragment extends Fragment {
         setUpChart(nutrients);
 
         return view;
+    }
+
+    private void showAlertDialog () {
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(requireContext());
+        alertDialog.setTitle("Chart Colour Indicator")
+                .setMessage(String.format("For each bar groups:\n%s: Your Recorded Intake\n - %s: Under suggested amount\n" +
+                        " - %s: Over suggested amount\n\n%s: Recommended Intake\n - %s: Suggested amount\n",
+                        "Left Bar","Yellow","Red","Right Bar","Orange"))
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int i) {
+                        dialog.dismiss();
+                    }
+                });
+
+        AlertDialog dialog = alertDialog.create();
+        dialog.show();
     }
 
     private void setUpChart(ArrayList<Nutrient> nutrients) {
@@ -169,6 +216,9 @@ public class TodayFragment extends Fragment {
         todayBarChart.setExtraBottomOffset(20f);
         todayBarChart.getDescription().setEnabled(false);
 
+        RoundedBarChart render = new RoundedBarChart(todayBarChart, todayBarChart.getAnimator(), todayBarChart.getViewPortHandler());
+        render.setmRadius(20);
+        todayBarChart.setRenderer(render);
         todayBarChart.invalidate();
     }
 }
