@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ProfilePage">
+
+    <Button
+        android:id="@+id/button4"
+        android:layout_width="72dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="12dp"
+        android:backgroundTint="#FDFBFB"
+        android:text=">"
+        android:textColor="#4E4C4C"
+        android:textSize="24sp"
+        app:layout_constraintStart_toStartOf="@+id/button"
+        app:layout_constraintTop_toBottomOf="@+id/button"
+        app:rippleColor="#615D5D" />
+
+    <Button
+        android:id="@+id/button5"
+        android:layout_width="72dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="12dp"
+        android:backgroundTint="#FDFBFB"
+        android:text=">"
+        android:textColor="#4E4C4C"
+        android:textSize="24sp"
+        app:layout_constraintStart_toStartOf="@+id/button4"
+        app:layout_constraintTop_toBottomOf="@+id/button4"
+        app:rippleColor="#615D5D" />
+
+    <Button
+        android:id="@+id/button6"
+        android:layout_width="72dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="12dp"
+        android:backgroundTint="#FDFBFB"
+        android:text=">"
+        android:textColor="#4E4C4C"
+        android:textSize="24sp"
+        app:layout_constraintStart_toStartOf="@+id/button5"
+        app:layout_constraintTop_toBottomOf="@+id/button5"
+        app:rippleColor="#615D5D" />
+
+    <ImageButton
+        android:id="@+id/homeButton"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_marginStart="68dp"
+        android:layout_marginBottom="28dp"
+        android:contentDescription="homeButton"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/profileButton"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/cameraButton"
+        app:srcCompat="@drawable/home_icon_bnw" />
+
+    <ImageButton
+        android:id="@+id/cameraButton"
+        android:layout_width="54dp"
+        android:layout_height="58dp"
+        android:layout_marginStart="56dp"
+        android:contentDescription="cameraButton"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/homeButton"
+        app:layout_constraintVertical_bias="0.0"
+        app:srcCompat="@drawable/camera_icon_bnw" />
+
+    <ImageButton
+        android:id="@+id/profileButton"
+        android:layout_width="49dp"
+        android:layout_height="57dp"
+        android:layout_marginEnd="56dp"
+        android:layout_marginBottom="28dp"
+        android:contentDescription="profileButton"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:srcCompat="@drawable/profile_icon_bnw" />
+
+    <ImageView
+        android:id="@+id/IVProfilePicture"
+        android:layout_width="180dp"
+        android:layout_height="174dp"
+        android:layout_marginTop="12dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/TVProfile"
+        app:srcCompat="@drawable/profile_circle" />
+
+    <TextView
+        android:id="@+id/TVProfile"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:fontFamily="@font/poppins_semibold"
+        android:text="Profile"
+        android:textSize="30sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/TVName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:fontFamily="@font/poppins_semibold"
+        android:text="Shum Joan"
+        android:textSize="24sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/IVProfilePicture" />
+
+    <ImageView
+        android:id="@+id/IVSetting"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        app:layout_constraintStart_toStartOf="@+id/IVHistory"
+        app:layout_constraintTop_toBottomOf="@+id/IVHistory"
+        app:srcCompat="@drawable/setting_icon" />
+
+    <ImageView
+        android:id="@+id/IVHistory"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        app:layout_constraintStart_toStartOf="@+id/IVEditProfile"
+        app:layout_constraintTop_toBottomOf="@+id/IVEditProfile"
+        app:srcCompat="@drawable/history_icon" />
+
+    <ImageView
+        android:id="@+id/IVPolicy"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        app:layout_constraintStart_toStartOf="@+id/IVSetting"
+        app:layout_constraintTop_toBottomOf="@+id/IVSetting"
+        app:srcCompat="@drawable/policy_icon" />
+
+    <ImageView
+        android:id="@+id/IVLogout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="9dp"
+        app:layout_constraintStart_toStartOf="@+id/IVPolicy"
+        app:layout_constraintTop_toBottomOf="@+id/IVPolicy"
+        app:srcCompat="@drawable/logout_icon" />
+
+    <ImageView
+        android:id="@+id/IVEditProfile"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="12dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/TVName"
+        app:srcCompat="@drawable/profile_icon" />
+
+    <TextView
+        android:id="@+id/TVEditProfile"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="28dp"
+        android:layout_marginTop="20dp"
+        android:fontFamily="@font/poppins_medium"
+        android:text="Edit Profile"
+        android:textSize="20sp"
+        app:layout_constraintStart_toEndOf="@+id/IVEditProfile"
+        app:layout_constraintTop_toBottomOf="@+id/TVName" />
+
+    <TextView
+        android:id="@+id/TVHistory"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="28dp"
+        android:fontFamily="@font/poppins_medium"
+        android:text="History"
+        android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="@+id/TVEditProfile"
+        app:layout_constraintTop_toBottomOf="@+id/TVEditProfile" />
+
+    <TextView
+        android:id="@+id/TVSetting"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:fontFamily="@font/poppins_medium"
+        android:text="Settings"
+        android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="@+id/TVHistory"
+        app:layout_constraintTop_toBottomOf="@+id/TVHistory" />
+
+    <TextView
+        android:id="@+id/TVPolicy"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="28dp"
+        android:fontFamily="@font/poppins_medium"
+        android:text="Privacy Policy"
+        android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="@+id/TVSetting"
+        app:layout_constraintTop_toBottomOf="@+id/TVSetting" />
+
+    <TextView
+        android:id="@+id/TVLogout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:fontFamily="@font/poppins_medium"
+        android:text="Log Out"
+        android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="@+id/TVPolicy"
+        app:layout_constraintTop_toBottomOf="@+id/TVPolicy" />
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="72dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="88dp"
+        android:layout_marginTop="12dp"
+        android:backgroundTint="#FDFBFB"
+        android:text=">"
+        android:textColor="#4E4C4C"
+        android:textSize="24sp"
+        app:layout_constraintStart_toEndOf="@+id/TVEditProfile"
+        app:layout_constraintTop_toBottomOf="@+id/TVName"
+        app:rippleColor="#615D5D" />
+
+    <Button
+        android:id="@+id/button2"
+        android:layout_width="72dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="12dp"
+        android:backgroundTint="#FDFBFB"
+        android:text=">"
+        android:textColor="#4E4C4C"
+        android:textSize="24sp"
+        app:layout_constraintStart_toStartOf="@+id/button6"
+        app:layout_constraintTop_toBottomOf="@+id/button6"
+        app:rippleColor="#615D5D" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
