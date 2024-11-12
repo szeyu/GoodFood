@@ -48,10 +48,10 @@
         android:text="What's Cooking?"
         android:textColor="#898888"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView" />
+        app:layout_constraintTop_toBottomOf="@+id/graphicMenu" />
 
     <ImageView
-        android:id="@+id/imageView"
+        android:id="@+id/graphicMenu"
         android:layout_width="238dp"
         android:layout_height="235dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -63,12 +63,20 @@
         app:srcCompat="@drawable/eating_healthy_food_cuate_1" />
 
     <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/listResults"
         android:layout_width="312dp"
         android:layout_height="354dp"
-        android:layout_marginStart="72dp"
-        android:layout_marginTop="56dp"
+        android:layout_marginStart="68dp"
+        android:layout_marginTop="52dp"
         android:textAlignment="center"
+        android:padding="16dp"
         app:layout_constraintStart_toStartOf="parent"
+        android:scrollbarThumbVertical="@drawable/scrollbar_thumb"
+        android:scrollbarTrackVertical="@drawable/scrollbar_track"
+
+        android:scrollbars="vertical"
+        android:visibility="visible"
+
         app:layout_constraintTop_toBottomOf="@+id/searchText" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -106,12 +114,13 @@
             app:srcCompat="@drawable/camera" />
 
         <ImageButton
-            android:id="@+id/imageButton5"
+            android:id="@+id/HomeButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="52dp"
             android:layout_marginTop="21dp"
             android:backgroundTint="#09FFFFFF"
+            android:contentDescription="homeButton"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
