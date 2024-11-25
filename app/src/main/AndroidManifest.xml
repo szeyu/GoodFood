@@ -26,6 +26,12 @@
             android:name=".Calories"
             android:exported="false" />
         <activity
+            android:name=".DisplayActivity"
+            android:exported="false" />
+        <activity
+            android:name=".SearchActivity"
+            android:exported="false" />
+        <activity
             android:name=".FoodScanner"
             android:exported="false" />
         <activity

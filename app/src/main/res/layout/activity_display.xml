@@ -28,7 +28,7 @@
         android:textSize="24sp"
         android:textColor="@android:color/black"
         android:textStyle="bold"
-        android:fontFamily="@font/poppins_medium"
+        android:fontFamily="@font/poppins_medium_regular"
         app:layout_constraintTop_toBottomOf="@id/toolbar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -75,7 +75,7 @@
                 android:text="Fat"
                 android:textColor="@android:color/black"
                 android:textSize="18sp"
-                android:fontFamily="@font/poppins_medium"
+                android:fontFamily="@font/poppins_medium_regular"
                 android:gravity="center" />
             <TextView
                 android:id="@+id/caloriesLabel"
@@ -85,7 +85,7 @@
                 android:text="Calories"
                 android:textColor="@android:color/black"
                 android:textSize="18sp"
-                android:fontFamily="@font/poppins_medium"
+                android:fontFamily="@font/poppins_medium_regular"
                 android:gravity="center" />
             <TextView
                 android:id="@+id/proteinLabel"
@@ -95,7 +95,7 @@
                 android:text="Protein"
                 android:textColor="@android:color/black"
                 android:textSize="18sp"
-                android:fontFamily="@font/poppins_medium"
+                android:fontFamily="@font/poppins_medium_regular"
                 android:gravity="center" />
         </LinearLayout>
 
@@ -114,7 +114,7 @@
                 android:text="10g"
                 android:textColor="@android:color/holo_orange_light"
                 android:textSize="18sp"
-                android:fontFamily="@font/poppins_medium"
+                android:fontFamily="@font/poppins_medium_regular"
                 android:gravity="center" />
             <TextView
                 android:id="@+id/caloriesTextView"
@@ -124,7 +124,7 @@
                 android:text="250g"
                 android:textColor="@android:color/holo_orange_light"
                 android:textSize="18sp"
-                android:fontFamily="@font/poppins_medium"
+                android:fontFamily="@font/poppins_medium_regular"
                 android:gravity="center" />
             <TextView
                 android:id="@+id/proteinTextView"
@@ -134,7 +134,7 @@
                 android:text="15g"
                 android:textColor="@android:color/holo_orange_light"
                 android:textSize="18sp"
-                android:fontFamily="@font/poppins_medium"
+                android:fontFamily="@font/poppins_medium_regular"
                 android:gravity="center" />
         </LinearLayout>
     </LinearLayout>
@@ -148,7 +148,7 @@
         android:textSize="20sp"
         android:textColor="@android:color/black"
         android:textStyle="bold"
-        android:fontFamily="@font/poppins_medium"
+        android:fontFamily="@font/poppins_medium_regular"
         app:layout_constraintTop_toBottomOf="@id/nutritionalLayout"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -164,7 +164,7 @@
         android:text="This is the description of the food item."
         android:textSize="16sp"
         android:textColor="@android:color/darker_gray"
-        android:fontFamily="@font/poppins_medium"
+        android:fontFamily="@font/poppins_medium_regular"
         app:layout_constraintTop_toBottomOf="@id/descriptionTitle"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -181,7 +181,7 @@
         android:textSize="20sp"
         android:textColor="@android:color/black"
         android:textStyle="bold"
-        android:fontFamily="@font/poppins_medium"
+        android:fontFamily="@font/poppins_medium_regular"
         app:layout_constraintTop_toBottomOf="@id/descriptionTextView"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -197,7 +197,7 @@
         android:text="Ingredient 1, Ingredient 2, Ingredient 3"
         android:textSize="16sp"
         android:textColor="@android:color/darker_gray"
-        android:fontFamily="@font/poppins_medium"
+        android:fontFamily="@font/poppins_medium_regular"
         app:layout_constraintTop_toBottomOf="@id/ingredientsTitle"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

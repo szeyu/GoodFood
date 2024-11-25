@@ -13,12 +13,24 @@ public class MainActivity extends AppCompatActivity {
     private ImageButton homeButton;
     private ImageButton cameraButton;
     private ImageButton profileButton;
+    private ImageButton searchButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
+        searchButton = findViewById(R.id.searchButton);
+
+        // Set OnClickListener for the search button
+        searchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Intent to navigate to SearchActivity
+                Intent intent = new Intent(MainActivity.this, SearchActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     public void toTodayStats(View view) {
