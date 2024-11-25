@@ -84,7 +84,7 @@ public class FoodScanner extends AppCompatActivity {
 
         // Create Retrofit instance
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://172.22.96.1:8080/")
+                .baseUrl("http://10.0.2.2:8080/")
                 .client(client)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
