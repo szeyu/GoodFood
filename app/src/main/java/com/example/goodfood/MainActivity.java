@@ -19,42 +19,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
-
-        // camera button functionality
-        cameraButton = findViewById(R.id.cameraButton);
-
-        cameraButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, FoodScanner.class);
-                startActivity(intent);
-            }
-        });
-
-        // navigation buttons functionality
-        homeButton = findViewById(R.id.homeButton);
-        profileButton = findViewById(R.id.profileButton);
-
-        homeButton.setImageResource(R.drawable.home_colored);
-
-        homeButton.setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, MainActivity.class);
-            startActivity(intent);
-            finish();
-        });
-
-        cameraButton.setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, FoodScanner.class);
-            startActivity(intent);
-            finish();
-        });
-//
-//        profileButton.setOnClickListener(v -> {
-//            Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
-//            startActivity(intent);
-//            overridePendingTransition(0, 0);
-//            finish();
-//        });
     }
 
     public void toTodayStats(View view) {

@@ -35,31 +35,6 @@ public class DashboardActivity extends AppCompatActivity {
             replaceFragment(new ThisMonthFragment());
         }
 
-        // navigation buttons functionality
-        ImageButton homeButton = findViewById(R.id.homeButton);
-        ImageButton cameraButton = findViewById(R.id.cameraButton);
-        ImageButton profileButton = findViewById(R.id.profileButton);
-
-        homeButton.setImageResource(R.drawable.home_colored);
-
-        homeButton.setOnClickListener(v -> {
-            Intent intent = new Intent(DashboardActivity.this, MainActivity.class);
-            startActivity(intent);
-            finish();
-        });
-
-        cameraButton.setOnClickListener(v -> {
-            Intent intent = new Intent(DashboardActivity.this, FoodScanner.class);
-            startActivity(intent);
-            finish();
-        });
-//
-//        profileButton.setOnClickListener(v -> {
-//            Intent intent = new Intent(DashboardActivity.this, ProfileActivity.class);
-//            startActivity(intent);
-//            overridePendingTransition(0, 0);
-//            finish();
-//        });
     }
 
     private void replaceFragment(Fragment fragment) {
