@@ -1,9 +1,11 @@
 package com.example.goodfood;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -12,6 +14,7 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,36 +23,29 @@ public class SearchActivity extends AppCompatActivity {
     private EditText searchText;
     private RecyclerView searchResults;
     private SearchAdapter adapter;
-    private List<String> itemList;
-    private List<String> filteredList;
-    private ImageView graphicMenu; // Declare the ImageView variable
+    private List<Item> itemList; // This should be a list of Item objects
+
+    private List<Item> filteredList; // List to store items with IDs
+    private ImageView graphicMenu;
     private TextView captionTag;
-
-
     private DatabaseHelper dbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.search_page); // Ensure this matches your layout filename
+        setContentView(R.layout.search_page);
 
         searchText = findViewById(R.id.searchText);
-        searchResults = findViewById(R.id.searchResults);
+        searchResults = findViewById(R.id.listResults);
         graphicMenu = findViewById(R.id.graphicMenu);
         captionTag = findViewById(R.id.captionTag);
 
-        // Sample data
-        itemList = new ArrayList<>();
-        itemList.add("Burger");
-        itemList.add("Cheese Burger");
-        itemList.add("Hamburger");
-        itemList.add("Vegetarian Burger");
-        itemList.add("Pizza");
-        itemList.add("Pasta");
+        dbHelper = new DatabaseHelper(this);
 
-        // Initialize filteredList as a copy of itemList
-        filteredList = new ArrayList<>(itemList);
+        // Initialize itemList and populate it from the database
+        itemList = dbHelper.getAllItems(); // Get the list of items directly
 
+        filteredList = new ArrayList<>();
         adapter = new SearchAdapter(filteredList);
         searchResults.setLayoutManager(new LinearLayoutManager(this));
         searchResults.setAdapter(adapter);
@@ -59,32 +55,32 @@ public class SearchActivity extends AppCompatActivity {
         graphicMenu.setVisibility(View.VISIBLE);
         captionTag.setVisibility(View.VISIBLE);
 
-        // Add a TextWatcher to the search input
         searchText.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                // No action needed
-            }
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 filter(s.toString());
                 if (s.length() > 0) {
                     graphicMenu.setVisibility(View.GONE);
-                    captionTag.setVisibility(View.GONE); // Hide ImageView
+                    captionTag.setVisibility(View.GONE);
                 } else {
                     graphicMenu.setVisibility(View.VISIBLE);
-                    captionTag.setVisibility(View.VISIBLE); // Show ImageView if no input
+                    captionTag.setVisibility(View.VISIBLE);
                 }
             }
 
             @Override
-            public void afterTextChanged(Editable s) {
-                // No action needed
-            }
+            public void afterTextChanged(Editable s) {}
+        });
+
+        adapter.setOnItemClickListener(id -> {
+            Intent intent = new Intent(SearchActivity.this, DisplayActivity.class);
+            intent.putExtra("ITEM_ID", id); // Send item ID
+            startActivity(intent);
         });
     }
-
 
     private void filter(String text) {
         if (filteredList == null) {
@@ -95,9 +91,19 @@ public class SearchActivity extends AppCompatActivity {
         if (text.isEmpty()) {
             searchResults.setVisibility(View.GONE); // Hide the RecyclerView when input is empty
         } else {
-            for (String item : itemList) {
-                if (item.toLowerCase().contains(text.toLowerCase())) {
-                    filteredList.add(item);
+            for (Item item : itemList) {
+                if (item.getName().toLowerCase().contains(text.toLowerCase())) {
+                    // Add item to filtered list, passing all required parameters
+                    filteredList.add(new Item(
+                            item.getId(),
+                            item.getName(),
+                            item.getImageResourceName(),
+                            item.getFatContent(),
+                            item.getCalories(),
+                            item.getProteinContent(),
+                            item.getDescription(),
+                            item.getIngredients()
+                    ));
                 }
             }
             // Show the RecyclerView if there are results
@@ -109,6 +115,5 @@ public class SearchActivity extends AppCompatActivity {
         }
         adapter.notifyDataSetChanged(); // Notify the adapter to refresh the list
     }
-
-
 }
+

@@ -64,20 +64,21 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/listResults"
-        android:layout_width="312dp"
-        android:layout_height="354dp"
-        android:layout_marginStart="68dp"
-        android:layout_marginTop="52dp"
-        android:textAlignment="center"
-        android:padding="16dp"
-        app:layout_constraintStart_toStartOf="parent"
-        android:scrollbarThumbVertical="@drawable/scrollbar_thumb"
-        android:scrollbarTrackVertical="@drawable/scrollbar_track"
+        android:layout_width="0dp"
+    android:layout_height="0dp"
+    android:layout_marginStart="68dp"
+    android:layout_marginTop="52dp"
+    android:padding="16dp"
+    android:scrollbarThumbVertical="@drawable/scrollbar_thumb"
+    android:scrollbarTrackVertical="@drawable/scrollbar_track"
+    android:scrollbars="vertical"
+    android:textAlignment="center"
+    android:visibility="visible"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toBottomOf="@+id/searchText"
+    app:layout_constraintEnd_toEndOf="parent"
+    />
 
-        android:scrollbars="vertical"
-        android:visibility="visible"
-
-        app:layout_constraintTop_toBottomOf="@+id/searchText" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="412dp"

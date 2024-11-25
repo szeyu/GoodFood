@@ -5,7 +5,6 @@
     android:layout_height="match_parent"
     android:background="#FFFFFF">
 
-    <!-- Title TextView -->
     <TextView
         android:id="@+id/searchTitle"
         android:layout_width="226dp"
@@ -18,13 +17,12 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- Search Text Field -->
     <EditText
         android:id="@+id/searchText"
         android:layout_width="295dp"
         android:layout_height="49dp"
         android:layout_marginStart="56dp"
-        android:layout_marginTop="128dp"
+        android:layout_marginTop="72dp"
         android:background="@drawable/search_box_background"
         android:ems="10"
         android:fontFamily="@font/poppins"
@@ -36,9 +34,8 @@
         android:textColorHint="#898787"
         android:textSize="12sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/searchTitle" />
 
-    <!-- Caption TextView -->
     <TextView
         android:id="@+id/captionTag"
         android:layout_width="wrap_content"
@@ -49,9 +46,8 @@
         android:text="What's Cooking?"
         android:textColor="#898888"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/graphicMenu" />
+        app:layout_constraintTop_toBottomOf="@id/graphicMenu" />
 
-    <!-- Image for Graphic -->
     <ImageView
         android:id="@+id/graphicMenu"
         android:layout_width="238dp"
@@ -64,24 +60,21 @@
         app:layout_constraintVertical_bias="0.498"
         app:srcCompat="@drawable/eating_healthy_food_cuate_1" />
 
-
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/searchResults"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginStart="4dp"
-        android:layout_marginTop="60dp"
-        android:background="@color/white"
-        android:clipToPadding="false"
-        android:elevation="4dp"
+        android:id="@+id/listResults"
+        android:layout_width="312dp"
+        android:layout_height="354dp"
+        android:layout_marginStart="68dp"
+        android:layout_marginTop="52dp"
+        android:textAlignment="center"
         android:padding="16dp"
-        android:scrollbars="vertical"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        android:scrollbarThumbVertical="@drawable/scrollbar_thumb"
+        android:scrollbarTrackVertical="@drawable/scrollbar_track"
+        android:scrollbars="vertical"
+        android:visibility="visible"
         app:layout_constraintTop_toBottomOf="@+id/searchText" />
 
-    <!-- Bottom navigation bar -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="412dp"
         android:layout_height="92dp"
@@ -90,7 +83,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
-        <!-- Profile Button -->
         <ImageButton
             android:id="@+id/imageButton6"
             android:layout_width="wrap_content"
@@ -104,7 +96,6 @@
             app:layout_constraintVertical_bias="0.512"
             app:srcCompat="@drawable/profile" />
 
-        <!-- Camera Button -->
         <ImageButton
             android:id="@+id/imageButton4"
             android:layout_width="62dp"
@@ -118,7 +109,6 @@
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/camera" />
 
-        <!-- Home Button -->
         <ImageButton
             android:id="@+id/HomeButton"
             android:layout_width="wrap_content"
@@ -126,6 +116,7 @@
             android:layout_marginStart="52dp"
             android:layout_marginTop="21dp"
             android:backgroundTint="#09FFFFFF"
+            android:contentDescription="homeButton"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"

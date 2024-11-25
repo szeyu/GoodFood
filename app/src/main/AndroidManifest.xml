@@ -15,6 +15,11 @@
         <activity
             android:name=".SearchActivity"
             android:exported="true" />
+        <activity android:name=".DisplayActivity"
+            android:exported="true">
+            <!-- You can add any additional configurations if needed -->
+        </activity>
+
         <activity
             android:name=".MainActivity"
             android:exported="true">
