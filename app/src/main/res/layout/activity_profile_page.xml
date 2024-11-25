@@ -8,7 +8,7 @@
     tools:context=".ProfilePage">
 
     <Button
-        android:id="@+id/button4"
+        android:id="@+id/BtnHistory"
         android:layout_width="72dp"
         android:layout_height="48dp"
         android:layout_marginTop="12dp"
@@ -16,12 +16,12 @@
         android:text=">"
         android:textColor="#4E4C4C"
         android:textSize="24sp"
-        app:layout_constraintStart_toStartOf="@+id/button"
-        app:layout_constraintTop_toBottomOf="@+id/button"
+        app:layout_constraintStart_toStartOf="@+id/BtnEditProfile"
+        app:layout_constraintTop_toBottomOf="@+id/BtnEditProfile"
         app:rippleColor="#615D5D" />
 
     <Button
-        android:id="@+id/button5"
+        android:id="@+id/BtnSettings"
         android:layout_width="72dp"
         android:layout_height="48dp"
         android:layout_marginTop="12dp"
@@ -29,12 +29,12 @@
         android:text=">"
         android:textColor="#4E4C4C"
         android:textSize="24sp"
-        app:layout_constraintStart_toStartOf="@+id/button4"
-        app:layout_constraintTop_toBottomOf="@+id/button4"
+        app:layout_constraintStart_toStartOf="@+id/BtnHistory"
+        app:layout_constraintTop_toBottomOf="@+id/BtnHistory"
         app:rippleColor="#615D5D" />
 
     <Button
-        android:id="@+id/button6"
+        android:id="@+id/BtnPrivacyPolicy"
         android:layout_width="72dp"
         android:layout_height="48dp"
         android:layout_marginTop="12dp"
@@ -42,8 +42,8 @@
         android:text=">"
         android:textColor="#4E4C4C"
         android:textSize="24sp"
-        app:layout_constraintStart_toStartOf="@+id/button5"
-        app:layout_constraintTop_toBottomOf="@+id/button5"
+        app:layout_constraintStart_toStartOf="@+id/BtnSettings"
+        app:layout_constraintTop_toBottomOf="@+id/BtnSettings"
         app:rippleColor="#615D5D" />
 
     <ImageButton
@@ -82,16 +82,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:srcCompat="@drawable/profile_icon_bnw" />
 
-    <ImageView
-        android:id="@+id/IVProfilePicture"
-        android:layout_width="180dp"
-        android:layout_height="174dp"
-        android:layout_marginTop="12dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/TVProfile"
-        app:srcCompat="@drawable/profile_circle" />
-
     <TextView
         android:id="@+id/TVProfile"
         android:layout_width="wrap_content"
@@ -108,13 +98,13 @@
         android:id="@+id/TVName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="10dp"
         android:fontFamily="@font/poppins_semibold"
-        android:text="Shum Joan"
+        android:text="John Doe"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/IVProfilePicture" />
+        app:layout_constraintTop_toBottomOf="@+id/IVProfile" />
 
     <ImageView
         android:id="@+id/IVSetting"
@@ -219,7 +209,7 @@
         app:layout_constraintTop_toBottomOf="@+id/TVPolicy" />
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/BtnEditProfile"
         android:layout_width="72dp"
         android:layout_height="48dp"
         android:layout_marginStart="88dp"
@@ -233,7 +223,7 @@
         app:rippleColor="#615D5D" />
 
     <Button
-        android:id="@+id/button2"
+        android:id="@+id/BtnLogout"
         android:layout_width="72dp"
         android:layout_height="48dp"
         android:layout_marginTop="12dp"
@@ -241,8 +231,18 @@
         android:text=">"
         android:textColor="#4E4C4C"
         android:textSize="24sp"
-        app:layout_constraintStart_toStartOf="@+id/button6"
-        app:layout_constraintTop_toBottomOf="@+id/button6"
+        app:layout_constraintStart_toStartOf="@+id/BtnPrivacyPolicy"
+        app:layout_constraintTop_toBottomOf="@+id/BtnPrivacyPolicy"
         app:rippleColor="#615D5D" />
+
+    <ImageView
+        android:id="@+id/IVProfile"
+        android:layout_width="172dp"
+        android:layout_height="172dp"
+        android:layout_marginTop="12dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/TVProfile"
+        app:srcCompat="@drawable/profile_pic_circle" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
