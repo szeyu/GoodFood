@@ -1,4 +1,14 @@
 <resources>
     <string name="app_name">GoodFood</string>
     <string name="appName">GOODFOOD</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="dashboardThisMonthTitle">This Month</string>
+    <string name="dashboardTodayTitle">Today</string>
+    <string name="calorieIntakeText">Calorie Intake</string>
+    <string name="nutrientIntakeText">Nutrient Intake</string>
+    <string name="mealHistoryText">Meal History</string>
+    <string name="popularMealsText">Popular Meals</string>
+    <string name="name">Name</string>
+    <string name="calories">Calories</string>
 </resources>
