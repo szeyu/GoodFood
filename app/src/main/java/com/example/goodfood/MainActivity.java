@@ -7,38 +7,29 @@ import android.widget.ImageButton;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
-import android.content.Intent;
-import android.os.Bundle;
-import android.view.View;
-import android.widget.ImageButton;
-
-import androidx.activity.EdgeToEdge;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 public class MainActivity extends AppCompatActivity {
+
+    private ImageButton homeButton;
+    private ImageButton cameraButton;
+    private ImageButton profileButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
-
-        // Find the searchButton by ID and set an OnClickListener
-        ImageButton searchButton = findViewById(R.id.searchButton);
-        searchButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Open the SearchActivity when searchButton is clicked
-                Intent intent = new Intent(MainActivity.this, SearchActivity.class);
-                startActivity(intent);
-            }
-        });
     }
 
+    public void toTodayStats(View view) {
+        Intent intent = new Intent(this, DashboardActivity.class);
+        intent.putExtra("code", "today");
+        startActivity(intent);
     }
+
+    public void toThisMonthStats (View view) {
+        Intent intent = new Intent(this, DashboardActivity.class);
+        intent.putExtra("code", "month");
+        startActivity(intent);
+    }
+}
