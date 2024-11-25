@@ -16,6 +16,9 @@
         android:theme="@style/Theme.GoodFood"
         tools:targetApi="31">
         <activity
+            android:name=".DashboardActivity"
+            android:exported="false" />
+        <activity
             android:name=".FoodScanner"
             android:exported="false" />
         <activity
