@@ -1,4 +1,4 @@
-package com.example.goodfood;
+package com.hmir.goodfood;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -29,11 +29,11 @@ import com.github.mikephil.charting.formatter.ValueFormatter;
 
 import java.util.ArrayList;
 
-public class ThisMonthFragment extends Fragment {
+public class TodayFragment extends Fragment {
 
-    private BarChart thisMonthBarChart;
+    private BarChart todayBarChart;
 
-    private LinearLayout popularMealsLinearLayout;
+    private LinearLayout mealHistoryLinearLayout;
 
     private ImageButton nutrientIntakeInfoButton;
 
@@ -42,11 +42,11 @@ public class ThisMonthFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
 
-        View view = inflater.inflate(R.layout.fragment_this_month, container, false);
+        View view = inflater.inflate(R.layout.fragment_today, container, false);
 
-        thisMonthBarChart = view.findViewById(R.id.thisMonthBarChart);
-        popularMealsLinearLayout = view.findViewById(R.id.thisMonthPopularMealsLinearLayout);
-        nutrientIntakeInfoButton = view.findViewById(R.id.thisMonthNutrientIntakeInfoButton);
+        todayBarChart = view.findViewById(R.id.todayBarChart);
+        mealHistoryLinearLayout = view.findViewById(R.id.todayMealHistoryLinearLayout);
+        nutrientIntakeInfoButton = view.findViewById(R.id.todayNutrientIntakeInfoButton);
 
         // listener for nutrient intake info button
         nutrientIntakeInfoButton.setOnClickListener(new View.OnClickListener() {
@@ -56,21 +56,20 @@ public class ThisMonthFragment extends Fragment {
             }
         });
 
-        // Calculate average calories
-        int totalCalories = 28500;
-        int caloriesSuggested = 30000;
-        int average = totalCalories / 30;
+        int caloriesTaken = 800;
+        int caloriesSuggested = 1000;
 
-        int percentage = (int) ((double) totalCalories / caloriesSuggested * 100);
+        // Calculate percentage
+        int percentage = (int) ((double) caloriesTaken / caloriesSuggested * 100);
 
         // Update ProgressBar and TextViews
-        ProgressBar progressBar = view.findViewById(R.id.thisMonthProgressBar);
-        TextView avgCalText = view.findViewById(R.id.thisMonthAvgCalText);
-        TextView calorieText = view.findViewById(R.id.thisMonthCalorieText);
+        ProgressBar progressBar = view.findViewById(R.id.todayProgressBar);
+        TextView percentageText = view.findViewById(R.id.todayPercentageText);
+        TextView calorieText = view.findViewById(R.id.todayCalorieText);
 
         progressBar.setProgress(percentage);
-        avgCalText.setText(Integer.toString(average));
-        calorieText.setText(totalCalories + " / " + caloriesSuggested + " cal");
+        percentageText.setText(Integer.toString(percentage));
+        calorieText.setText(caloriesTaken + " / " + caloriesSuggested + " cal");
 
         // Create an ArrayList with simulated nutrients data
         ArrayList<Nutrient> nutrients = new ArrayList<>();
@@ -93,7 +92,7 @@ public class ThisMonthFragment extends Fragment {
         LayoutInflater inflaterMeal = LayoutInflater.from(getContext());
         for (Meal meal : meals) {
             // Inflate each meal item layout
-            View mealView = inflaterMeal.inflate(R.layout.meal_item, popularMealsLinearLayout, false);
+            View mealView = inflaterMeal.inflate(R.layout.meal_item, mealHistoryLinearLayout, false);
 
             // Set the meal's name and calories dynamically
             TextView mealName = mealView.findViewById(R.id.meal_name);
@@ -103,7 +102,7 @@ public class ThisMonthFragment extends Fragment {
             mealCalories.setText(meal.getCalories() + " kcal");
 
             // Add the inflated view to the meal container
-            popularMealsLinearLayout.addView(mealView);
+            mealHistoryLinearLayout.addView(mealView);
         }
 
         // Set up the chart
@@ -116,7 +115,7 @@ public class ThisMonthFragment extends Fragment {
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(requireContext());
         alertDialog.setTitle("Chart Colour Indicator")
                 .setMessage(String.format("For each bar groups:\n%s: Your Recorded Intake\n - %s: Under suggested amount\n" +
-                                " - %s: Over suggested amount\n\n%s: Recommended Intake\n - %s: Suggested amount\n",
+                        " - %s: Over suggested amount\n\n%s: Recommended Intake\n - %s: Suggested amount\n",
                         "Left Bar","Yellow","Red","Right Bar","Orange"))
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
@@ -187,39 +186,39 @@ public class ThisMonthFragment extends Fragment {
 
         BarData data = new BarData(takenDataSet, suggestedDataSet);
         data.setBarWidth(barWidth);
-        thisMonthBarChart.setData(data);
-        thisMonthBarChart.setVisibleXRangeMaximum(3);
+        todayBarChart.setData(data);
+        todayBarChart.setVisibleXRangeMaximum(3);
 
-        XAxis xAxis = thisMonthBarChart.getXAxis();
+        XAxis xAxis = todayBarChart.getXAxis();
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         xAxis.setCenterAxisLabels(true);
         xAxis.setGranularity(1f);
         xAxis.setGranularityEnabled(true);
         xAxis.setAxisMinimum(0);
-        xAxis.setAxisMaximum(0 + thisMonthBarChart.getBarData().getGroupWidth(groupSpace, barSpace) * nutrients.size());
+        xAxis.setAxisMaximum(0 + todayBarChart.getBarData().getGroupWidth(groupSpace, barSpace) * nutrients.size());
         xAxis.setValueFormatter(new IndexAxisValueFormatter(nutrientLabels));
         xAxis.setDrawGridLines(false);
         xAxis.setTypeface(customFont);
 
-        thisMonthBarChart.groupBars(0, groupSpace, barSpace);
+        todayBarChart.groupBars(0, groupSpace, barSpace);
 
         // Y-Axis customization
-        YAxis leftAxis = thisMonthBarChart.getAxisLeft();
+        YAxis leftAxis = todayBarChart.getAxisLeft();
         leftAxis.setAxisMinimum(0f);
         leftAxis.setDrawGridLines(false);
         leftAxis.setTypeface(customFont);
-        thisMonthBarChart.getAxisRight().setEnabled(false);
-        thisMonthBarChart.getLegend().setEnabled(false);
+        todayBarChart.getAxisRight().setEnabled(false);
+        todayBarChart.getLegend().setEnabled(false);
 
-        thisMonthBarChart.setDragEnabled(true);
-        thisMonthBarChart.setExtraRightOffset(12f);
-        thisMonthBarChart.setExtraLeftOffset(12f);
-        thisMonthBarChart.setExtraBottomOffset(20f);
-        thisMonthBarChart.getDescription().setEnabled(false);
+        todayBarChart.setDragEnabled(true);
+        todayBarChart.setExtraRightOffset(12f);
+        todayBarChart.setExtraLeftOffset(12f);
+        todayBarChart.setExtraBottomOffset(20f);
+        todayBarChart.getDescription().setEnabled(false);
 
-        RoundedBarChart render = new RoundedBarChart(thisMonthBarChart, thisMonthBarChart.getAnimator(), thisMonthBarChart.getViewPortHandler());
+        RoundedBarChart render = new RoundedBarChart(todayBarChart, todayBarChart.getAnimator(), todayBarChart.getViewPortHandler());
         render.setmRadius(20);
-        thisMonthBarChart.setRenderer(render);
-        thisMonthBarChart.invalidate();
+        todayBarChart.setRenderer(render);
+        todayBarChart.invalidate();
     }
 }

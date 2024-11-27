@@ -1,4 +1,4 @@
-package com.example.goodfood.models;
+package com.hmir.goodfood.models;
 
 public class ExtractRequest {
     private String image_data;

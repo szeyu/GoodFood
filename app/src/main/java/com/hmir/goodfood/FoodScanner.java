@@ -1,4 +1,4 @@
-package com.example.goodfood;
+package com.hmir.goodfood;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -26,8 +26,8 @@ import androidx.activity.EdgeToEdge;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.goodfood.models.ExtractRequest;
-import com.example.goodfood.services.IngredientService;
+import com.hmir.goodfood.models.ExtractRequest;
+import com.hmir.goodfood.services.IngredientService;
 
 public class FoodScanner extends AppCompatActivity {
     private static final int REQUEST_CODE = 22;
