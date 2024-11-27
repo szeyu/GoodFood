@@ -1,6 +1,6 @@
-package com.example.goodfood.services;
+package com.hmir.goodfood.services;
 
-import com.example.goodfood.models.ExtractRequest;
+import com.hmir.goodfood.models.ExtractRequest;
 
 import retrofit2.Call;
 import retrofit2.http.Body;

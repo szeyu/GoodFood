@@ -211,7 +211,7 @@
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragmentContainerView3"
-        android:name="com.example.goodfood.BottomNavigationFragment"
+        android:name="com.hmir.goodfood.BottomNavigationFragment"
         android:layout_width="410dp"
         android:layout_height="93dp"
         app:layout_constraintBottom_toBottomOf="parent"
