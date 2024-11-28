@@ -3,11 +3,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.goodfood"
+    namespace = "com.hmir.goodfood"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.goodfood"
+        applicationId = "com.hmir.goodfood"
         minSdk = 24
         targetSdk = 34
         versionCode = 1

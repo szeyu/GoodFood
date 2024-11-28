@@ -1,4 +1,4 @@
-package com.example.goodfood;
+package com.hmir.goodfood;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -37,7 +37,7 @@ public class BottomNavigationFragment extends Fragment {
             } else if (item.getItemId() == R.id.nav_camera) {
                 targetActivity = FoodScanner.class;
             } else if (item.getItemId() == R.id.nav_profile) {
-                targetActivity = null;
+                targetActivity = ProfilePage.class;
             }
 
             if(targetActivity != null && getActivity() != null && !getActivity().getClass().equals(targetActivity)){

@@ -1,19 +1,13 @@
-package com.example.goodfood;
+package com.hmir.goodfood;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.viewpager2.widget.ViewPager2;
 
 public class DashboardActivity extends AppCompatActivity {
 

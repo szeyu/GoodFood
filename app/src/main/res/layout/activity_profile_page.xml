@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ProfilePage">
+
+    <Button
+        android:id="@+id/BtnHistory"
+        android:layout_width="72dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="12dp"
+        android:backgroundTint="#FDFBFB"
+        android:text=">"
+        android:textColor="#4E4C4C"
+        android:textSize="24sp"
+        app:layout_constraintStart_toStartOf="@+id/BtnEditProfile"
+        app:layout_constraintTop_toBottomOf="@+id/BtnEditProfile"
+        app:rippleColor="#615D5D" />
+
+    <Button
+        android:id="@+id/BtnSettings"
+        android:layout_width="72dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="12dp"
+        android:backgroundTint="#FDFBFB"
+        android:text=">"
+        android:textColor="#4E4C4C"
+        android:textSize="24sp"
+        app:layout_constraintStart_toStartOf="@+id/BtnHistory"
+        app:layout_constraintTop_toBottomOf="@+id/BtnHistory"
+        app:rippleColor="#615D5D" />
+
+    <Button
+        android:id="@+id/BtnPrivacyPolicy"
+        android:layout_width="72dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="12dp"
+        android:backgroundTint="#FDFBFB"
+        android:text=">"
+        android:textColor="#4E4C4C"
+        android:textSize="24sp"
+        app:layout_constraintStart_toStartOf="@+id/BtnSettings"
+        app:layout_constraintTop_toBottomOf="@+id/BtnSettings"
+        app:rippleColor="#615D5D" />
+
+    <TextView
+        android:id="@+id/TVProfile"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:fontFamily="@font/poppins_semibold"
+        android:text="Profile"
+        android:textSize="30sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/TVName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:fontFamily="@font/poppins_semibold"
+        android:text="John Doe"
+        android:textSize="24sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/IVProfile" />
+
+    <ImageView
+        android:id="@+id/IVSetting"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        app:layout_constraintStart_toStartOf="@+id/IVHistory"
+        app:layout_constraintTop_toBottomOf="@+id/IVHistory"
+        app:srcCompat="@drawable/setting_icon" />
+
+    <ImageView
+        android:id="@+id/IVHistory"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        app:layout_constraintStart_toStartOf="@+id/IVEditProfile"
+        app:layout_constraintTop_toBottomOf="@+id/IVEditProfile"
+        app:srcCompat="@drawable/history_icon" />
+
+    <ImageView
+        android:id="@+id/IVPolicy"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        app:layout_constraintStart_toStartOf="@+id/IVSetting"
+        app:layout_constraintTop_toBottomOf="@+id/IVSetting"
+        app:srcCompat="@drawable/policy_icon" />
+
+    <ImageView
+        android:id="@+id/IVLogout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="9dp"
+        app:layout_constraintStart_toStartOf="@+id/IVPolicy"
+        app:layout_constraintTop_toBottomOf="@+id/IVPolicy"
+        app:srcCompat="@drawable/logout_icon" />
+
+    <ImageView
+        android:id="@+id/IVEditProfile"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="12dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/TVName"
+        app:srcCompat="@drawable/profile_icon" />
+
+    <TextView
+        android:id="@+id/TVEditProfile"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="28dp"
+        android:layout_marginTop="20dp"
+        android:fontFamily="@font/poppins_medium"
+        android:text="Edit Profile"
+        android:textSize="20sp"
+        app:layout_constraintStart_toEndOf="@+id/IVEditProfile"
+        app:layout_constraintTop_toBottomOf="@+id/TVName" />
+
+    <TextView
+        android:id="@+id/TVHistory"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="28dp"
+        android:fontFamily="@font/poppins_medium"
+        android:text="History"
+        android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="@+id/TVEditProfile"
+        app:layout_constraintTop_toBottomOf="@+id/TVEditProfile" />
+
+    <TextView
+        android:id="@+id/TVSetting"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:fontFamily="@font/poppins_medium"
+        android:text="Settings"
+        android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="@+id/TVHistory"
+        app:layout_constraintTop_toBottomOf="@+id/TVHistory" />
+
+    <TextView
+        android:id="@+id/TVPolicy"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="28dp"
+        android:fontFamily="@font/poppins_medium"
+        android:text="Privacy Policy"
+        android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="@+id/TVSetting"
+        app:layout_constraintTop_toBottomOf="@+id/TVSetting" />
+
+    <TextView
+        android:id="@+id/TVLogout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:fontFamily="@font/poppins_medium"
+        android:text="Log Out"
+        android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="@+id/TVPolicy"
+        app:layout_constraintTop_toBottomOf="@+id/TVPolicy" />
+
+    <Button
+        android:id="@+id/BtnEditProfile"
+        android:layout_width="72dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="88dp"
+        android:layout_marginTop="12dp"
+        android:backgroundTint="#FDFBFB"
+        android:text=">"
+        android:textColor="#4E4C4C"
+        android:textSize="24sp"
+        app:layout_constraintStart_toEndOf="@+id/TVEditProfile"
+        app:layout_constraintTop_toBottomOf="@+id/TVName"
+        app:rippleColor="#615D5D" />
+
+    <Button
+        android:id="@+id/BtnLogout"
+        android:layout_width="72dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="12dp"
+        android:backgroundTint="#FDFBFB"
+        android:text=">"
+        android:textColor="#4E4C4C"
+        android:textSize="24sp"
+        app:layout_constraintStart_toStartOf="@+id/BtnPrivacyPolicy"
+        app:layout_constraintTop_toBottomOf="@+id/BtnPrivacyPolicy"
+        app:rippleColor="#615D5D" />
+
+    <ImageView
+        android:id="@+id/IVProfile"
+        android:layout_width="172dp"
+        android:layout_height="172dp"
+        android:layout_marginTop="12dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/TVProfile"
+        app:srcCompat="@drawable/profile_pic_circle" />
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/fragmentContainerView3"
+        android:name="com.hmir.goodfood.BottomNavigationFragment"
+        android:layout_width="410dp"
+        android:layout_height="93dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
