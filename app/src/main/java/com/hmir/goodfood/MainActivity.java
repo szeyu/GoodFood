@@ -3,6 +3,7 @@ import android.content.Intent;
 
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ImageButton;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,6 +15,17 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
+        ImageButton searchButton = findViewById(R.id.searchButton);
+
+        // Set OnClickListener for the search button
+        searchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Intent to navigate to SearchActivity
+                Intent intent = new Intent(com.hmir.goodfood.MainActivity.this, SearchActivity.class);
+                startActivity(intent);
+            }
+        });
 
     }
 

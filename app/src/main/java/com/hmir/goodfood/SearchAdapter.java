@@ -1,4 +1,4 @@
-package com.example.goodfood;
+package com.hmir.goodfood;
 
 import android.content.Intent;
 import android.view.LayoutInflater;

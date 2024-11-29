@@ -1,4 +1,4 @@
-package com.example.goodfood;
+package com.hmir.goodfood;
 
 import android.content.Intent;
 import android.database.Cursor;
@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -34,6 +35,9 @@ public class SearchActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.search_page);
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         searchText = findViewById(R.id.searchText);
         searchResults = findViewById(R.id.listResults);
@@ -113,7 +117,19 @@ public class SearchActivity extends AppCompatActivity {
                 searchResults.setVisibility(View.VISIBLE); // Show if there are results
             }
         }
-        adapter.notifyDataSetChanged(); // Notify the adapter to refresh the list
+        adapter.notifyDataSetChanged();
+
+    }
+    @Override
+    public boolean onOptionsItemSelected(android.view.MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                // Handle back button click
+                onBackPressed();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 }
 

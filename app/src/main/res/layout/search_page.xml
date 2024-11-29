@@ -5,6 +5,18 @@
     android:layout_height="match_parent"
     android:background="#FFFFFF">
 
+    <!-- Toolbar -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:titleTextColor="@android:color/white"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+        app:title="" />
+
     <TextView
         android:id="@+id/searchTitle"
         android:layout_width="226dp"
@@ -75,53 +87,13 @@
         android:visibility="visible"
         app:layout_constraintTop_toBottomOf="@+id/searchText" />
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="412dp"
-        android:layout_height="92dp"
-        android:layout_marginBottom="1dp"
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/fragmentContainerView"
+        android:name="com.hmir.goodfood.BottomNavigationFragment"
+        android:layout_width="match_parent"
+        android:layout_height="93dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
-
-        <ImageButton
-            android:id="@+id/imageButton6"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="316dp"
-            android:backgroundTint="#00FFFFFF"
-            android:contentDescription="homebutton"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.512"
-            app:srcCompat="@drawable/profile" />
-
-        <ImageButton
-            android:id="@+id/imageButton4"
-            android:layout_width="62dp"
-            android:layout_height="69dp"
-            android:layout_marginTop="12dp"
-            android:backgroundTint="#00FFFFFF"
-            android:contentDescription="cameraIcon"
-            android:scaleType="center"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/camera" />
-
-        <ImageButton
-            android:id="@+id/HomeButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="52dp"
-            android:layout_marginTop="21dp"
-            android:backgroundTint="#09FFFFFF"
-            android:contentDescription="homeButton"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.0"
-            app:srcCompat="@drawable/home" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

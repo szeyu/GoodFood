@@ -1,4 +1,6 @@
-package com.example.goodfood;
+package com.hmir.goodfood;
+
+import com.hmir.goodfood.R;
 
 public class Item {
     private int id;
