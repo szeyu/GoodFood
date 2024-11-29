@@ -1,4 +1,4 @@
-package com.example.goodfood;
+package com.hmir.goodfood;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;

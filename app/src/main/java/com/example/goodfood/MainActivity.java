@@ -8,19 +8,22 @@ import android.widget.ImageButton;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.hmir.goodfood.DashboardActivity;
+import com.hmir.goodfood.R;
+import com.hmir.goodfood.SearchActivity;
+
 public class MainActivity extends AppCompatActivity {
 
     private ImageButton homeButton;
     private ImageButton cameraButton;
     private ImageButton profileButton;
-    private ImageButton searchButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
-        searchButton = findViewById(R.id.searchButton);
+        ImageButton searchButton = findViewById(R.id.searchButton);
 
         // Set OnClickListener for the search button
         searchButton.setOnClickListener(new View.OnClickListener() {

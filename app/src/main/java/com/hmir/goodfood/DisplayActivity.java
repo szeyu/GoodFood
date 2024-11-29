@@ -1,4 +1,4 @@
-package com.example.goodfood;
+package com.hmir.goodfood;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -9,12 +9,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import com.bumptech.glide.Glide;
+import com.hmir.goodfood.R;
 
 public class DisplayActivity extends AppCompatActivity {
 
     private TextView foodNameTextView, fatTextView, caloriesTextView, proteinTextView, descriptionTextView, ingredientsTextView;
     private ImageView foodImageView;
-    private DatabaseHelper dbHelper;
+    private com.hmir.goodfood.DatabaseHelper dbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

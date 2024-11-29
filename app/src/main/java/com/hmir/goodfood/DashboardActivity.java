@@ -9,6 +9,8 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.hmir.goodfood.R;
+
 public class DashboardActivity extends AppCompatActivity {
 
     @Override
