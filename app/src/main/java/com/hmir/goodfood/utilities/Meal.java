@@ -1,7 +1,7 @@
-package com.hmir.goodfood;
+package com.hmir.goodfood.utilities;
 
 public class Meal {
-    // Temporary meal class for data
+    // this class will be terminated at the final stage
     public String name;
     public int calories;
 
