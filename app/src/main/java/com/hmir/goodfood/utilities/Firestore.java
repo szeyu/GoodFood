@@ -7,8 +7,10 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.SetOptions;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -109,10 +111,62 @@ public class Firestore {
                 .addOnFailureListener(e -> Log.e("Firestore", "Error updating user info", e));
     }
 
+    // Add New User Info
+    public void addUserInfo(Map<String, Object> user) {
+        String email = (String) user.get("email");
+        if (email != null) {
+            user.remove("email");
+
+            Map<String, Object> defaultUser = new HashMap<>();
+            defaultUser.put("username", null);
+            defaultUser.put("age", null);
+            defaultUser.put("height", null);
+            defaultUser.put("weight", null);
+            defaultUser.put("health_label", null);
+
+            defaultUser.putAll(user);
+
+            db.collection("user")
+                    .document(email)
+                    .set(defaultUser, SetOptions.merge())
+                    .addOnSuccessListener(aVoid -> Log.d("Firestore", "User added with email as document ID"))
+                    .addOnFailureListener(e -> Log.e("Firestore", "Error adding user", e));
+        } else {
+            Log.e("Firestore", "Error: email is null");
+        }
+    }
+
+    // Delete User Record
+    public void deleteUserInfo(String email){
+        db.collection("user")
+                .document(email)
+                .delete()
+                .addOnSuccessListener(aVoid -> Log.d("Firestore", "User deleted"))
+                .addOnFailureListener(e -> Log.e("Firestore", "Error deleting user", e));
+    }
+
     // Add New Nutritional Record
     public void addNutritionalRecord(Map<String, Object> record) {
+        Map<String, Object> defaultRecord = new HashMap<>();
+        defaultRecord.put("calcium", null);
+        defaultRecord.put("calories", null);
+        defaultRecord.put("carbs", null);
+        defaultRecord.put("magnesium", null);
+        defaultRecord.put("cholesterol", null);
+        defaultRecord.put("dateTime", null);
+        defaultRecord.put("fat", null);
+        defaultRecord.put("image", null);
+        defaultRecord.put("ingredient", null);
+        defaultRecord.put("iron", null);
+        defaultRecord.put("potassium", null);
+        defaultRecord.put("protein",null);
+        defaultRecord.put("sodium", null);
+        defaultRecord.put("user_id", null);
+
+        defaultRecord.putAll(record);
+
         db.collection("nutritional_record")
-                .add(record)
+                .add(defaultRecord)
                 .addOnSuccessListener(documentReference -> Log.d("Firestore", "Nutritional record added"))
                 .addOnFailureListener(e -> Log.e("Firestore", "Error adding nutritional record", e));
     }
@@ -128,8 +182,26 @@ public class Firestore {
 
     // Add Favourite Recipe
     public void addFavouriteRecipe(Map<String, Object> recipe) {
+        Map<String, Object> defaultRecipe = new HashMap<>();
+        defaultRecipe.put("calcium", null);
+        defaultRecipe.put("calories", null);
+        defaultRecipe.put("carbs", null);
+        defaultRecipe.put("name", null);
+        defaultRecipe.put("magnesium", null);
+        defaultRecipe.put("cholesterol", null);
+        defaultRecipe.put("diet_label", null);
+        defaultRecipe.put("fat", null);
+        defaultRecipe.put("image", null);
+        defaultRecipe.put("servings", null);
+        defaultRecipe.put("iron", null);
+        defaultRecipe.put("potassium", null);
+        defaultRecipe.put("protein",null);
+        defaultRecipe.put("sodium", null);
+        defaultRecipe.put("user_id", null);
+
+        defaultRecipe.putAll(recipe);
         db.collection("favourite_recipe")
-                .add(recipe)
+                .add(defaultRecipe)
                 .addOnSuccessListener(documentReference -> Log.d("Firestore", "Favourite recipe added"))
                 .addOnFailureListener(e -> Log.e("Firestore", "Error adding favourite recipe", e));
     }

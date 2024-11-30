@@ -54,29 +54,30 @@ public class MainActivity extends AppCompatActivity {
             Log.e("Firestore", "Error fetching nutritional records", e);
         });
 
-        String username = "John Doe";
         List<String> healthLabel = new ArrayList<>();
+        healthLabel.add("pescatarian");
         healthLabel.add("halal");
-        healthLabel.add("lactose intolerant");
-        long age = 25;
-        long height = 185;
-        long weight = 70;
+        Map<String, Object> user = new HashMap<>();
+        user.put("username", "test");
+        user.put("health_label", healthLabel);
+        user.put("age", 30);
+        user.put("email","test1@gmail.com");
 
-        firestore.updateUserInfo(username, healthLabel, age, height, weight);
+        firestore.addUserInfo(user);
 
-        Map<String, Object> favouriteRecipe = new HashMap<>();
-        favouriteRecipe.put("user_id", "test2@gmail.com");
-        favouriteRecipe.put("recipe_name", "Banana Pancakes");
-        favouriteRecipe.put("calories", 200);
-        List<String> ingredients = new ArrayList<>();
-        ingredients.add("Flour");
-        ingredients.add("Almond Milk");
-        ingredients.add("Banana");
-        favouriteRecipe.put("ingredients", ingredients);
-
-        firestore.addFavouriteRecipe(favouriteRecipe);
-
-        firestore.deleteFavouriteRecipe("6OqV4Vo7uAglO2UrYnIX");
+//        Map<String, Object> favouriteRecipe = new HashMap<>();
+//        favouriteRecipe.put("user_id", "test2@gmail.com");
+//        favouriteRecipe.put("recipe_name", "Banana Pancakes");
+//        favouriteRecipe.put("calories", 200);
+//        List<String> ingredients = new ArrayList<>();
+//        ingredients.add("Flour");
+//        ingredients.add("Almond Milk");
+//        ingredients.add("Banana");
+//        favouriteRecipe.put("ingredients", ingredients);
+//
+//        firestore.addFavouriteRecipe(favouriteRecipe);
+//
+//        firestore.deleteFavouriteRecipe("6OqV4Vo7uAglO2UrYnIX");
     }
 
         public void toTodayStats(View view){
