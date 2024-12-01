@@ -8,51 +8,41 @@
 
     <application
         android:allowBackup="true"
-        android:networkSecurityConfig="@xml/network_security_config"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/full_logo_round"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:networkSecurityConfig="@xml/network_security_config"
+        android:roundIcon="@mipmap/full_logo_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.GoodFood"
         tools:targetApi="31">
-        <activity
-            android:name=".ProfilePage"
-            android:exported="false" />
-        <activity
-            android:name=".DashboardActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ExtractIngredient"
-            android:exported="false" />
-        <activity
-            android:name=".Calories"
-            android:exported="false" />
-        <activity
-            android:name=".DisplayActivity"
-            android:exported="false" />
-        <activity
-            android:name=".SearchActivity"
-            android:exported="false" />
-        <activity
-            android:name=".FoodScanner"
-            android:exported="false" />
-        <activity
-            android:name=".TipsActivity"
-            android:exported="false" />
-        <activity
-            android:name=".MainActivity"
-            android:exported="false" />
+
+        <!-- Other activities -->
+        <activity android:name=".HomePage" android:exported="false" />
+        <activity android:name=".LoginPage" android:exported="false" />
+        <activity android:name=".ProfilePage" android:exported="false" />
+        <activity android:name=".DashboardActivity" android:exported="false" />
+        <activity android:name=".ExtractIngredient" android:exported="false" />
+        <activity android:name=".Calories" android:exported="false" />
+        <activity android:name=".DisplayActivity" android:exported="false" />
+        <activity android:name=".SearchActivity" android:windowSoftInputMode="adjustPan" android:exported="false" />
+        <activity android:name=".FoodScanner" android:exported="false" />
+        <activity android:name=".TipsActivity" android:exported="false" />
+
+        <!-- SplashActivity is now the launcher activity -->
         <activity
             android:name=".SplashActivity"
+            android:theme="@style/SplashTheme"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- MainActivity should not have a launcher intent filter -->
+        <activity android:name=".MainActivity" android:exported="false" />
 
         <meta-data
             android:name="preloaded_fonts"
