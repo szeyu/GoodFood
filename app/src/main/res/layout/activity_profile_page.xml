@@ -192,6 +192,7 @@
         android:layout_height="48dp"
         android:layout_marginTop="12dp"
         android:backgroundTint="#FDFBFB"
+        android:onClick="logoutGoogle"
         android:text=">"
         android:textColor="#4E4C4C"
         android:textSize="24sp"
