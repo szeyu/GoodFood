@@ -6,40 +6,33 @@ import android.graphics.Color;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RoundRectShape;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.viewpager2.widget.ViewPager2;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class TipsActivity extends AppCompatActivity {
 
-    private ViewPager2 viewPager;
+    private RecyclerView recyclerView;
     private TipsAdapter adapter;
     private List<TipItem> tipsList;
-
-    private RecyclerView recyclerView;
-    private Handler autoScrollHandler = new Handler();
-    private Runnable autoScrollRunnable;
-    private int currentPosition = 0;  // Define currentPosition here
+    private Button buttonNext;
+    private int currentPosition = 0; // Track the current tip
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tips);
 
-
         recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        buttonNext = findViewById(R.id.getStartedButton);
 
         // Populate the tips list
         tipsList = new ArrayList<>();
@@ -47,20 +40,33 @@ public class TipsActivity extends AppCompatActivity {
         tipsList.add(new TipItem(R.drawable.tip2, "Healthy Recipes", "Browse thousands of healthy recipes from all over the world."));
         tipsList.add(new TipItem(R.drawable.tip3, "Track Your Health", "With amazing inbuilt tools you can track your progress."));
 
+        // Set up the adapter and attach to RecyclerView
         adapter = new TipsAdapter(this, tipsList);
         recyclerView.setAdapter(adapter);
-        recyclerView.scrollToPosition(0);
-        addDots(tipsList.size(), currentPosition);
-// Start auto-slide
-        startAutoSwipe();
 
-        // Set "Get Started" button listener
-        findViewById(R.id.getStartedButton).setOnClickListener(v -> {
-            Intent intent = new Intent(TipsActivity.this, MainActivity.class);
-            startActivity(intent);
-            finish();
+        // Initially update dots and button text
+        addDots(tipsList.size(), currentPosition);
+        updateButtonText();
+
+        // Button click listener
+        buttonNext.setOnClickListener(v -> {
+            if (currentPosition < tipsList.size() - 1) {
+                // Move to the next tip
+                currentPosition++;
+                recyclerView.smoothScrollToPosition(currentPosition);
+
+                // Update dots and button text
+                addDots(tipsList.size(), currentPosition);
+                updateButtonText();
+            } else {
+                // Last tip - navigate to the main activity
+                Intent intent = new Intent(TipsActivity.this, MainActivity.class);
+                startActivity(intent);
+                finish();
+            }
         });
-        // Add scroll listener to update the dots
+
+        // RecyclerView scroll listener to update dots on swipe
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -68,39 +74,19 @@ public class TipsActivity extends AppCompatActivity {
                 int position = ((LinearLayoutManager) recyclerView.getLayoutManager()).findFirstVisibleItemPosition();
                 if (position != currentPosition) {
                     currentPosition = position;
-                    addDots(tipsList.size(), currentPosition);  // Update dots when scrolling
+                    addDots(tipsList.size(), currentPosition);
+                    updateButtonText();
                 }
             }
         });
-
     }
 
-    private void startAutoSwipe() {
-        final Handler handler = new Handler();
-        final Runnable swipeRunnable = new Runnable() {
-            @Override
-            public void run() {
-                // Update the current position
-                currentPosition = (currentPosition + 1) % tipsList.size(); // Loop back to the first tip
-
-                // Smooth scroll to the new position
-                recyclerView.smoothScrollToPosition(currentPosition);
-
-                // Force the transition to swipe left-to-right
-                if (currentPosition == 0) {
-                    // Delay before resetting back to the first item, simulating a left-to-right effect
-                    handler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            recyclerView.scrollToPosition(0); // Reset to the first item instantly
-                        }
-                    }, 1500); // This delay can be adjusted
-                }
-
-                handler.postDelayed(this, 4000); // Change tip every 4 seconds
-            }
-        };
-        handler.post(swipeRunnable);
+    private void updateButtonText() {
+        if (currentPosition < tipsList.size() - 1) {
+            buttonNext.setText("Next");
+        } else {
+            buttonNext.setText("Get Started!");
+        }
     }
 
     private void addDots(int count, int currentIndex) {
@@ -112,7 +98,7 @@ public class TipsActivity extends AppCompatActivity {
         int activeDotHeight = 30; // Height of the active dot
         int inactiveDotWidth = 40;  // Width of the inactive dot
         int inactiveDotHeight = 20; // Height of the inactive dot
-        int dotMargin = 15; // Adjust margin between dots
+        int dotMargin = 15; // Margin between dots
 
         for (int i = 0; i < count; i++) {
             // Create a rounded rectangle shape
@@ -120,62 +106,49 @@ public class TipsActivity extends AppCompatActivity {
                     new float[] {20, 20, 20, 20, 20, 20, 20, 20}, // Rounded corners
                     null, null)); // Optional padding
 
-            // Set the background color based on whether it's the current index
+            // Set the color for active or inactive dots
             int color = (i == currentIndex) ? Color.parseColor("#FF5733") : Color.parseColor("#FFD8B3"); // Light orange for inactive
             dotShape.getPaint().setColor(color);
 
-            // Create a View to hold the shape
+            // Create a View for each dot
             View dotView = new View(this);
 
-            // Set the size based on whether it's active or inactive
-            final int startWidth = (i == currentIndex) ? inactiveDotWidth : activeDotWidth;
-            final int startHeight = (i == currentIndex) ? inactiveDotHeight : activeDotHeight;
-
-            dotView.setLayoutParams(new LinearLayout.LayoutParams(startWidth, startHeight));
+            // Set initial size based on active/inactive state
+            dotView.setLayoutParams(new LinearLayout.LayoutParams(
+                    (i == currentIndex) ? activeDotWidth : inactiveDotWidth,
+                    (i == currentIndex) ? activeDotHeight : inactiveDotHeight));
             dotView.setBackground(dotShape);
 
-            // Set margin between dots
+            // Add margins to the dot view
             LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) dotView.getLayoutParams();
-            params.setMargins(dotMargin, 0, dotMargin, 0);  // Left and right margins
+            params.setMargins(dotMargin, 0, dotMargin, 0);
             dotView.setLayoutParams(params);
 
-            // Animate the size change of the dot
-            ValueAnimator animatorWidth = ValueAnimator.ofInt(startWidth, (i == currentIndex) ? activeDotWidth : inactiveDotWidth);
-            ValueAnimator animatorHeight = ValueAnimator.ofInt(startHeight, (i == currentIndex) ? activeDotHeight : inactiveDotHeight);
-
-            animatorWidth.addUpdateListener(animation -> {
-                int animatedValue = (int) animation.getAnimatedValue();
-                LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) dotView.getLayoutParams();
-                layoutParams.width = animatedValue;
-                dotView.setLayoutParams(layoutParams);
-            });
-
-            animatorHeight.addUpdateListener(animation -> {
-                int animatedValue = (int) animation.getAnimatedValue();
-                LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) dotView.getLayoutParams();
-                layoutParams.height = animatedValue;
-                dotView.setLayoutParams(layoutParams);
-            });
-
-            animatorWidth.setDuration(300);  // Adjust duration for smoothness
-            animatorHeight.setDuration(300); // Adjust duration for smoothness
-
-            animatorWidth.start();
-            animatorHeight.start();
-
-            // Add the dot (rounded rectangle) to the layout
+            // Add the dot to the layout
             dotLayout.addView(dotView);
+
+            // If it's the current index, animate the change to make it visually distinct
+            if (i == currentIndex) {
+                ValueAnimator animatorWidth = ValueAnimator.ofInt(inactiveDotWidth, activeDotWidth);
+                ValueAnimator animatorHeight = ValueAnimator.ofInt(inactiveDotHeight, activeDotHeight);
+
+                animatorWidth.addUpdateListener(animation -> {
+                    int animatedValue = (int) animation.getAnimatedValue();
+                    params.width = animatedValue;
+                    dotView.setLayoutParams(params);
+                });
+
+                animatorHeight.addUpdateListener(animation -> {
+                    int animatedValue = (int) animation.getAnimatedValue();
+                    params.height = animatedValue;
+                    dotView.setLayoutParams(params);
+                });
+
+                animatorWidth.setDuration(300);  // Smooth transition duration
+                animatorHeight.setDuration(300); // Smooth transition duration
+
+                animatorWidth.start();
+                animatorHeight.start();
+            }
         }
-    }
-
-
-
-
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        autoScrollHandler.removeCallbacks(autoScrollRunnable); // Stop auto-scroll on destroy
-    }
-
-}
+    }}

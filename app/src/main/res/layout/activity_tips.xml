@@ -15,7 +15,9 @@
         android:layout_marginEnd="-5dp"
         android:layout_marginBottom="178dp"
         android:gravity="center"
-        android:orientation="horizontal"></LinearLayout>
+        android:orientation="horizontal">
+
+    </LinearLayout>
 
     <TextView
         android:id="@+id/textView9"
@@ -52,7 +54,7 @@
         android:layout_marginBottom="86dp"
         android:backgroundTint="#FF5733"
         android:fontFamily="@font/poppins_medium_regular"
-        android:text="Get Started!"
+        android:text="Next"
         android:textColor="#FFFFFF"
         android:textSize="24sp" />
 
