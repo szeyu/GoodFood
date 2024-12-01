@@ -8,9 +8,6 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
-import com.bumptech.glide.Glide;
-import com.hmir.goodfood.R;
-
 public class DisplayActivity extends AppCompatActivity {
 
     private TextView foodNameTextView, fatTextView, caloriesTextView, proteinTextView, descriptionTextView, ingredientsTextView;
