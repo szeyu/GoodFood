@@ -1,5 +1,6 @@
 package com.hmir.goodfood;
 
+import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
@@ -8,6 +9,8 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import android.content.SharedPreferences;
+import android.text.InputFilter;
+import android.text.InputType;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -33,6 +36,32 @@ public class welcomePage extends AppCompatActivity {
         weightEditText = findViewById(R.id.editText_weight);
         confirmButton = findViewById(R.id.button_confirm);
 
+        // Restrict age to integers only
+        InputFilter[] integerFilter = new InputFilter[]{(source, start, end, dest, dstart, dend) -> {
+            for (int i = start; i < end; i++) {
+                if (!Character.isDigit(source.charAt(i))) {
+                    return "";
+                }
+            }
+            return null;
+        }};
+        ageEditText.setFilters(integerFilter);
+        ageEditText.setInputType(InputType.TYPE_CLASS_NUMBER);
+
+        // Allow decimals for height and weight
+        InputFilter[] decimalFilter = new InputFilter[]{(source, start, end, dest, dstart, dend) -> {
+            String destText = dest.toString();
+            String result = destText.substring(0, dstart) + source + destText.substring(dend);
+            if (result.matches("\\d*(\\.\\d{0,2})?")) { // Restrict to 2 decimal places
+                return null;
+            }
+            return "";
+        }};
+        heightEditText.setFilters(decimalFilter);
+        weightEditText.setFilters(decimalFilter);
+        heightEditText.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+        weightEditText.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+
         // Initialize diet buttons
         halalButton = findViewById(R.id.button_halal);
         veganButton = findViewById(R.id.button_vegan);
@@ -48,16 +77,18 @@ public class welcomePage extends AppCompatActivity {
 
         View.OnClickListener dietButtonListener = view -> {
             Button button = (Button) view;
-            if (selectedDietTypes.toString().contains(button.getText())) {
-                selectedDietTypes.replace(
-                        selectedDietTypes.indexOf(button.getText().toString()),
-                        selectedDietTypes.indexOf(button.getText().toString()) + button.getText().length() + 1,
-                        ""
-                );
-                button.setBackgroundColor(getResources().getColor(android.R.color.darker_gray));
+            // Toggle selection state
+            button.setSelected(!button.isSelected());
+
+            // Manage selectedDietTypes
+            String buttonText = button.getText().toString();
+            if (button.isSelected()) {
+                selectedDietTypes.append(buttonText).append(",");
             } else {
-                selectedDietTypes.append(button.getText()).append(",");
-                button.setBackgroundColor(getResources().getColor(android.R.color.holo_blue_light));
+                int startIndex = selectedDietTypes.indexOf(buttonText);
+                if (startIndex != -1) {
+                    selectedDietTypes.delete(startIndex, startIndex + buttonText.length() + 1); // +1 for the comma
+                }
             }
         };
 

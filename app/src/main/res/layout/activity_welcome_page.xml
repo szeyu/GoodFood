@@ -22,9 +22,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="40dp"
+        android:layout_marginTop="16dp"
         android:text="Username"
         app:layout_constraintStart_toStartOf="parent"
-        tools:layout_editor_absoluteY="180dp" />
+        app:layout_constraintTop_toBottomOf="@+id/imageView4" />
 
     <EditText
         android:id="@+id/editText_username"
@@ -197,7 +198,7 @@
             android:layout_width="108dp"
             android:layout_height="37dp"
             android:layout_margin="3dp"
-            android:background="@drawable/roundstylediet"
+            android:background="@drawable/diet_button_selector"
             android:fontFamily="serif"
             android:text="Halal"
             android:textSize="9sp" />
@@ -207,7 +208,7 @@
             android:layout_width="108dp"
             android:layout_height="37dp"
             android:layout_margin="3dp"
-            android:background="@drawable/roundstylediet"
+            android:background="@drawable/diet_button_selector"
             android:fontFamily="serif"
             android:text="Vegan"
             android:textSize="9sp" />
@@ -217,7 +218,7 @@
             android:layout_width="108dp"
             android:layout_height="37dp"
             android:layout_margin="3dp"
-            android:background="@drawable/roundstylediet"
+            android:background="@drawable/diet_button_selector"
             android:fontFamily="serif"
             android:text="Pescatarian"
             android:textSize="9sp" />
@@ -227,7 +228,7 @@
             android:layout_width="108dp"
             android:layout_height="37dp"
             android:layout_margin="3dp"
-            android:background="@drawable/roundstylediet"
+            android:background="@drawable/diet_button_selector"
             android:fontFamily="serif"
             android:text="Custom"
             android:textSize="9sp" />
@@ -237,7 +238,7 @@
             android:layout_width="108dp"
             android:layout_height="37dp"
             android:layout_margin="3dp"
-            android:background="@drawable/roundstylediet"
+            android:background="@drawable/diet_button_selector"
             android:fontFamily="serif"
             android:text="Dairy"
             android:textSize="9sp" />
@@ -247,7 +248,7 @@
             android:layout_width="108dp"
             android:layout_height="37dp"
             android:layout_margin="3dp"
-            android:background="@drawable/roundstylediet"
+            android:background="@drawable/diet_button_selector"
             android:fontFamily="serif"
             android:text="Nuts"
             android:textSize="9sp" />
@@ -257,7 +258,7 @@
             android:layout_width="108dp"
             android:layout_height="37dp"
             android:layout_margin="3dp"
-            android:background="@drawable/roundstylediet"
+            android:background="@drawable/diet_button_selector"
             android:fontFamily="serif"
             android:text="Seafood"
             android:textSize="9sp" />
@@ -267,7 +268,7 @@
             android:layout_width="108dp"
             android:layout_height="37dp"
             android:layout_margin="3dp"
-            android:background="@drawable/roundstylediet"
+            android:background="@drawable/diet_button_selector"
             android:fontFamily="serif"
             android:text="Others"
             android:textSize="9sp" />
