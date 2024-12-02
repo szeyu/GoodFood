@@ -33,7 +33,7 @@ public class BottomNavigationFragment extends Fragment {
             Class<?> targetActivity = null;
 
             if (item.getItemId() == R.id.nav_home) {
-                targetActivity = MainActivity.class;
+                targetActivity = HomePage.class;
             } else if (item.getItemId() == R.id.nav_camera) {
                 targetActivity = FoodScanner.class;
             } else if (item.getItemId() == R.id.nav_profile) {
