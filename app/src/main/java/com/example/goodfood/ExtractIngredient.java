@@ -45,7 +45,7 @@ public class ExtractIngredient extends AppCompatActivity {
         // Display these ingredients in a TextView (assuming you have a TextView with id ingredientTextView)
         TextView IngredientTextView = findViewById(R.id.IngredientsTextView);
         IngredientTextView.setText("Ingredients:\n" + ingredients + "\n");
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.ProfilePageMain), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
