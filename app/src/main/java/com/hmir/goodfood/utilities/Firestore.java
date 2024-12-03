@@ -2,7 +2,11 @@ package com.hmir.goodfood.utilities;
 
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -17,15 +21,20 @@ import java.util.Map;
 public class Firestore {
 
     private final FirebaseFirestore db;
-    private final String currentEmail = "test1@gmail.com";  // Hardcoded email
+    private String currentEmail;
 
+    // TODO: Google Auth get current Email initialization
     public Firestore() {
         db = FirebaseFirestore.getInstance();
+
+        // current user email fetch from google auth
+        // currentEmail = FirebaseAuth.getInstance().getCurrentUser().getEmail();
     }
 
-    // Callback Interface for Async Operations
+    // Callback Interface for Asynchronous Operations
     public interface Callback<T> {
         void onSuccess(T result);
+
         void onFailure(Exception e);
     }
 
@@ -113,33 +122,41 @@ public class Firestore {
 
     // Add New User Info
     public void addUserInfo(Map<String, Object> user) {
-        String email = (String) user.get("email");
-        if (email != null) {
-            user.remove("email");
+        Map<String, Object> defaultUser = new HashMap<>();
+        defaultUser.put("username", null);
+        defaultUser.put("age", null);
+        defaultUser.put("height", null);
+        defaultUser.put("weight", null);
+        defaultUser.put("health_label", null);
+        defaultUser.putAll(user);
 
-            Map<String, Object> defaultUser = new HashMap<>();
-            defaultUser.put("username", null);
-            defaultUser.put("age", null);
-            defaultUser.put("height", null);
-            defaultUser.put("weight", null);
-            defaultUser.put("health_label", null);
-
-            defaultUser.putAll(user);
-
-            db.collection("user")
-                    .document(email)
-                    .set(defaultUser, SetOptions.merge())
-                    .addOnSuccessListener(aVoid -> Log.d("Firestore", "User added with email as document ID"))
-                    .addOnFailureListener(e -> Log.e("Firestore", "Error adding user", e));
-        } else {
-            Log.e("Firestore", "Error: email is null");
-        }
+        db.collection("user")
+                .document(currentEmail)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        // User already exists, send an error message
+                        Log.e("Firestore", "User already exists with this email");
+                    } else {
+                        // User doesn't exist, proceed with adding the user
+                        db.collection("user")
+                                .document(currentEmail)
+                                .set(defaultUser, SetOptions.merge())
+                                .addOnSuccessListener(aVoid ->
+                                        Log.d("Firestore", "User added with email as document ID"))
+                                .addOnFailureListener(e ->
+                                        Log.e("Firestore", "Error adding user", e));
+                    }
+                })
+                .addOnFailureListener(e ->
+                        Log.e("Firestore", "Error checking user existence", e));
     }
 
-    // Delete User Record
-    public void deleteUserInfo(String email){
+
+    // Delete current User Record
+    public void deleteUserInfo() {
         db.collection("user")
-                .document(email)
+                .document(currentEmail)
                 .delete()
                 .addOnSuccessListener(aVoid -> Log.d("Firestore", "User deleted"))
                 .addOnFailureListener(e -> Log.e("Firestore", "Error deleting user", e));
@@ -159,7 +176,7 @@ public class Firestore {
         defaultRecord.put("ingredient", null);
         defaultRecord.put("iron", null);
         defaultRecord.put("potassium", null);
-        defaultRecord.put("protein",null);
+        defaultRecord.put("protein", null);
         defaultRecord.put("sodium", null);
         defaultRecord.put("user_id", null);
 
@@ -171,8 +188,35 @@ public class Firestore {
                 .addOnFailureListener(e -> Log.e("Firestore", "Error adding nutritional record", e));
     }
 
+    // Update Nutritional Record
+    public void updateNutritionalRecord(double calcium, double calories, double carbs, double cholesterol, double magnesium,
+                                        Timestamp dateTime, double fat, DocumentReference image, List<String> ingredient, double iron,
+                                        double potassium, double protein, double sodium, String user_id, @NonNull String recordId) {
+        Map<String, Object> recordUpdates = Map.ofEntries(
+                Map.entry("calcium", calcium),
+                Map.entry("calories", calories),
+                Map.entry("carbs", carbs),
+                Map.entry("cholesterol", cholesterol),
+                Map.entry("magnesium", magnesium),
+                Map.entry("dateTime", dateTime),
+                Map.entry("fat", fat),
+                Map.entry("image", image),
+                Map.entry("ingredient", ingredient),
+                Map.entry("iron", iron),
+                Map.entry("potassium", potassium),
+                Map.entry("protein", protein),
+                Map.entry("sodium", sodium),
+                Map.entry("user_id", user_id)
+        );
+        db.collection("nutritional_record")
+                .document(recordId)
+                .update(recordUpdates)
+                .addOnSuccessListener(aVoid -> Log.d("Firestore", "Record info updated"))
+                .addOnFailureListener(e -> Log.e("Firestore", "Error updating record info", e));
+    }
+
     // Delete Nutritional Record by Document ID
-    public void deleteNutritionalRecord(String recordId) {
+    public void deleteNutritionalRecord(@NonNull String recordId) {
         db.collection("nutritional_record")
                 .document(recordId)
                 .delete()
@@ -195,7 +239,7 @@ public class Firestore {
         defaultRecipe.put("servings", null);
         defaultRecipe.put("iron", null);
         defaultRecipe.put("potassium", null);
-        defaultRecipe.put("protein",null);
+        defaultRecipe.put("protein", null);
         defaultRecipe.put("sodium", null);
         defaultRecipe.put("user_id", null);
 
@@ -206,8 +250,36 @@ public class Firestore {
                 .addOnFailureListener(e -> Log.e("Firestore", "Error adding favourite recipe", e));
     }
 
+    // Update Recipe Record
+    public void updateFavouriteRecipe(double calcium, double calories, double carbs, String name, double cholesterol, double magnesium,
+                                      double fat, DocumentReference image, List<String> diet_label, double iron, long servings,
+                                      double potassium, double protein, double sodium, String user_id, @NonNull String recipeId) {
+        Map<String, Object> recipeUpdates = Map.ofEntries(
+                Map.entry("calcium", calcium),
+                Map.entry("calories", calories),
+                Map.entry("carbs", carbs),
+                Map.entry("cholesterol", cholesterol),
+                Map.entry("magnesium", magnesium),
+                Map.entry("name", name),
+                Map.entry("fat", fat),
+                Map.entry("image", image),
+                Map.entry("diet_label", diet_label),
+                Map.entry("servings", servings),
+                Map.entry("iron", iron),
+                Map.entry("potassium", potassium),
+                Map.entry("protein", protein),
+                Map.entry("sodium", sodium),
+                Map.entry("user_id", user_id)
+        );
+        db.collection("favourite_recipe")
+                .document(recipeId)
+                .update(recipeUpdates)
+                .addOnSuccessListener(aVoid -> Log.d("Firestore", "Recipe info updated"))
+                .addOnFailureListener(e -> Log.e("Firestore", "Error updating recipe info", e));
+    }
+
     // Delete Favourite Recipe by Document ID
-    public void deleteFavouriteRecipe(String recipeId) {
+    public void deleteFavouriteRecipe(@NonNull String recipeId) {
         db.collection("favourite_recipe")
                 .document(recipeId)
                 .delete()
