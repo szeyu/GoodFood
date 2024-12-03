@@ -1,5 +1,6 @@
 package com.hmir.goodfood;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 
@@ -128,6 +129,11 @@ public class welcomePage extends AppCompatActivity {
 
             // Show confirmation
             Toast.makeText(welcomePage.this, "Data saved successfully!", Toast.LENGTH_SHORT).show();
+
+            // Navigate to homepage
+            Intent intent = new Intent(welcomePage.this, HomePage.class);
+            startActivity(intent);
+            finish(); // Optional: Close the welcomePage activity
         });
     }
 }
