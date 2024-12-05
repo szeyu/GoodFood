@@ -1,17 +1,26 @@
 package com.hmir.goodfood.utilities;
 
-import android.media.Image;
+import android.util.Log;
 
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.type.DateTime;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldPath;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 public class NutritionalRecord {
     private String record_id;
-    private List<String> ingredient;
-    private Timestamp dateTime;
+    private String ingredients;
+    private Timestamp date_time;
     private double calories;
     private double protein;
     private double carbs;
@@ -23,32 +32,33 @@ public class NutritionalRecord {
     private double potassium;
     private double magnesium;
     private DocumentReference image;
-    private String user_id;
 
     public NutritionalRecord(String record_id, double calcium, double calories, double carbs,
-                             double cholesterol, Timestamp dateTime, double fat, DocumentReference image,
-                             List<String> ingredient, double iron, double potassium, double protein,
-                             double sodium, double magnesium, String user_id) {
+                             double cholesterol, Timestamp date_time, double fat, DocumentReference image,
+                             String ingredients, double iron, double potassium, double protein,
+                             double sodium, double magnesium) {
         this.record_id = record_id;
         this.calcium = calcium;
         this.calories = calories;
         this.carbs = carbs;
         this.magnesium = magnesium;
         this.cholesterol = cholesterol;
-        this.dateTime = dateTime;
+        this.date_time = date_time;
         this.fat = fat;
         this.image = image;
-        this.ingredient = ingredient;
+        this.ingredients = ingredients;
         this.iron = iron;
         this.potassium = potassium;
         this.protein = protein;
         this.sodium = sodium;
-        this.user_id = user_id;
     }
 
+    // Getter and Setter
     public NutritionalRecord (){
+        // empty constructor
     }
 
+    // Getter and Setter
     public String getRecord_id() {
         return record_id;
     }
@@ -97,12 +107,12 @@ public class NutritionalRecord {
         this.cholesterol = cholesterol;
     }
 
-    public Timestamp getDateTime() {
-        return dateTime;
+    public Timestamp getDate_time() {
+        return date_time;
     }
 
-    public void setDateTime(Timestamp dateTime) {
-        this.dateTime = dateTime;
+    public void setDate_time(Timestamp date_time) {
+        this.date_time = date_time;
     }
 
     public double getFat() {
@@ -121,12 +131,12 @@ public class NutritionalRecord {
         this.image = image;
     }
 
-    public List<String>getIngredient() {
-        return ingredient;
+    public String getIngredients() {
+        return ingredients;
     }
 
-    public void setIngredient(List<String> ingredient) {
-        this.ingredient = ingredient;
+    public void setIngredients(String ingredients) {
+        this.ingredients = ingredients;
     }
 
     public double getIron() {
@@ -161,11 +171,10 @@ public class NutritionalRecord {
         this.sodium = sodium;
     }
 
-    public String getUser_id() {
-        return user_id;
-    }
+    // Callback Interface for Asynchronous Operations
+    public interface Callback<T> {
+        void onSuccess(T result);
 
-    public void setUser_id(String user_id) {
-        this.user_id = user_id;
+        void onFailure(Exception e);
     }
 }
