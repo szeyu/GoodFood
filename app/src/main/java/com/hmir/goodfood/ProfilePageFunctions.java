@@ -1,4 +1,5 @@
-package com.example.goodfood;
+//package com.example.goodfood;
+package com.hmir.goodfood;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -10,6 +11,8 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
+
+import com.hmir.goodfood.EditProfileFragment;
 
 public class ProfilePageFunctions extends AppCompatActivity {
 

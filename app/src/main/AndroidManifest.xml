@@ -20,12 +20,6 @@
         <activity
             android:name=".ProfilePageFunctions"
             android:exported="false" />
-        <activity
-            android:name=".ProfilePageActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ProfilePage"
-            android:exported="false" />
 
         <!-- Other activities -->
         <activity android:name=".HomePage" android:exported="false" />
