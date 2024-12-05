@@ -48,7 +48,7 @@
 
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/fragmentContainerView"
-            android:name="com.example.goodfood.BottomNavigationFragment"
+            android:name="com.hmir.goodfood.BottomNavigationFragment"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
     </FrameLayout>

@@ -197,6 +197,7 @@
         android:layout_height="48dp"
         android:layout_marginTop="12dp"
         android:backgroundTint="#FDFBFB"
+        android:onClick="logoutGoogle"
         android:text=">"
         android:textColor="#4E4C4C"
         android:textSize="24sp"
@@ -214,14 +215,14 @@
         app:layout_constraintTop_toBottomOf="@+id/TVProfile"
         app:srcCompat="@drawable/profile_pic_circle" />
 
-        <androidx.fragment.app.FragmentContainerView
-            android:id="@+id/fragmentContainerView3"
-            android:name="com.example.goodfood.BottomNavigationFragment"
-            android:layout_width="410dp"
-            android:layout_height="93dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/fragmentContainerView3"
+        android:name="com.hmir.goodfood.BottomNavigationFragment"
+        android:layout_width="410dp"
+        android:layout_height="93dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 
     <FrameLayout
