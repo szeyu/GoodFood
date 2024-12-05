@@ -1,14 +1,23 @@
 package com.hmir.goodfood;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.widget.ImageButton;
+import android.util.Log;
+import android.view.View;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 
+import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class ProfilePage extends AppCompatActivity {
 
-    private ImageButton cameraButton, profileButton, homeButton;
+    private GoogleSignInClient googleSignInClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -16,33 +25,26 @@ public class ProfilePage extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_profile_page);
 
+        // Configure Google Sign-In
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build();
+        googleSignInClient = GoogleSignIn.getClient(this, gso);
+    }
 
-        /*
-        // Dynamically add the BottomNavigationFragment if needed
-        if (savedInstanceState == null) {
-            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            transaction.replace(R.id.bottom_navigation_container, new BottomNavigationFragment());
-            transaction.commit();
-        }
+    public void logoutGoogle(View view) {
+        // Firebase sign out
+        FirebaseAuth.getInstance().signOut();
 
-
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
+        // Google sign out
+        googleSignInClient.signOut().addOnCompleteListener(this, task -> {
+            Log.d("ProfilePage", "User logged out from Google");
+            // Redirect to MainActivity
+            Intent intent = new Intent(ProfilePage.this, MainActivity.class);
+            startActivity(intent);
+            finish(); // Close ProfilePage
         });
-
-        homeButton = findViewById(R.id.homeButton);
-        homeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(ProfilePage.this, MainActivity.class);
-                startActivity(intent);
-                finish();
-            }
-        }); */
-
-
     }
 }
 

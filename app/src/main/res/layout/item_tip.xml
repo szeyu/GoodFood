@@ -1,0 +1,39 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="16dp">
+
+    <!-- Tip Image -->
+    <ImageView
+        android:id="@+id/tip_image"
+        android:layout_width="196dp"
+        android:layout_height="212dp"
+        android:scaleType="centerCrop" />
+
+    <!-- Tip Title -->
+    <TextView
+        android:id="@+id/tip_title"
+        android:layout_width="234dp"
+        android:layout_height="52dp"
+        android:layout_marginTop="8dp"
+        android:fontFamily="@font/poppins_medium_regular"
+        android:gravity="center"
+        android:text="Tip Title"
+        android:textSize="26sp"
+        android:textStyle="bold" />
+
+    <!-- Tip Description -->
+    <TextView
+        android:id="@+id/tip_description"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:fontFamily="@font/poppins_light"
+        android:gravity="center"
+        android:text="Tip Description goes here"
+        android:textSize="16sp" />
+
+</LinearLayout>

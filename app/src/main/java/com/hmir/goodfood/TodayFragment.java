@@ -132,7 +132,7 @@ public class TodayFragment extends Fragment {
     }
 
     private void setUpChart(ArrayList<Nutrient> nutrients) {
-        Typeface customFont = ResourcesCompat.getFont(getContext(), R.font.poppins_light);
+        Typeface customFont = ResourcesCompat.getFont(getContext(), R.font.poppins_light_regular);
 
         ArrayList<BarEntry> takenEntries = new ArrayList<>();
         ArrayList<BarEntry> suggestedEntries = new ArrayList<>();

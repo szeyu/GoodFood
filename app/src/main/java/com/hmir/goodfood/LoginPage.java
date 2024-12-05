@@ -82,6 +82,12 @@ public class LoginPage extends AppCompatActivity {
                     // sign in successful
                     Log.w(TAG, "Authentication Success");
                     FirebaseUser user = auth.getCurrentUser();
+
+                    // Navigate to the Main Activity
+                    Intent intent = new Intent(LoginPage.this, MainActivity.class);
+                    intent.putExtra("USER_NAME", user.getDisplayName());
+                    startActivity(intent);
+                    finish();
                 } else {
                     Log.w(TAG, "Authentication Failed", task.getException());
                 }
