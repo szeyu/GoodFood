@@ -21,7 +21,7 @@ import java.util.Map;
 public class Firestore {
 
     private final FirebaseFirestore db;
-    private String currentEmail;
+    private static String currentEmail;
 
     // TODO: Google Auth get current Email initialization
     public Firestore() {
