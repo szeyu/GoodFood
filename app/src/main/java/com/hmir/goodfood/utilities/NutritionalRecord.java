@@ -1,5 +1,6 @@
 package com.hmir.goodfood.utilities;
 
+import android.annotation.SuppressLint;
 import android.util.Log;
 
 import com.google.android.gms.tasks.Task;
@@ -171,10 +172,28 @@ public class NutritionalRecord {
         this.sodium = sodium;
     }
 
-    // Callback Interface for Asynchronous Operations
-    public interface Callback<T> {
-        void onSuccess(T result);
-
-        void onFailure(Exception e);
+    @SuppressLint("DefaultLocale")
+    @Override
+    public String toString() {
+        return String.format(
+                "NutritionalRecord { " +
+                        "record_id='%s', ingredients='%s', date_time='%s', calories=%.2f, " +
+                        "protein=%.2f, carbs=%.2f, fat=%.2f, sodium=%.2f, calcium=%.2f, " +
+                        "iron=%.2f, cholesterol=%.2f, potassium=%.2f, magnesium=%.2f, image='%s' }",
+                record_id,
+                ingredients,
+                date_time != null ? date_time.toDate().toString() : "null",
+                calories,
+                protein,
+                carbs,
+                fat,
+                sodium,
+                calcium,
+                iron,
+                cholesterol,
+                potassium,
+                magnesium,
+                image != null ? image.getPath() : "null"
+        );
     }
 }

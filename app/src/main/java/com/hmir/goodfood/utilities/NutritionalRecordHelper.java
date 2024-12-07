@@ -2,6 +2,8 @@ package com.hmir.goodfood.utilities;
 
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.Timestamp;
@@ -21,10 +23,25 @@ import java.util.concurrent.ExecutionException;
 public class NutritionalRecordHelper {
     /*
       In this class, there will be multiple methods relating to nutritional record(s):
+
+      * Note :  The following Functions 1 - 4 are mostly covered in UserHelper, so these usually are not being used / called directly from
+                NutritionalRecordHelper.
+
       Function 1 : Fetch
                     - fetchNutritionalRecord()
                     - fetchSomeNutritionalRecords()
                     - fetchAllNutritionalRecords()
+
+                    * method calling example
+                    nutritionalRecordHelper.fetchAllNutritionalRecords()
+                        .addOnSuccessListener(nutritionalRecords -> {
+                            for (NutritionalRecord record : nutritionalRecords) {
+                                Log.d("MainActivity", "Record: " + record.toString());
+                            }
+                        })
+                        .addOnFailureListener(e -> {
+                            Log.e("MainActivity", "Error fetching nutritional records: " + e.getMessage());
+                        });
 
       Function 2 : Add
                     - addNutritionalRecord()
@@ -32,18 +49,18 @@ public class NutritionalRecordHelper {
       Function 3 : Update
                     - updateNutritionalRecord()
 
-       Function 4 : Delete
+      Function 4 : Delete
                     - deleteNutritionalRecord()
      */
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-    public NutritionalRecordHelper() {}
+    public NutritionalRecordHelper() {
+    }
 
     // Function 1 : Fetch
 
-    // Helper Method
     // Fetch specific nutritional record and return a Task of it
-    private Task<NutritionalRecord> fetchNutritionalRecordTask(String record_id) {
+    public Task<NutritionalRecord> fetchNutritionalRecord(@NonNull String record_id) {
         return db.collection("nutritional_records")
                 .document(record_id)
                 .get()
@@ -67,25 +84,10 @@ public class NutritionalRecordHelper {
                 });
     }
 
-    // Return NutritionalRecord object
-    public NutritionalRecord fetchNutritionalRecord(String record_id) throws Exception {
-        if (record_id == null || record_id.isEmpty()) {
-            throw new IllegalArgumentException("record_id is null or empty");
-        }
-
-        try {
-            Task<NutritionalRecord> task = fetchNutritionalRecordTask(record_id);
-            return Tasks.await(task); // This blocks until the task completes
-        } catch (ExecutionException | InterruptedException e) {
-            throw new Exception("Error fetching nutritional record information", e);
-        }
-    }
-
-    // Helper Method
     // Fetch selected nutritional records and return a Task of a List of them
-    private Task<List<NutritionalRecord>> fetchSomeNutritionalRecordsTask(List<String> record_id) {
+    public Task<List<NutritionalRecord>> fetchSomeNutritionalRecords(List<String> record_id) {
         if (record_id == null || record_id.isEmpty()) {
-            return Tasks.forException(new Exception("Record IDs list is null or empty"));
+            return Tasks.forException(new Exception("record_id(s) list is null or empty"));
         }
 
         List<Task<DocumentSnapshot>> tasks = new ArrayList<>();
@@ -110,23 +112,8 @@ public class NutritionalRecordHelper {
         });
     }
 
-    // Return selected NutritionalRecord objects List
-    public List<NutritionalRecord> fetchSomeNutritionalRecords(List<String> record_id) throws Exception {
-        if (record_id == null || record_id.isEmpty()) {
-            throw new Exception("Record IDs list is null or empty");
-        }
-
-        try {
-            Task<List<NutritionalRecord>> task = fetchSomeNutritionalRecordsTask(record_id);
-            return Tasks.await(task);
-        } catch (ExecutionException | InterruptedException e) {
-            throw new Exception("Error fetching selected nutritional records", e);
-        }
-    }
-
-    // Helper Method
     // Fetch all nutritional records with no restrictions and return a Task of a List of them
-    private Task<List<NutritionalRecord>> fetchAllNutritionalRecordsTask() {
+    public Task<List<NutritionalRecord>> fetchAllNutritionalRecords() {
         return db.collection("nutritional_records")
                 .get()
                 .continueWith(task -> {
@@ -149,75 +136,38 @@ public class NutritionalRecordHelper {
                 });
     }
 
-    // Return all NutritionalRecord objects List
-    public List<NutritionalRecord> fetchAllNutritionalRecords() throws Exception {
-        try {
-            Task<List<NutritionalRecord>> task = fetchAllNutritionalRecordsTask();
-            return Tasks.await(task);
-        } catch (ExecutionException | InterruptedException e) {
-            throw new Exception("Error fetching all nutritional records", e);
-        }
-    }
-
     // Function 2 : Add
 
     // Add new nutritional record
-    public String addNutritionalRecord(Map<String, Object> record) throws Exception {
+    public void addNutritionalRecord(Map<String, Object> record, OnRecordAddedCallback callback) {
         Map<String, Object> defaultRecord = new HashMap<>();
-        defaultRecord.put("calcium", null);
-        defaultRecord.put("calories", null);
-        defaultRecord.put("carbs", null);
-        defaultRecord.put("magnesium", null);
-        defaultRecord.put("cholesterol", null);
+        defaultRecord.put("calcium", 0);
+        defaultRecord.put("calories", 0);
+        defaultRecord.put("carbs", 0);
+        defaultRecord.put("magnesium", 0);
+        defaultRecord.put("cholesterol", 0);
         defaultRecord.put("date_time", null);
-        defaultRecord.put("fat", null);
+        defaultRecord.put("fat", 0);
         defaultRecord.put("image", null);
         defaultRecord.put("ingredients", null);
-        defaultRecord.put("iron", null);
-        defaultRecord.put("potassium", null);
-        defaultRecord.put("protein", null);
-        defaultRecord.put("sodium", null);
+        defaultRecord.put("iron", 0);
+        defaultRecord.put("potassium", 0);
+        defaultRecord.put("protein", 0);
+        defaultRecord.put("sodium", 0);
         defaultRecord.putAll(record);
 
-        try {
-            // Fetch the latest record ID
-            Task<QuerySnapshot> queryTask = db.collection("nutritional_records")
-                    .orderBy(FieldPath.documentId(), Query.Direction.DESCENDING)
-                    .limit(1)
-                    .get();
-
-            QuerySnapshot querySnapshot = Tasks.await(queryTask);
-
-            // Generate the new record ID
-            String newRecordId = "record-1";
-            if (!querySnapshot.isEmpty()) {
-                DocumentSnapshot latestRecord = querySnapshot.getDocuments().get(0);
-                String latestRecordId = latestRecord.getId();
-                if (latestRecordId.startsWith("record-")) {
-                    String[] parts = latestRecordId.split("-");
-                    try {
-                        int currentId = Integer.parseInt(parts[1]);
-                        newRecordId = "record-" + (currentId + 1);
-                    } catch (NumberFormatException e) {
-                        Log.e("Firestore", "Failed to parse record ID: " + latestRecordId, e);
-                    }
-                }
-            }
-
-            // Add the new record to Firestore
-            Task<Void> addTask = db.collection("nutritional_records")
-                    .document(newRecordId)
-                    .set(defaultRecord);
-
-            Tasks.await(addTask);
-
-            // Return the new record ID
-            return newRecordId;
-
-        } catch (ExecutionException | InterruptedException e) {
-            throw new Exception("Error adding nutritional record", e);
-        }
+        // Use Firestore to generate a random document ID
+        db.collection("nutritional_records")
+                .add(defaultRecord)
+                .addOnSuccessListener(documentReference -> {
+                    String newRecordId = documentReference.getId();
+                    callback.onRecordAdded(newRecordId);
+                })
+                .addOnFailureListener(e -> {
+                    callback.onError(new Exception("Error adding nutritional record", e));
+                });
     }
+
 
     // Function 3 : Update
 
@@ -248,8 +198,8 @@ public class NutritionalRecordHelper {
         db.collection("nutritional_records")
                 .document(record_id)
                 .update(recordUpdates)
-                .addOnSuccessListener(aVoid -> Log.d("Firestore", "Record info updated"))
-                .addOnFailureListener(e -> Log.e("Firestore", "Error updating record info", e));
+                .addOnSuccessListener(aVoid -> Log.d("NutritionalRecordHelper", "Record info updated"))
+                .addOnFailureListener(e -> Log.e("NutritionalRecordHelper", "Error updating record info", e));
     }
 
     // Function 4 : Delete
@@ -263,7 +213,13 @@ public class NutritionalRecordHelper {
         db.collection("nutritional_records")
                 .document(record_id)
                 .delete()
-                .addOnSuccessListener(aVoid -> Log.d("Firestore", "Nutritional record deleted"))
-                .addOnFailureListener(e -> Log.e("Firestore", "Error deleting nutritional record", e));
+                .addOnSuccessListener(aVoid -> Log.d("NutritionalRecordHelper", "Nutritional record deleted"))
+                .addOnFailureListener(e -> Log.e("NutritionalRecordHelper", "Error deleting nutritional record", e));
+    }
+
+    public interface OnRecordAddedCallback {
+        void onRecordAdded(String recordId);
+
+        void onError(Exception e);
     }
 }

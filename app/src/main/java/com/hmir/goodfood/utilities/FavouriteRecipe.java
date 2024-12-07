@@ -1,5 +1,6 @@
 package com.hmir.goodfood.utilities;
 
+import android.annotation.SuppressLint;
 import android.util.Log;
 
 import com.google.android.gms.tasks.Task;
@@ -283,5 +284,31 @@ public class FavouriteRecipe {
 
     public void setSodium(double sodium) {
         this.sodium = sodium;
+    }
+
+    @SuppressLint("DefaultLocale")
+    @Override
+    public String toString() {
+        return String.format(
+                "FavouriteRecipe { " +
+                        "recipe_id='%s', name='%s', diet_labels='%s', calories=%.2f, " +
+                        "protein=%.2f, carbs=%.2f, fat=%.2f, sodium=%.2f, calcium=%.2f, " +
+                        "iron=%.2f, cholesterol=%.2f, potassium=%.2f, magnesium=%.2f, servings=%d, image='%s' }",
+                recipe_id,
+                name,
+                diet_labels,
+                calories,
+                protein,
+                carbs,
+                fat,
+                sodium,
+                calcium,
+                iron,
+                cholesterol,
+                potassium,
+                magnesium,
+                servings,
+                image != null ? image.getPath() : "null"
+        );
     }
 }

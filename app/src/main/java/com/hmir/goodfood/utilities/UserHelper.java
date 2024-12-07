@@ -2,26 +2,26 @@ package com.hmir.goodfood.utilities;
 
 import android.util.Log;
 
-import com.google.android.gms.tasks.Task;
-import com.google.android.gms.tasks.Tasks;
-import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
+import java.util.Queue;
 
 public class UserHelper {
     /*
       In this class, there will be multiple sections of methods relating to a user:
       Section 1 : User Specifics
-                    - fetchUserInfo()
                     - addNewUser()
                     - updateUserInfo()
                     - deleteUser()
+
+                    * just call these methods the normal way
 
       Section 2 : User Nutritional Records
                     - fetchUserNutritionalRecord()
@@ -30,382 +30,496 @@ public class UserHelper {
                     - updateUserNutritionalRecord()
                     - deleteUserNutritionalRecord()
 
+                    * fetch methods are called with callbacks
+                        userHelper.fetchMethod(argument, new UserHelper.OnFetchedCallback() {
+                            @Override
+                            public void onFetched(Object obj) {
+                                Log.d("Example", "Fetched: " + obj.toString());
+                            }
+
+                            @Override
+                            public void onError(Exception e) {
+                                Log.e("Example", "Error fetching: " + e.getMessage());
+                            }
+                        });
+                    * other methods are called the normal way
+
       Section 3 : User Favourite Recipes
                     - fetchUserFavouriteRecipe()
                     - fetchAllUserFavouriteRecipes()
+                    - searchUserFavouriteRecipesByName()
                     - addUserFavouriteRecipe()
                     - updateUserFavouriteRecipe()
                     - deleteUserFavouriteRecipe()
+
+                    * refer to Section 2 for method calling
     */
 
-    //    private final static String email = FirebaseAuth.getInstance().getCurrentUser().getEmail();
-    private final static String email = "test1@gmail.com";
+    private final static String email = FirebaseAuth.getInstance().getCurrentUser().getEmail();
+//    private final static String email = "test1@gmail.com";
+    private boolean isUserLoaded = false;
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final NutritionalRecordHelper nutritionalRecordHelper = new NutritionalRecordHelper();
     private final FavouriteRecipeHelper favouriteRecipeHelper = new FavouriteRecipeHelper();
+    private final Queue<Runnable> pendingOperations = new LinkedList<>();
     private User currentUser;
-    public UserHelper () {
-        try{
-            currentUser = fetchUserInfo();
-        } catch (Exception e) {
-            e.printStackTrace();
+
+    public UserHelper() {
+        initializeCurrentUser();
+    }
+
+    public void initializeCurrentUser() {
+        currentUser = new User(new User.UserCallback() {
+            @Override
+            public void onSuccess(User user) {
+                Log.d("UserHelper", "User loaded successfully: " + user.toString());
+                currentUser = user;
+                isUserLoaded = true;
+                processPendingOperations();
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                Log.e("UserHelper", "Error loading user: " + e.getMessage());
+            }
+        });
+    }
+
+    // Add an operation to the queue
+    private void enqueueOrExecute(Runnable operation) {
+        if (isUserLoaded) {
+            operation.run();
+        } else {
+            pendingOperations.add(operation);
+        }
+    }
+
+    // Process all pending operations
+    private void processPendingOperations() {
+        while (!pendingOperations.isEmpty()) {
+            // Execute each task
+            pendingOperations.poll().run();
         }
     }
 
     // Section 1 : User Specifics
 
-    // Helper Method
-    // Fetch user and return a Task of it
-    private Task<User> fetchUserInfoTask() {
-        if (email == null || email.isEmpty()) {
-            return Tasks.forException(new Exception("Email is null or empty"));
-        }
-
-        return db.collection("user").document(email).get().continueWith(task -> {
-            if (task.isSuccessful()) {
-                DocumentSnapshot documentSnapshot = task.getResult();
-                if (documentSnapshot.exists()) {
-                    return documentSnapshot.toObject(User.class);
-                } else {
-                    throw new Exception("User not found");
-                }
-            } else {
-                throw task.getException() != null ?
-                        task.getException() : new Exception("Failed to fetch user record");
-            }
-        });
-    }
-
-    // Return User object
-    public User fetchUserInfo() throws Exception {
-        try {
-            Task<User> task = fetchUserInfoTask();
-            return Tasks.await(task); // This blocks until the task completes
-        } catch (ExecutionException | InterruptedException e) {
-            throw new Exception("Error fetching user information", e);
-        }
-    }
-
     // Update User document
-    public void updateUserInfo(String username, List<String> health_labels, long age, long height, long weight,
+    public void updateUserInfo(String username, List<String> health_labels, long age, double height, double weight,
                                List<String> favourite_recipes, List<String> nutritional_records) {
-        if (email == null || email.isEmpty()) {
-            throw new IllegalArgumentException("Email is null or empty");
-        }
+        enqueueOrExecute(() -> {
+            if (email == null || email.isEmpty()) {
+                throw new IllegalArgumentException("Email is null or empty");
+            }
 
-        Map<String, Object> userUpdates = Map.of(
-                "username", username,
-                "health_labels", health_labels,
-                "age", age,
-                "height", height,
-                "weight", weight,
-                "favourite_recipes", favourite_recipes,
-                "nutritional_records", nutritional_records
-        );
+            Map<String, Object> userUpdates = Map.of(
+                    "username", username,
+                    "health_labels", health_labels,
+                    "age", age,
+                    "height", height,
+                    "weight", weight,
+                    "favourite_recipes", favourite_recipes,
+                    "nutritional_records", nutritional_records
+            );
 
-        db.collection("user").document(email).update(userUpdates)
-                .addOnSuccessListener(aVoid ->
-                        Log.d("Firestore", "User info updated"))
-                .addOnFailureListener(e ->
-                        Log.e("Firestore", "Error updating user info", e));
+            db.collection("user").document(email).get().addOnSuccessListener(documentSnapshot -> {
+                if (documentSnapshot.exists()) {
+                    db.collection("user").document(email).update(userUpdates)
+                            .addOnSuccessListener(aVoid ->
+                                    Log.d("UserHelper", "User info updated"))
+                            .addOnFailureListener(e ->
+                                    Log.e("UserHelper", "Error updating user info", e));
+                } else {
+                    Log.e("UserHelper", "User document not found for email: " + email);
+                }
+            });
+        });
     }
 
     // Add new user
     public void addNewUser(Map<String, Object> user) {
-        if (email == null || email.isEmpty()) {
-            throw new IllegalArgumentException("Email is null or empty");
-        }
+        enqueueOrExecute(() -> {
+            if (email == null || email.isEmpty()) {
+                throw new IllegalArgumentException("Email is null or empty");
+            }
 
-        Map<String, Object> defaultUser = new HashMap<>();
-        defaultUser.put("username", null);
-        defaultUser.put("age", null);
-        defaultUser.put("height", null);
-        defaultUser.put("weight", null);
-        defaultUser.put("health_label", null);
-        defaultUser.put("favourite_recipes", null);
-        defaultUser.put("nutritional_records", null);
-        defaultUser.putAll(user);
+            Map<String, Object> defaultUser = new HashMap<>();
+            defaultUser.put("username", null);
+            defaultUser.put("age", 0);
+            defaultUser.put("height", 0);
+            defaultUser.put("weight", 0);
+            defaultUser.put("health_label", null);
+            defaultUser.put("favourite_recipes", null);
+            defaultUser.put("nutritional_records", null);
+            defaultUser.putAll(user);
 
-        db.collection("user")
-                .document(email)
-                .set(defaultUser, SetOptions.merge())  // Overwrite existing data or add new user
-                .addOnSuccessListener(aVoid ->
-                        Log.d("Firestore", "User added or updated with email as document ID"))
-                .addOnFailureListener(e ->
-                        Log.e("Firestore", "Error adding or updating user", e));
+            db.collection("user")
+                    .document(email)
+                    .set(defaultUser, SetOptions.merge())  // Overwrite existing data or add new user
+                    .addOnSuccessListener(aVoid ->
+                            Log.d("UserHelper", "User added or updated"))
+                    .addOnFailureListener(e ->
+                            Log.e("UserHelper", "Error adding or updating user", e));
+        });
     }
 
     // Delete user
     public void deleteUser() {
-        if (email == null || email.isEmpty()) {
-            throw new IllegalArgumentException("Email is null or empty");
-        }
+        enqueueOrExecute(() -> {
+            if (email == null || email.isEmpty()) {
+                throw new IllegalArgumentException("Email is null or empty");
+            }
 
-        db.collection("user")
-                .document(email)
-                .delete()
-                .addOnSuccessListener(aVoid ->
-                        Log.d("Firestore", "User deleted"))
-                .addOnFailureListener(e ->
-                        Log.e("Firestore", "Error deleting user", e));
+            db.collection("user")
+                    .document(email)
+                    .delete()
+                    .addOnSuccessListener(aVoid ->
+                            Log.d("UserHelper", "User deleted"))
+                    .addOnFailureListener(e ->
+                            Log.e("UserHelper", "Error deleting user", e));
+
+        });
     }
 
     // Section 2 : User Nutritional Records
 
-    // Fetch specific nutritional record based on record id
-    public NutritionalRecord fetchUserNutritionalRecord(String record_id) {
-        if (record_id == null || record_id.isEmpty()) {
-            throw new IllegalArgumentException("record_id is null or empty");
-        }
+    // Fetch specific nutritional record based on record id and return a callback
+    public void fetchUserNutritionalRecord(String record_id, OnRecordFetchedCallback callback) {
+        enqueueOrExecute(() -> {
+            if (record_id == null || record_id.isEmpty()) {
+                callback.onError(new IllegalArgumentException("record_id is null or empty"));
+                return;
+            }
 
-        try {
-            return nutritionalRecordHelper.fetchNutritionalRecord(record_id);
-        } catch (Exception e) {
-            System.err.println("Error fetching nutritional record: " + e.getMessage());
-            return null;
-        }
+            nutritionalRecordHelper.fetchNutritionalRecord(record_id)
+                    .addOnSuccessListener(record -> {
+                        if (record != null) {
+                            callback.onRecordFetched(record);
+                        } else {
+                            callback.onError(new Exception("Nutritional record not found"));
+                        }
+                    })
+                    .addOnFailureListener(callback::onError);
+        });
     }
 
-    // Fetch list of nutritional records based on record id
-    public List<NutritionalRecord> fetchAllUserNutritionalRecords() {
-        List<String> record_id = currentUser.getNutritional_records();
-        if (record_id == null || record_id.isEmpty()) {
-            throw new IllegalArgumentException("record_id is null or empty");
-        }
 
-        try {
-            return nutritionalRecordHelper.fetchSomeNutritionalRecords(record_id);
-        } catch (Exception e) {
-            System.err.println("Error fetching nutritional record: " + e.getMessage());
-            return null;
-        }
+    // Fetch list of nutritional records based on record id and return a callback
+    public void fetchAllUserNutritionalRecords(OnRecordListFetchedCallback callback) {
+        enqueueOrExecute(() -> {
+            if (!isUserLoaded) {
+                Log.e("UserHelper", "User is not loaded yet. Aborting operation.");
+                return;
+            }
+
+            List<String> record_id = currentUser.getNutritional_records();
+
+            if (record_id == null || record_id.isEmpty()) {
+                callback.onError(new IllegalArgumentException("record_id(s) are null or empty"));
+                return;
+            }
+
+            nutritionalRecordHelper.fetchSomeNutritionalRecords(record_id)
+                    .addOnSuccessListener(records -> {
+                        if (records != null && !records.isEmpty()) {
+                            callback.onRecordListFetched(records);
+                        } else {
+                            callback.onError(new Exception("No nutritional records found"));
+                        }
+                    })
+                    .addOnFailureListener(callback::onError);
+        });
     }
 
     // Add new nutritional record
     public void addUserNutritionalRecord(Map<String, Object> record) {
-        if (email == null || email.isEmpty()) {
-            throw new IllegalArgumentException("Email is null or empty");
-        }
+        enqueueOrExecute(() -> {
+            if (email == null || email.isEmpty()) {
+                throw new IllegalArgumentException("Email is null or empty");
+            }
 
-        String newRecordId = null;
-        try {
-            newRecordId = nutritionalRecordHelper.addNutritionalRecord(record);
-        } catch (Exception e) {
-            System.err.println("Error adding nutritional record: " + e.getMessage());
-        }
+            nutritionalRecordHelper.addNutritionalRecord(record, new NutritionalRecordHelper.OnRecordAddedCallback() {
+                @Override
+                public void onRecordAdded(String recordId) {
+                    currentUser.getNutritional_records().add(recordId);
 
-        if (newRecordId != null) {
-            currentUser.getNutritional_records().add(newRecordId);
+                    db.collection("user")
+                            .document(email)
+                            .update("nutritional_records", FieldValue.arrayUnion(recordId))
+                            .addOnSuccessListener(aVoid -> {
+                                Log.d("UserHelper", "Nutritional record added to user successfully." + recordId);
+                            })
+                            .addOnFailureListener(e -> {
+                                Log.e("UserHelper", "Error adding nutritional record to user", e);
+                            });
+                }
 
-            db.collection("user")
-                    .document(email)
-                    .update("nutritional_records", FieldValue.arrayUnion(newRecordId))
-                    .addOnSuccessListener(aVoid -> {
-                        Log.d("Firestore", "New nutritional record ID added to user successfully.");
-                    })
-                    .addOnFailureListener(e -> {
-                        Log.e("Firestore", "Error adding new nutritional record ID to user", e);
-                    });
-        }
+                @Override
+                public void onError(Exception e) {
+                    Log.e("UserHelper", "Error adding nutritional record: " + e.getMessage());
+                }
+            });
+        });
     }
 
     // Update nutritional record
     public void updateUserNutritionalRecord(String record_id, Map<String, Object> record) {
-        if (email == null || email.isEmpty()) {
-            throw new IllegalArgumentException("Email is null or empty");
-        }
+        enqueueOrExecute(() -> {
+            if (email == null || email.isEmpty()) {
+                throw new IllegalArgumentException("Email is null or empty");
+            }
 
-        String newRecordId = null;
-        try {
-            newRecordId = nutritionalRecordHelper.addNutritionalRecord(record);
-        } catch (Exception e) {
-            System.err.println("Error adding nutritional record: " + e.getMessage());
-            return;  // exit early
-        }
+            nutritionalRecordHelper.addNutritionalRecord(record, new NutritionalRecordHelper.OnRecordAddedCallback() {
+                @Override
+                public void onRecordAdded(String newRecordId) {
+                    if (currentUser.getNutritional_records() != null) {
+                        currentUser.getNutritional_records().add(newRecordId);
+                        currentUser.getNutritional_records().remove(record_id);
+                    }
 
-        if (newRecordId != null) {
-            currentUser.getNutritional_records().add(newRecordId);
-            currentUser.getNutritional_records().remove(record_id);
+                    db.collection("user")
+                            .document(email)
+                            .update("nutritional_records", FieldValue.arrayRemove(record_id))
+                            .addOnSuccessListener(aVoid -> {
+                                db.collection("user")
+                                        .document(email)
+                                        .update("nutritional_records", FieldValue.arrayUnion(newRecordId))
+                                        .addOnSuccessListener(aVoid2 ->
+                                                Log.d("UserHelper", "Nutritional record updated successfully."))
+                                        .addOnFailureListener(e ->
+                                                Log.e("UserHelper", "Error updating nutritional record", e));
+                            })
+                            .addOnFailureListener(e ->
+                                    Log.e("UserHelper", "Error removing old nutritional record", e));
+                }
 
-            db.collection("user")
-                    .document(email)
-                    .update(
-                            "nutritional_records", FieldValue.arrayRemove(record_id),
-                            "nutritional_records", FieldValue.arrayUnion(newRecordId)
-                    )
-                    .addOnSuccessListener(aVoid -> {
-                        Log.d("Firestore", "Nutritional record updated successfully.");
-                    })
-                    .addOnFailureListener(e -> {
-                        Log.e("Firestore", "Error updating nutritional record", e);
-                    });
-        }
+                @Override
+                public void onError(Exception e) {
+                    Log.e("UserHelper", "Error updating nutritional record: " + e.getMessage());
+                }
+            });
+        });
     }
 
     // Delete nutritional record
     public void deleteUserNutritionalRecord(String record_id) {
-        if (email == null || email.isEmpty()) {
-            throw new IllegalArgumentException("Email is null or empty");
-        }
+        enqueueOrExecute(() -> {
+            if (email == null || email.isEmpty()) {
+                throw new IllegalArgumentException("Email is null or empty");
+            }
 
-        if (record_id == null || record_id.isEmpty()) {
-            throw new IllegalArgumentException("record_id is null or empty");
-        }
+            if (record_id == null || record_id.isEmpty()) {
+                throw new IllegalArgumentException("record_id is null or empty");
+            }
 
-        if (currentUser.getNutritional_records().contains(record_id)) {
-            currentUser.getNutritional_records().remove(record_id);
+            if (currentUser.getNutritional_records().contains(record_id)) {
+                currentUser.getNutritional_records().remove(record_id);
 
-            db.collection("user")
-                    .document(email)
-                    .update("nutritional_records", FieldValue.arrayRemove(record_id))
-                    .addOnSuccessListener(aVoid -> {
-                        Log.d("Firestore", "Nutritional record removed from user successfully.");
-                    })
-                    .addOnFailureListener(e -> {
-                        Log.e("Firestore", "Error removing nutritional record from user", e);
-                    });
-        } else {
-            Log.d("Firestore", "Nutritional record not found in user's list.");
-        }
+                db.collection("user")
+                        .document(email)
+                        .update("nutritional_records", FieldValue.arrayRemove(record_id))
+                        .addOnSuccessListener(aVoid -> {
+                            Log.d("UserHelper", "Nutritional record removed from user successfully.");
+                        })
+                        .addOnFailureListener(e -> {
+                            Log.e("UserHelper", "Error removing nutritional record from user", e);
+                        });
+            } else {
+                Log.d("UserHelper", "Nutritional record not found in user's list.");
+            }
+        });
     }
 
     // Section 3 : User Favourite Recipes
 
     // Fetch specific favourite recipe based on recipe id
-    public FavouriteRecipe fetchUserFavouriteRecipe(String recipe_id) {
-        if (recipe_id == null || recipe_id.isEmpty()) {
-            throw new IllegalArgumentException("recipe_id is null or empty");
-        }
+    public void fetchUserFavouriteRecipe(String recipe_id, OnRecipeFetchedCallback callback) {
+        enqueueOrExecute(() -> {
+            if (recipe_id == null || recipe_id.isEmpty()) {
+                callback.onError(new IllegalArgumentException("recipe_id is null or empty"));
+                return;
+            }
 
-        try {
-            return favouriteRecipeHelper.fetchFavouriteRecipe(recipe_id);
-        } catch (Exception e) {
-            System.err.println("Error fetching favourite recipe: " + e.getMessage());
-            return null;
-        }
+            favouriteRecipeHelper.fetchFavouriteRecipe(recipe_id)
+                    .addOnSuccessListener(recipe -> {
+                        if (recipe != null) {
+                            callback.onRecipeFetched(recipe);
+                        } else {
+                            callback.onError(new Exception("Favourite recipe not found"));
+                        }
+                    })
+                    .addOnFailureListener(callback::onError);
+        });
     }
 
     // Fetch list of favourite recipes based on recipe id
-    public List<FavouriteRecipe> fetchAllUserFavouriteRecipes() {
-        List<String> recipe_id = currentUser.getFavourite_recipes();
-        if (recipe_id == null || recipe_id.isEmpty()) {
-            throw new IllegalArgumentException("recipe_id is null or empty");
-        }
+    public void fetchAllUserFavouriteRecipes(OnRecipeListFetchedCallback callback) {
+        enqueueOrExecute(() -> {
+            if (!isUserLoaded) {
+                Log.e("UserHelper", "User is not loaded yet. Aborting operation.");
+                return;
+            }
 
-        try {
-            return favouriteRecipeHelper.fetchSomeFavouriteRecipes(recipe_id);
-        } catch (Exception e) {
-            System.err.println("Error fetching favourite recipe: " + e.getMessage());
-            return null;
-        }
+            List<String> recipe_id = currentUser.getFavourite_recipes();
+
+            if (recipe_id == null || recipe_id.isEmpty()) {
+                callback.onError(new IllegalArgumentException("recipe_id(s) are null or empty"));
+                return;
+            }
+
+            favouriteRecipeHelper.fetchSomeFavouriteRecipes(recipe_id)
+                    .addOnSuccessListener(recipes -> {
+                        if (recipes != null && !recipes.isEmpty()) {
+                            callback.onRecipeListFetched(recipes);
+                        } else {
+                            callback.onError(new Exception("No favourite recipes found"));
+                        }
+                    })
+                    .addOnFailureListener(callback::onError);
+        });
     }
 
     // Search favourite recipes by name
-    public List<FavouriteRecipe> searchUserFavouriteRecipesByName(String name) {
-        if (name == null || name.isEmpty()) {
-            throw new IllegalArgumentException("name is null or empty");
-        }
+    public void searchUserFavouriteRecipesByName(String name, OnRecipeListFetchedCallback callback) {
+        enqueueOrExecute(() -> {
+            if (name == null || name.isEmpty()) {
+                callback.onError(new IllegalArgumentException("Name is null or empty"));
+                return;
+            }
 
-        try {
-            return favouriteRecipeHelper.searchFavouriteRecipesByName(name);
-        } catch (Exception e) {
-            System.err.println("Error searching favourite recipe: " + e.getMessage());
-            return null;
-        }
+            favouriteRecipeHelper.searchFavouriteRecipesByName(name)
+                    .addOnSuccessListener(recipes -> {
+                        if (recipes != null && !recipes.isEmpty()) {
+                            callback.onRecipeListFetched(recipes);
+                        } else {
+                            callback.onError(new Exception("No favourite recipes found by name"));
+                        }
+                    })
+                    .addOnFailureListener(callback::onError);
+        });
     }
 
-    // Add new nutritional record
+    // Add new favourite recipe
     public void addUserFavouriteRecipe(Map<String, Object> recipe) {
-        if (email == null || email.isEmpty()) {
-            throw new IllegalArgumentException("Email is null or empty");
-        }
+        enqueueOrExecute(() -> {
+            if (email == null || email.isEmpty()) {
+                throw new IllegalArgumentException("Email is null or empty");
+            }
 
-        String newRecipeId = null;
-        try {
-            newRecipeId = favouriteRecipeHelper.addFavouriteRecipe(recipe);
-        } catch (Exception e) {
-            System.err.println("Error adding nutritional record: " + e.getMessage());
-        }
+            favouriteRecipeHelper.addFavouriteRecipe(recipe, new FavouriteRecipeHelper.OnRecipeAddedCallback() {
+                @Override
+                public void onRecipeAdded(String recipeId) {
+                    currentUser.getFavourite_recipes().add(recipeId);
 
-        if (newRecipeId != null) {
-            currentUser.getFavourite_recipes().add(newRecipeId);
+                    db.collection("user")
+                            .document(email)
+                            .update("favourite_recipes", FieldValue.arrayUnion(recipeId))
+                            .addOnSuccessListener(aVoid -> {
+                                Log.d("UserHelper", "New favourite recipe added to user successfully.");
+                            })
+                            .addOnFailureListener(e -> {
+                                Log.e("UserHelper", "Error adding new favourite recipe to user", e);
+                            });
+                }
 
-            db.collection("user")
-                    .document(email)
-                    .update("favourite_recipes", FieldValue.arrayUnion(newRecipeId))
-                    .addOnSuccessListener(aVoid -> {
-                        Log.d("Firestore", "New favourite recipe ID added to user successfully.");
-                    })
-                    .addOnFailureListener(e -> {
-                        Log.e("Firestore", "Error adding new favourite recipe ID to user", e);
-                    });
-        }
+                @Override
+                public void onError(Exception e) {
+                    Log.e("UserHelper", "Error adding favourite recipe: " + e.getMessage());
+                }
+            });
+        });
     }
 
     // Update favourite recipe
     public void updateUserFavouriteRecipe(String recipe_id, Map<String, Object> recipe) {
-        if (email == null || email.isEmpty()) {
-            throw new IllegalArgumentException("Email is null or empty");
-        }
+        enqueueOrExecute(() -> {
+            if (email == null || email.isEmpty()) {
+                throw new IllegalArgumentException("Email is null or empty");
+            }
 
-        String newRecipeId = null;
-        try {
-            newRecipeId = favouriteRecipeHelper.addFavouriteRecipe(recipe);
-        } catch (Exception e) {
-            System.err.println("Error adding favourite recipe: " + e.getMessage());
-            return;  // exit early
-        }
+            favouriteRecipeHelper.addFavouriteRecipe(recipe, new FavouriteRecipeHelper.OnRecipeAddedCallback() {
+                @Override
+                public void onRecipeAdded(String newRecipeId) {
+                    if (currentUser.getNutritional_records() != null) {
+                        currentUser.getNutritional_records().add(newRecipeId);
+                        currentUser.getNutritional_records().remove(recipe_id);
+                    }
 
-        if (newRecipeId != null) {
-            currentUser.getFavourite_recipes().add(newRecipeId);
-            currentUser.getFavourite_recipes().remove(recipe_id);
+                    db.collection("user")
+                            .document(email)
+                            .update("favourite_recipes", FieldValue.arrayRemove(recipe_id))
+                            .addOnSuccessListener(aVoid -> {
+                                db.collection("user")
+                                        .document(email)
+                                        .update("favourite_recipes", FieldValue.arrayUnion(newRecipeId))
+                                        .addOnSuccessListener(aVoid2 ->
+                                                Log.d("UserHelper", "Favourite recipe updated successfully."))
+                                        .addOnFailureListener(e ->
+                                                Log.e("UserHelper", "Error adding new favourite recipe", e));
+                            })
+                            .addOnFailureListener(e ->
+                                    Log.e("UserHelper", "Error removing old favourite recipe", e));
+                }
 
-            db.collection("user")
-                    .document(email)
-                    .update(
-                            "favourite_recipes", FieldValue.arrayRemove(recipe_id),
-                            "favourite_recipes", FieldValue.arrayUnion(newRecipeId)
-                    )
-                    .addOnSuccessListener(aVoid -> {
-                        Log.d("Firestore", "Favourite recipe updated successfully.");
-                    })
-                    .addOnFailureListener(e -> {
-                        Log.e("Firestore", "Error updating favourite recipe", e);
-                    });
-        }
+                @Override
+                public void onError(Exception e) {
+                    Log.e("UserHelper", "Error updating favourite recipe: " + e.getMessage());
+                }
+            });
+        });
     }
 
     // Delete favourite recipe
     public void deleteUserFavouriteRecipe(String recipe_id) {
-        if (email == null || email.isEmpty()) {
-            throw new IllegalArgumentException("Email is null or empty");
-        }
+        enqueueOrExecute(() -> {
+            if (email == null || email.isEmpty()) {
+                throw new IllegalArgumentException("Email is null or empty");
+            }
 
-        if (recipe_id == null || recipe_id.isEmpty()) {
-            throw new IllegalArgumentException("recipe_id is null or empty");
-        }
+            if (recipe_id == null || recipe_id.isEmpty()) {
+                throw new IllegalArgumentException("recipe_id is null or empty");
+            }
 
-        if (currentUser.getFavourite_recipes().contains(recipe_id)) {
-            currentUser.getFavourite_recipes().remove(recipe_id);
+            if (currentUser.getFavourite_recipes().contains(recipe_id)) {
+                currentUser.getFavourite_recipes().remove(recipe_id);
 
-            db.collection("user")
-                    .document(email)
-                    .update("favourite_recipes", FieldValue.arrayRemove(recipe_id))
-                    .addOnSuccessListener(aVoid -> {
-                        Log.d("Firestore", "Favourite recipe removed from user successfully.");
-                    })
-                    .addOnFailureListener(e -> {
-                        Log.e("Firestore", "Error removing favourite recipe from user", e);
-                    });
-        } else {
-            Log.d("Firestore", "Favourite recipe not found in user's list.");
-        }
+                db.collection("user")
+                        .document(email)
+                        .update("favourite_recipes", FieldValue.arrayRemove(recipe_id))
+                        .addOnSuccessListener(aVoid -> {
+                            Log.d("UserHelper", "Favourite recipe removed from user successfully.");
+                        })
+                        .addOnFailureListener(e -> {
+                            Log.e("UserHelper", "Error removing favourite recipe from user", e);
+                        });
+            } else {
+                Log.d("UserHelper", "Favourite recipe not found in user's list.");
+            }
+        });
     }
 
-    // Callback Interface for Asynchronous Operations
-    public interface Callback<T> {
-        void onSuccess(T result);
+    // Callback interfaces
+    public interface OnRecordFetchedCallback {
+        void onRecordFetched(NutritionalRecord record);
 
-        void onFailure(Exception e);
+        void onError(Exception e);
+    }
+
+    public interface OnRecipeFetchedCallback {
+        void onRecipeFetched(FavouriteRecipe recipe);
+
+        void onError(Exception e);
+    }
+
+    public interface OnRecordListFetchedCallback {
+        void onRecordListFetched(List<NutritionalRecord> records);
+
+        void onError(Exception e);
+    }
+
+    public interface OnRecipeListFetchedCallback {
+        void onRecipeListFetched(List<FavouriteRecipe> recipes);
+
+        void onError(Exception e);
     }
 }

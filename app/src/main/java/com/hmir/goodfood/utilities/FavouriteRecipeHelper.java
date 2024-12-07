@@ -2,6 +2,8 @@ package com.hmir.goodfood.utilities;
 
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.DocumentReference;
@@ -20,6 +22,10 @@ import java.util.concurrent.ExecutionException;
 public class FavouriteRecipeHelper {
     /*
       In this class, there will be multiple methods relating to favourite recipe(s):
+
+      * Note :  The following Functions 1 - 4 are mostly covered in UserHelper, so these usually are not being used / called directly from
+                FavouriteRecipeHelper.
+
       Function 1 : Fetch and Search
                     - fetchFavouriteRecipe()
                     - fetchSomeFavouriteRecipes()
@@ -41,9 +47,8 @@ public class FavouriteRecipeHelper {
 
     // Function 1 : Fetch and Search
 
-    // Helper Method
     // Fetch specific favourite recipe and return a Task of it
-    private Task<FavouriteRecipe> fetchFavouriteRecipeTask(String recipe_id) {
+    public Task<FavouriteRecipe> fetchFavouriteRecipe(@NonNull String recipe_id) {
         return db.collection("favourite_recipes")
                 .document(recipe_id)
                 .get()
@@ -67,25 +72,10 @@ public class FavouriteRecipeHelper {
                 });
     }
 
-    // Return FavouriteRecipe object
-    public FavouriteRecipe fetchFavouriteRecipe(String recipe_id) throws Exception {
-        if (recipe_id == null || recipe_id.isEmpty()) {
-            throw new IllegalArgumentException("recipe_id is null or empty");
-        }
-
-        try {
-            Task<FavouriteRecipe> task = fetchFavouriteRecipeTask(recipe_id);
-            return Tasks.await(task); // This blocks until the task completes
-        } catch (ExecutionException | InterruptedException e) {
-            throw new Exception("Error fetching favourite recipe information", e);
-        }
-    }
-
-    // Helper Method
     // Fetch selected favourite recipes and return a Task of a List of them
-    private Task<List<FavouriteRecipe>> fetchSomeFavouriteRecipesTask(List<String> recipe_id) {
+    public Task<List<FavouriteRecipe>> fetchSomeFavouriteRecipes(List<String> recipe_id) {
         if (recipe_id == null || recipe_id.isEmpty()) {
-            return Tasks.forException(new Exception("recipe IDs list is null or empty"));
+            return Tasks.forException(new Exception("recipe_id(s) list is null or empty"));
         }
 
         List<Task<DocumentSnapshot>> tasks = new ArrayList<>();
@@ -110,23 +100,8 @@ public class FavouriteRecipeHelper {
         });
     }
 
-    // Return selected FavouriteRecipe objects List
-    public List<FavouriteRecipe> fetchSomeFavouriteRecipes(List<String> recipe_id) throws Exception {
-        if (recipe_id == null || recipe_id.isEmpty()) {
-            throw new Exception("recipe IDs list is null or empty");
-        }
-
-        try {
-            Task<List<FavouriteRecipe>> task = fetchSomeFavouriteRecipesTask(recipe_id);
-            return Tasks.await(task);
-        } catch (ExecutionException | InterruptedException e) {
-            throw new Exception("Error fetching selected favourite recipes", e);
-        }
-    }
-
-    // Helper Method
     // Fetch all favourite recipes with no restrictions and return a Task of a List of them
-    private Task<List<FavouriteRecipe>> fetchAllFavouriteRecipesTask() {
+    private Task<List<FavouriteRecipe>> fetchAllFavouriteRecipes() {
         return db.collection("favourite_recipes")
                 .get()
                 .continueWith(task -> {
@@ -149,19 +124,8 @@ public class FavouriteRecipeHelper {
                 });
     }
 
-    // Return all FavouriteRecipe objects List
-    public List<FavouriteRecipe> fetchAllFavouriteRecipes() throws Exception {
-        try {
-            Task<List<FavouriteRecipe>> task = fetchAllFavouriteRecipesTask();
-            return Tasks.await(task);
-        } catch (ExecutionException | InterruptedException e) {
-            throw new Exception("Error fetching all favourite recipes", e);
-        }
-    }
-
-    // Helper Method
     // Search favourite recipes by name (inclusive - contains)
-    private Task<List<FavouriteRecipe>> searchFavouriteRecipesByNameTask(String name) {
+    public Task<List<FavouriteRecipe>> searchFavouriteRecipesByName(String name) {
         if (name == null || name.isEmpty()) {
             return Tasks.forException(new IllegalArgumentException("Name is null or empty"));
         }
@@ -192,79 +156,36 @@ public class FavouriteRecipeHelper {
                 });
     }
 
-    // Return searched FavouriteRecipe objects List
-    public List<FavouriteRecipe> searchFavouriteRecipesByName(String name) throws Exception {
-        if (name == null || name.isEmpty()) {
-            throw new IllegalArgumentException("Name is null or empty");
-        }
-
-        try {
-            Task<List<FavouriteRecipe>> task = searchFavouriteRecipesByNameTask(name);
-            return Tasks.await(task);
-        } catch (ExecutionException | InterruptedException e) {
-            throw new Exception("Error fetching favourite recipe information", e);
-        }
-    }
-
     // Function 2 : Add
 
     // Add new favourite recipe
-    public String addFavouriteRecipe(Map<String, Object> recipe) throws Exception {
+    public void addFavouriteRecipe(Map<String, Object> recipe, OnRecipeAddedCallback callback) {
         Map<String, Object> defaultRecipe = new HashMap<>();
-        defaultRecipe.put("calcium", null);
-        defaultRecipe.put("calories", null);
-        defaultRecipe.put("carbs", null);
-        defaultRecipe.put("magnesium", null);
-        defaultRecipe.put("cholesterol", null);
+        defaultRecipe.put("calcium", 0);
+        defaultRecipe.put("calories", 0);
+        defaultRecipe.put("carbs", 0);
+        defaultRecipe.put("magnesium", 0);
+        defaultRecipe.put("cholesterol", 0);
         defaultRecipe.put("diet_labels", null);
-        defaultRecipe.put("fat", null);
+        defaultRecipe.put("fat", 0);
         defaultRecipe.put("image", null);
         defaultRecipe.put("name", null);
-        defaultRecipe.put("iron", null);
-        defaultRecipe.put("potassium", null);
-        defaultRecipe.put("protein", null);
-        defaultRecipe.put("sodium", null);
-        defaultRecipe.put("servings", null);
+        defaultRecipe.put("iron", 0);
+        defaultRecipe.put("potassium", 0);
+        defaultRecipe.put("protein", 0);
+        defaultRecipe.put("sodium", 0);
+        defaultRecipe.put("servings", 0);
         defaultRecipe.putAll(recipe);
 
-        try {
-            // Fetch the latest recipe ID
-            Task<QuerySnapshot> queryTask = db.collection("favourite_recipes")
-                    .orderBy(FieldPath.documentId(), Query.Direction.DESCENDING)
-                    .limit(1)
-                    .get();
-
-            QuerySnapshot querySnapshot = Tasks.await(queryTask);
-
-            // Generate the new recipe ID
-            String newrecipeId = "recipe-1";
-            if (!querySnapshot.isEmpty()) {
-                DocumentSnapshot latestrecipe = querySnapshot.getDocuments().get(0);
-                String latestrecipeId = latestrecipe.getId();
-                if (latestrecipeId.startsWith("recipe-")) {
-                    String[] parts = latestrecipeId.split("-");
-                    try {
-                        int currentId = Integer.parseInt(parts[1]);
-                        newrecipeId = "recipe-" + (currentId + 1);
-                    } catch (NumberFormatException e) {
-                        Log.e("Firestore", "Failed to parse recipe ID: " + latestrecipeId, e);
-                    }
-                }
-            }
-
-            // Add the new recipe to Firestore
-            Task<Void> addTask = db.collection("favourite_recipes")
-                    .document(newrecipeId)
-                    .set(defaultRecipe);
-
-            Tasks.await(addTask);
-
-            // Return the new recipe ID
-            return newrecipeId;
-
-        } catch (ExecutionException | InterruptedException e) {
-            throw new Exception("Error adding favourite recipe", e);
-        }
+        db.collection("favourite_recipes")
+                .add(defaultRecipe)
+                .addOnSuccessListener(documentReference -> {
+                    String newRecipeId = documentReference.getId();
+                    callback.onRecipeAdded(newRecipeId);
+                })
+                .addOnFailureListener(e -> {
+                    callback.onError(new Exception("Error adding favourite recipe", e));
+                });
     }
 
     // Function 3 : Update
@@ -297,8 +218,8 @@ public class FavouriteRecipeHelper {
         db.collection("favourite_recipes")
                 .document(recipe_id)
                 .update(recipeUpdates)
-                .addOnSuccessListener(aVoid -> Log.d("Firestore", "recipe info updated"))
-                .addOnFailureListener(e -> Log.e("Firestore", "Error updating recipe info", e));
+                .addOnSuccessListener(aVoid -> Log.d("FavouriteRecipeHelper", "recipe info updated"))
+                .addOnFailureListener(e -> Log.e("FavouriteRecipeHelper", "Error updating recipe info", e));
     }
 
     // Function 4 : Delete
@@ -312,7 +233,12 @@ public class FavouriteRecipeHelper {
         db.collection("favourite_recipes")
                 .document(recipe_id)
                 .delete()
-                .addOnSuccessListener(aVoid -> Log.d("Firestore", "favourite recipe deleted"))
-                .addOnFailureListener(e -> Log.e("Firestore", "Error deleting favourite recipe", e));
+                .addOnSuccessListener(aVoid -> Log.d("FavouriteRecipeHelper", "favourite recipe deleted"))
+                .addOnFailureListener(e -> Log.e("FavouriteRecipeHelper", "Error deleting favourite recipe", e));
+    }
+
+    public interface OnRecipeAddedCallback {
+        void onRecipeAdded(String recipeId);
+        void onError(Exception e);
     }
 }
