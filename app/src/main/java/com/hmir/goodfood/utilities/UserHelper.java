@@ -2,7 +2,10 @@ package com.hmir.goodfood.utilities;
 
 import android.util.Log;
 
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
@@ -17,20 +20,12 @@ public class UserHelper {
     /*
       In this class, there will be multiple sections of methods relating to a user:
       Section 1 : User Specifics
+                    - fetchUser()
                     - addNewUser()
                     - updateUserInfo()
                     - deleteUser()
 
-                    * just call these methods the normal way
-
-      Section 2 : User Nutritional Records
-                    - fetchUserNutritionalRecord()
-                    - fetchAllUserNutritionalRecords()
-                    - addUserNutritionalRecord()
-                    - updateUserNutritionalRecord()
-                    - deleteUserNutritionalRecord()
-
-                    * fetch methods are called with callbacks
+                    *  fetch methods are called with callbacks
                         userHelper.fetchMethod(argument, new UserHelper.OnFetchedCallback() {
                             @Override
                             public void onFetched(Object obj) {
@@ -44,6 +39,15 @@ public class UserHelper {
                         });
                     * other methods are called the normal way
 
+      Section 2 : User Nutritional Records
+                    - fetchUserNutritionalRecord()
+                    - fetchAllUserNutritionalRecords()
+                    - addUserNutritionalRecord()
+                    - updateUserNutritionalRecord()
+                    - deleteUserNutritionalRecord()
+
+                    * refer to Section 1 for method calling
+
       Section 3 : User Favourite Recipes
                     - fetchUserFavouriteRecipe()
                     - fetchAllUserFavouriteRecipes()
@@ -52,7 +56,16 @@ public class UserHelper {
                     - updateUserFavouriteRecipe()
                     - deleteUserFavouriteRecipe()
 
-                    * refer to Section 2 for method calling
+                    * refer to Section 1 for method calling
+
+       Section 4 : Callbacks
+                    - OnRecordFetchedCallback
+                    - OnRecipeFetchedCallback
+                    - OnRecordListFetchedCallback
+                    - OnRecipeListFetchedCallback
+                    - OnUserFetchedCallback
+
+                    * do use these if you are calling fetch methods
     */
 
     private final static String email = FirebaseAuth.getInstance().getCurrentUser().getEmail();
@@ -62,25 +75,27 @@ public class UserHelper {
     private final NutritionalRecordHelper nutritionalRecordHelper = new NutritionalRecordHelper();
     private final FavouriteRecipeHelper favouriteRecipeHelper = new FavouriteRecipeHelper();
     private final Queue<Runnable> pendingOperations = new LinkedList<>();
-    private User currentUser;
+    protected User currentUser;
 
     public UserHelper() {
         initializeCurrentUser();
     }
 
-    public void initializeCurrentUser() {
-        currentUser = new User(new User.UserCallback() {
-            @Override
-            public void onSuccess(User user) {
-                Log.d("UserHelper", "User loaded successfully: " + user.toString());
-                currentUser = user;
-                isUserLoaded = true;
-                processPendingOperations();
-            }
-
-            @Override
-            public void onFailure(Exception e) {
-                Log.e("UserHelper", "Error loading user: " + e.getMessage());
+    private void initializeCurrentUser() {
+        fetchUser().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                User user = task.getResult();
+                if (user != null) {
+                    Log.d("UserHelper", "User loaded successfully: " + user.toString());
+                    currentUser = user;
+                    isUserLoaded = true;
+                    processPendingOperations();
+                } else {
+                    Log.e("UserHelper", "User not found");
+                }
+            } else {
+                Exception e = task.getException();
+                Log.e("UserHelper", "Error loading user: " + (e != null ? e.getMessage() : "Unknown error"));
             }
         });
     }
@@ -103,6 +118,26 @@ public class UserHelper {
     }
 
     // Section 1 : User Specifics
+
+    // Fetch user and return a Task of it
+    public Task<User> fetchUser() {
+        if (email == null || email.isEmpty()) {
+            return Tasks.forException(new Exception("Email is null or empty"));
+        }
+
+        return db.collection("user").document(email).get().continueWith(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot documentSnapshot = task.getResult();
+                if (documentSnapshot.exists()) {
+                    return documentSnapshot.toObject(User.class);
+                } else {
+                    throw new Exception("User not found");
+                }
+            } else {
+                throw task.getException() != null ? task.getException() : new Exception("Failed to fetch user record");
+            }
+        });
+    }
 
     // Update User document
     public void updateUserInfo(String username, List<String> health_labels, long age, double height, double weight,
@@ -501,25 +536,26 @@ public class UserHelper {
     // Callback interfaces
     public interface OnRecordFetchedCallback {
         void onRecordFetched(NutritionalRecord record);
-
         void onError(Exception e);
     }
 
     public interface OnRecipeFetchedCallback {
         void onRecipeFetched(FavouriteRecipe recipe);
-
         void onError(Exception e);
     }
 
     public interface OnRecordListFetchedCallback {
         void onRecordListFetched(List<NutritionalRecord> records);
-
         void onError(Exception e);
     }
 
     public interface OnRecipeListFetchedCallback {
         void onRecipeListFetched(List<FavouriteRecipe> recipes);
+        void onError(Exception e);
+    }
 
+    public interface OnUserFetchedCallback {
+        void onUserFetched(User user);
         void onError(Exception e);
     }
 }
