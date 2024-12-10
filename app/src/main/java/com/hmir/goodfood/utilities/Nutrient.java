@@ -1,4 +1,4 @@
-package com.hmir.goodfood;
+package com.hmir.goodfood.utilities;
 
 public class Nutrient {
     // Temporary nutrient class for data
