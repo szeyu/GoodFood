@@ -3,8 +3,6 @@ package com.hmir.goodfood;
 import android.content.Intent;
 
 import android.os.Bundle;
-import android.view.View;
-import android.widget.ImageButton;
 import android.util.Log;
 
 import androidx.activity.EdgeToEdge;
@@ -21,19 +19,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_main);
         FirebaseApp.initializeApp(MainActivity.this);
-        ImageButton searchButton = findViewById(R.id.searchButton);
-
-        // Set OnClickListener for the search button
-        searchButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Intent to navigate to SearchActivity
-                Intent intent = new Intent(com.hmir.goodfood.MainActivity.this, SearchActivity.class);
-                startActivity(intent);
-            }
-        });
 
         // Check the user's authentication status
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
