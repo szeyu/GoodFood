@@ -59,8 +59,8 @@ public class TipsActivity extends AppCompatActivity {
                 addDots(tipsList.size(), currentPosition);
                 updateButtonText();
             } else {
-                // Last tip - navigate to the main activity
-                Intent intent = new Intent(TipsActivity.this, MainActivity.class);
+                // Last tip - navigate to the login page
+                Intent intent = new Intent(TipsActivity.this, LoginPage.class);
                 startActivity(intent);
                 finish();
             }
