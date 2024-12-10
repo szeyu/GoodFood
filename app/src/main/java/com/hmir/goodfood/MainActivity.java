@@ -2,6 +2,7 @@ package com.hmir.goodfood;
 
 import android.content.Intent;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -29,8 +30,14 @@ public class MainActivity extends AppCompatActivity {
             // Print all user info
             printUserInfo(currentUser);
 
-            // redirect to home page
-            redirectToHomePage();
+            // Check if user data exists in SharedPreferences
+            if (isUserDataAvailable()) {
+                // Redirect to home page
+                redirectToHomePage();
+            } else {
+                // Redirect to welcome page to collect user info
+                redirectToWelcomePage();
+            }
         } else {
             // User is not signed in, redirect to login page
             redirectToLoginPage();
@@ -40,6 +47,16 @@ public class MainActivity extends AppCompatActivity {
         finish();
     }
 
+    private boolean isUserDataAvailable() {
+        SharedPreferences sharedPreferences = getSharedPreferences("UserPreferences", MODE_PRIVATE);
+
+        // Check if the key "Username" or any other mandatory field exists
+        return sharedPreferences.contains("Username") &&
+                sharedPreferences.contains("Age") &&
+                sharedPreferences.contains("Height") &&
+                sharedPreferences.contains("Weight")&&
+                sharedPreferences.contains("DietTypes");
+    }
     private void printUserInfo(FirebaseUser user){
         String TAG = "Firebase";
         if (user != null) {
@@ -58,6 +75,11 @@ public class MainActivity extends AppCompatActivity {
 
     private void redirectToLoginPage() {
         Intent intent = new Intent(MainActivity.this, LoginPage.class);
+        startActivity(intent);
+    }
+
+    private void redirectToWelcomePage() {
+        Intent intent = new Intent(MainActivity.this, welcomePage.class);
         startActivity(intent);
     }
 }
