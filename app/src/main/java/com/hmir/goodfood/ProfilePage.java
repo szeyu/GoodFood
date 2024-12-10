@@ -43,5 +43,23 @@ public class ProfilePage extends AppCompatActivity {
             finish(); // Close ProfilePage
         });
     }
+
+    public void goEditProfile(View view){
+        Intent intent = new Intent(ProfilePage.this, ProfilePageFunctions.class);
+        intent.putExtra("FRAGMENT_TYPE", "EditProfile");
+        startActivity(intent);
+    }
+
+    public void goToHistory(View view){
+
+    }
+
+    public void goToSettings(View view){
+
+    }
+
+    public void goToPrivacyPolicy(View view){
+
+    }
 }
 

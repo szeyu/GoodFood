@@ -9,7 +9,7 @@
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/FCProfileFunctions"
-        android:name="com.example.goodfood.EditProfileFragment"
+        android:name="com.hmir.goodfood.EditProfileFragment"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -19,7 +19,7 @@
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragmentContainerView3"
-        android:name="com.example.goodfood.BottomNavigationFragment"
+        android:name="com.hmir.goodfood.BottomNavigationFragment"
         android:layout_width="410dp"
         android:layout_height="93dp"
         app:layout_constraintBottom_toBottomOf="parent"

@@ -8,18 +8,33 @@
     tools:context=".ProfilePage">
 
     <Button
+        android:id="@+id/BtnEditProfile"
+        android:layout_width="72dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="88dp"
+        android:layout_marginTop="12dp"
+        android:backgroundTint="#FDFBFB"
+        android:onClick="goEditProfile"
+        android:text=">"
+        android:textColor="#4E4C4C"
+        android:textSize="24sp"
+        app:layout_constraintStart_toEndOf="@+id/TVEditProfile"
+        app:layout_constraintTop_toBottomOf="@+id/TVName"
+        app:rippleColor="#615D5D" />
+
+    <Button
         android:id="@+id/BtnHistory"
         android:layout_width="72dp"
         android:layout_height="48dp"
         android:layout_marginTop="12dp"
         android:backgroundTint="#FDFBFB"
+        android:onClick="goToHistory"
         android:text=">"
         android:textColor="#4E4C4C"
         android:textSize="24sp"
         app:layout_constraintStart_toStartOf="@+id/BtnEditProfile"
         app:layout_constraintTop_toBottomOf="@+id/BtnEditProfile"
-        app:rippleColor="#615D5D"
-        android:onClick="onButtonClicked"/>
+        app:rippleColor="#615D5D" />
 
     <Button
         android:id="@+id/BtnSettings"
@@ -27,13 +42,13 @@
         android:layout_height="48dp"
         android:layout_marginTop="12dp"
         android:backgroundTint="#FDFBFB"
+        android:onClick="goToSettings"
         android:text=">"
         android:textColor="#4E4C4C"
         android:textSize="24sp"
         app:layout_constraintStart_toStartOf="@+id/BtnHistory"
         app:layout_constraintTop_toBottomOf="@+id/BtnHistory"
-        app:rippleColor="#615D5D"
-        android:onClick="onButtonClicked"/>
+        app:rippleColor="#615D5D" />
 
     <Button
         android:id="@+id/BtnPrivacyPolicy"
@@ -41,13 +56,13 @@
         android:layout_height="48dp"
         android:layout_marginTop="12dp"
         android:backgroundTint="#FDFBFB"
+        android:onClick="goToPrivacyPolicy"
         android:text=">"
         android:textColor="#4E4C4C"
         android:textSize="24sp"
         app:layout_constraintStart_toStartOf="@+id/BtnSettings"
         app:layout_constraintTop_toBottomOf="@+id/BtnSettings"
-        app:rippleColor="#615D5D"
-        android:onClick="onButtonClicked"/>
+        app:rippleColor="#615D5D" />
 
     <TextView
         android:id="@+id/TVProfile"
@@ -175,21 +190,7 @@
         app:layout_constraintStart_toStartOf="@+id/TVPolicy"
         app:layout_constraintTop_toBottomOf="@+id/TVPolicy" />
 
-    <Button
-        android:id="@+id/BtnEditProfile"
-        android:layout_width="72dp"
-        android:layout_height="48dp"
-        android:layout_marginStart="88dp"
-        android:layout_marginTop="12dp"
-        android:backgroundTint="#FDFBFB"
-        android:text=">"
-        android:textColor="#4E4C4C"
-        android:textSize="24sp"
-        app:layout_constraintStart_toEndOf="@+id/TVEditProfile"
-        app:layout_constraintTop_toBottomOf="@+id/TVName"
-        app:rippleColor="#615D5D"
-        android:onClick="onButtonClicked" />
-        <!-- android:onClick="toEditProfile" /> -->
+    <!-- android:onClick="toEditProfile" /> -->
 
     <Button
         android:id="@+id/BtnLogout"
@@ -229,9 +230,9 @@
         android:id="@+id/fragmentContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        tools:layout_editor_absoluteY="0dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0"
         tools:layout_editor_absoluteX="0dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
