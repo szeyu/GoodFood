@@ -18,7 +18,8 @@ import android.widget.Toast;
 
 public class SettingsFragment extends Fragment {
 
-    private Button BtnPermissions, BtnReport;
+    private Button BtnPermissions;
+    private Button BtnReport;
 
     public SettingsFragment() {
         // Required empty public constructor
