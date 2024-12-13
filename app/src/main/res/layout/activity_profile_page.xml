@@ -12,56 +12,70 @@
         android:layout_width="72dp"
         android:layout_height="48dp"
         android:layout_marginStart="88dp"
-        android:layout_marginTop="12dp"
         android:backgroundTint="#FDFBFB"
         android:onClick="goEditProfile"
         android:text=">"
         android:textColor="#4E4C4C"
         android:textSize="24sp"
+        app:layout_constraintBottom_toBottomOf="@+id/TVEditProfile"
         app:layout_constraintStart_toEndOf="@+id/TVEditProfile"
-        app:layout_constraintTop_toBottomOf="@+id/TVName"
+        app:layout_constraintTop_toTopOf="@+id/TVEditProfile"
         app:rippleColor="#615D5D" />
 
     <Button
         android:id="@+id/BtnHistory"
         android:layout_width="72dp"
         android:layout_height="48dp"
-        android:layout_marginTop="12dp"
         android:backgroundTint="#FDFBFB"
         android:onClick="goToHistory"
         android:text=">"
         android:textColor="#4E4C4C"
         android:textSize="24sp"
+        app:layout_constraintBottom_toBottomOf="@+id/TVHistory"
         app:layout_constraintStart_toStartOf="@+id/BtnEditProfile"
-        app:layout_constraintTop_toBottomOf="@+id/BtnEditProfile"
+        app:layout_constraintTop_toTopOf="@+id/TVHistory"
         app:rippleColor="#615D5D" />
 
     <Button
         android:id="@+id/BtnSettings"
         android:layout_width="72dp"
         android:layout_height="48dp"
-        android:layout_marginTop="12dp"
         android:backgroundTint="#FDFBFB"
         android:onClick="goToSettings"
         android:text=">"
         android:textColor="#4E4C4C"
         android:textSize="24sp"
+        app:layout_constraintBottom_toBottomOf="@+id/TVSetting"
         app:layout_constraintStart_toStartOf="@+id/BtnHistory"
-        app:layout_constraintTop_toBottomOf="@+id/BtnHistory"
+        app:layout_constraintTop_toTopOf="@+id/TVSetting"
         app:rippleColor="#615D5D" />
 
     <Button
         android:id="@+id/BtnPrivacyPolicy"
         android:layout_width="72dp"
         android:layout_height="48dp"
-        android:layout_marginTop="12dp"
         android:backgroundTint="#FDFBFB"
         android:onClick="goToPrivacyPolicy"
         android:text=">"
         android:textColor="#4E4C4C"
         android:textSize="24sp"
+        app:layout_constraintBottom_toBottomOf="@+id/TVPolicy"
         app:layout_constraintStart_toStartOf="@+id/BtnSettings"
-        app:layout_constraintTop_toBottomOf="@+id/BtnSettings"
+        app:layout_constraintTop_toTopOf="@+id/TVPolicy"
+        app:rippleColor="#615D5D" />
+
+    <Button
+        android:id="@+id/BtnLogout"
+        android:layout_width="72dp"
+        android:layout_height="48dp"
+        android:backgroundTint="#FDFBFB"
+        android:onClick="logoutGoogle"
+        android:text=">"
+        android:textColor="#4E4C4C"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toBottomOf="@+id/TVLogout"
+        app:layout_constraintStart_toStartOf="@+id/BtnPrivacyPolicy"
+        app:layout_constraintTop_toTopOf="@+id/TVLogout"
         app:rippleColor="#615D5D" />
 
     <TextView
@@ -139,72 +153,58 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="28dp"
-        android:layout_marginTop="20dp"
         android:fontFamily="@font/poppins_medium"
         android:text="Edit Profile"
         android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="@+id/IVEditProfile"
         app:layout_constraintStart_toEndOf="@+id/IVEditProfile"
-        app:layout_constraintTop_toBottomOf="@+id/TVName" />
+        app:layout_constraintTop_toTopOf="@+id/IVEditProfile" />
 
     <TextView
         android:id="@+id/TVHistory"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="28dp"
         android:fontFamily="@font/poppins_medium"
         android:text="History"
         android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="@+id/IVHistory"
         app:layout_constraintStart_toStartOf="@+id/TVEditProfile"
-        app:layout_constraintTop_toBottomOf="@+id/TVEditProfile" />
+        app:layout_constraintTop_toTopOf="@+id/IVHistory" />
 
     <TextView
         android:id="@+id/TVSetting"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
         android:fontFamily="@font/poppins_medium"
         android:text="Settings"
         android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="@+id/IVSetting"
         app:layout_constraintStart_toStartOf="@+id/TVHistory"
-        app:layout_constraintTop_toBottomOf="@+id/TVHistory" />
+        app:layout_constraintTop_toTopOf="@+id/IVSetting" />
 
     <TextView
         android:id="@+id/TVPolicy"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="28dp"
         android:fontFamily="@font/poppins_medium"
         android:text="Privacy Policy"
         android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="@+id/IVPolicy"
         app:layout_constraintStart_toStartOf="@+id/TVSetting"
-        app:layout_constraintTop_toBottomOf="@+id/TVSetting" />
+        app:layout_constraintTop_toTopOf="@+id/IVPolicy" />
 
     <TextView
         android:id="@+id/TVLogout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
         android:fontFamily="@font/poppins_medium"
         android:text="Log Out"
         android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="@+id/IVLogout"
         app:layout_constraintStart_toStartOf="@+id/TVPolicy"
-        app:layout_constraintTop_toBottomOf="@+id/TVPolicy" />
+        app:layout_constraintTop_toTopOf="@+id/IVLogout" />
 
     <!-- android:onClick="toEditProfile" /> -->
-
-    <Button
-        android:id="@+id/BtnLogout"
-        android:layout_width="72dp"
-        android:layout_height="48dp"
-        android:layout_marginTop="12dp"
-        android:backgroundTint="#FDFBFB"
-        android:onClick="logoutGoogle"
-        android:text=">"
-        android:textColor="#4E4C4C"
-        android:textSize="24sp"
-        app:layout_constraintStart_toStartOf="@+id/BtnPrivacyPolicy"
-        app:layout_constraintTop_toBottomOf="@+id/BtnPrivacyPolicy"
-        app:rippleColor="#615D5D" />
 
     <ImageView
         android:id="@+id/IVProfile"
