@@ -51,15 +51,21 @@ public class ProfilePage extends AppCompatActivity {
     }
 
     public void goToHistory(View view){
-
+        Intent intent = new Intent(ProfilePage.this, ProfilePageFunctions.class);
+        intent.putExtra("FRAGMENT_TYPE", "History");
+        startActivity(intent);
     }
 
     public void goToSettings(View view){
-
+        Intent intent = new Intent(ProfilePage.this, ProfilePageFunctions.class);
+        intent.putExtra("FRAGMENT_TYPE", "Settings");
+        startActivity(intent);
     }
 
     public void goToPrivacyPolicy(View view){
-
+        Intent intent = new Intent(ProfilePage.this, ProfilePageFunctions.class);
+        intent.putExtra("FRAGMENT_TYPE", "PrivacyPolicy");
+        startActivity(intent);
     }
 }
 
