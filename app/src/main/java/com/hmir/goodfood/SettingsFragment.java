@@ -18,8 +18,8 @@ import android.widget.Toast;
 
 public class SettingsFragment extends Fragment {
 
-    private Button BtnPermissions, BtnReport;
-    private ImageButton IBBackSettings;
+    private Button BtnPermissions;
+    private Button BtnReport;
 
     public SettingsFragment() {
         // Required empty public constructor
@@ -36,7 +36,7 @@ public class SettingsFragment extends Fragment {
 
         BtnPermissions = view.findViewById(R.id.BtnPermissions);
         BtnReport = view.findViewById(R.id.BtnReport);
-        IBBackSettings = view.findViewById(R.id.IBBackSettings);
+        //IBBackSettings = view.findViewById(R.id.IBBackSettings);
 
         // listener for nutrient intake info button
         BtnPermissions.setOnClickListener(new View.OnClickListener() {
@@ -52,14 +52,14 @@ public class SettingsFragment extends Fragment {
                 showReportProblemDialog();
             }
         });
-
+        /*
         IBBackSettings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity(), ProfilePage.class);
                 startActivity(intent);
             }
-        });
+        }); */
 
         return view;
 
