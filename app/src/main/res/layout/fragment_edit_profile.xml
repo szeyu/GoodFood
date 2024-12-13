@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/EditProfileCL"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".EditProfileFragment">
+
+    <TextView
+        android:id="@+id/TVWeight"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:fontFamily="@font/poppins_medium"
+        android:text="Weight"
+        android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="@+id/ETUsername"
+        app:layout_constraintTop_toBottomOf="@+id/TVHeight" />
+
+    <TextView
+        android:id="@+id/TVDietTypes"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:fontFamily="@font/poppins_medium"
+        android:text="Diet Types"
+        android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="@+id/ETUsername"
+        app:layout_constraintTop_toBottomOf="@+id/TVWeight" />
+
+    <TextView
+        android:id="@+id/TVUsername"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="28dp"
+        android:layout_marginTop="24dp"
+        android:fontFamily="@font/poppins_medium"
+        android:text="Username"
+        android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/IVProfile2" />
+
+    <TextView
+        android:id="@+id/TVAge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:fontFamily="@font/poppins_medium"
+        android:text="Age"
+        android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="@+id/ETUsername"
+        app:layout_constraintTop_toBottomOf="@+id/ETUsername" />
+
+    <TextView
+        android:id="@+id/TVHeight"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:fontFamily="@font/poppins_medium"
+        android:text="Height"
+        android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="@+id/ETUsername"
+        app:layout_constraintTop_toBottomOf="@+id/TVAge" />
+
+    <ImageView
+        android:id="@+id/IVProfile2"
+        android:layout_width="172dp"
+        android:layout_height="172dp"
+        android:layout_marginTop="24dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/TVEditProfileTitle"
+        app:srcCompat="@drawable/profile_pic_circle" />
+
+    <TextView
+        android:id="@+id/TVEditProfileTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:fontFamily="@font/poppins_semibold"
+        android:text="Edit Profile"
+        android:textSize="30sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.472"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageButton
+        android:id="@+id/IBDone"
+        android:layout_width="54dp"
+        android:layout_height="57dp"
+        android:layout_marginEnd="40dp"
+        android:contentDescription="EditProfileDone"
+        android:src="?android:attr/textCheckMark"
+        app:layout_constraintBottom_toBottomOf="@+id/TVEditProfileTitle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/TVEditProfileTitle"
+        app:layout_constraintVertical_bias="1.0" />
+
+    <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/ETUsername"
+        android:layout_width="353dp"
+        android:layout_height="52dp"
+        android:backgroundTint="#090909"
+        android:fontFamily="sans-serif"
+        android:hint="Username"
+        android:textColor="#0D0D0D"
+        app:layout_constraintStart_toStartOf="@+id/TVUsername"
+        app:layout_constraintTop_toBottomOf="@+id/TVUsername" />
+
+    <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/ETAge"
+        android:layout_width="72dp"
+        android:layout_height="49dp"
+        android:layout_marginStart="64dp"
+        android:backgroundTint="#090909"
+        android:fontFamily="sans-serif"
+        android:hint=" Age"
+        android:textColor="#0D0D0D"
+        app:layout_constraintBottom_toBottomOf="@+id/TVAge"
+        app:layout_constraintStart_toEndOf="@+id/TVAge"
+        app:layout_constraintTop_toTopOf="@+id/TVAge" />
+
+    <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/ETWeight"
+        android:layout_width="79dp"
+        android:layout_height="54dp"
+        android:backgroundTint="#090909"
+        android:fontFamily="sans-serif"
+        android:hint="Weight"
+        android:textColor="#0D0D0D"
+        app:layout_constraintBottom_toBottomOf="@+id/TVWeight"
+        app:layout_constraintStart_toStartOf="@+id/ETAge"
+        app:layout_constraintTop_toTopOf="@+id/TVWeight" />
+
+    <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/ETHeight"
+        android:layout_width="78dp"
+        android:layout_height="52dp"
+        android:backgroundTint="#090909"
+        android:fontFamily="sans-serif"
+        android:hint="Height"
+        android:textColor="#0D0D0D"
+        app:layout_constraintBottom_toBottomOf="@+id/TVHeight"
+        app:layout_constraintStart_toStartOf="@+id/ETAge"
+        app:layout_constraintTop_toTopOf="@+id/TVHeight"
+        app:layout_constraintVertical_bias="0.466" />
+
+    <CheckBox
+        android:id="@+id/CBHalal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-medium"
+        android:text="Halal "
+        app:layout_constraintStart_toStartOf="@+id/TVDietTypes"
+        app:layout_constraintTop_toBottomOf="@+id/TVDietTypes" />
+
+    <CheckBox
+        android:id="@+id/CBSeafood"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="40dp"
+        android:fontFamily="sans-serif-medium"
+        android:text="Seafood"
+        android:textSize="14sp"
+        app:layout_constraintStart_toEndOf="@+id/CBHalal"
+        app:layout_constraintTop_toTopOf="@+id/CBHalal" />
+
+    <CheckBox
+        android:id="@+id/CBDairy"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-medium"
+        android:text="Dairy"
+        app:layout_constraintStart_toStartOf="@+id/TVDietTypes"
+        app:layout_constraintTop_toBottomOf="@+id/CBHalal" />
+
+    <CheckBox
+        android:id="@+id/CBPescetarian"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-medium"
+        android:text="Pescetarian"
+        app:layout_constraintStart_toStartOf="@+id/CBSeafood"
+        app:layout_constraintTop_toBottomOf="@+id/CBSeafood" />
+
+    <CheckBox
+        android:id="@+id/CBOthers"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-medium"
+        android:text="Others"
+        app:layout_constraintStart_toStartOf="@+id/CBVegan"
+        app:layout_constraintTop_toBottomOf="@+id/CBVegan" />
+
+    <CheckBox
+        android:id="@+id/CBVegan"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="40dp"
+        android:fontFamily="sans-serif-medium"
+        android:text="Vegan"
+        app:layout_constraintStart_toEndOf="@+id/CBSeafood"
+        app:layout_constraintTop_toTopOf="@+id/CBSeafood" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

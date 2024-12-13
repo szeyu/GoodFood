@@ -7,9 +7,6 @@ import android.view.View;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 
-import androidx.activity.EdgeToEdge;
-import androidx.appcompat.app.AppCompatActivity;
-
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -45,6 +42,30 @@ public class ProfilePage extends AppCompatActivity {
             startActivity(intent);
             finish(); // Close ProfilePage
         });
+    }
+
+    public void goEditProfile(View view){
+        Intent intent = new Intent(ProfilePage.this, ProfilePageFunctions.class);
+        intent.putExtra("FRAGMENT_TYPE", "EditProfile");
+        startActivity(intent);
+    }
+
+    public void goToHistory(View view){
+        Intent intent = new Intent(ProfilePage.this, ProfilePageFunctions.class);
+        intent.putExtra("FRAGMENT_TYPE", "History");
+        startActivity(intent);
+    }
+
+    public void goToSettings(View view){
+        Intent intent = new Intent(ProfilePage.this, ProfilePageFunctions.class);
+        intent.putExtra("FRAGMENT_TYPE", "Settings");
+        startActivity(intent);
+    }
+
+    public void goToPrivacyPolicy(View view){
+        Intent intent = new Intent(ProfilePage.this, ProfilePageFunctions.class);
+        intent.putExtra("FRAGMENT_TYPE", "PrivacyPolicy");
+        startActivity(intent);
     }
 }
 
