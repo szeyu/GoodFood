@@ -13,7 +13,6 @@ import android.widget.ImageButton;
 
 public class PrivacyPolicyFragment extends Fragment {
 
-    private ImageButton BtnBackPrivacyPolicy;
 
     public PrivacyPolicyFragment() {
         // Required empty public constructor

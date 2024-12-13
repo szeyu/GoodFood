@@ -19,7 +19,6 @@ import android.widget.Toast;
 public class SettingsFragment extends Fragment {
 
     private Button BtnPermissions, BtnReport;
-    private ImageButton IBBackSettings;
 
     public SettingsFragment() {
         // Required empty public constructor
