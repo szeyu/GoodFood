@@ -1,5 +1,7 @@
 package com.hmir.goodfood;
 
+import static com.hmir.goodfood.utilities.FileUtil.readBase64FromFile;
+
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -23,7 +25,6 @@ import java.io.File;
 
 public class Calories extends AppCompatActivity {
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,9 +33,17 @@ public class Calories extends AppCompatActivity {
 
         Intent intent = getIntent();
         String nutritionData = intent.getStringExtra("nutritionData");
-
         String cleanedIngredients = nutritionData.substring(2, nutritionData.length() - 8);
         Log.d("Ingredients", cleanedIngredients);
+
+        String filePath = intent.getStringExtra("file_path");
+        // Check if the file path is valid before proceeding
+        if (filePath != null) {
+            String encodedImage = readBase64FromFile(new File(filePath));
+            if (encodedImage != null) {
+                displayImage(encodedImage);
+            }
+        }
 
         LinearLayout nutritionContainer = findViewById(R.id.nutritionContainer);
 
@@ -77,6 +86,14 @@ public class Calories extends AppCompatActivity {
         }
 
     }
+
+    private void displayImage(String encodedImage) {
+        byte[] imageBytes = Base64.decode(encodedImage, Base64.DEFAULT);
+        Bitmap bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
+        ImageView capturedImageView = findViewById(R.id.MealImage);
+        capturedImageView.setImageBitmap(bitmap);
+    }
+
 
     // Helper method to add a nutrient card
     private void addNutrientCard(String label, double value, String unit, LinearLayout container) {

@@ -1,5 +1,7 @@
 package com.hmir.goodfood;
 
+import static com.hmir.goodfood.utilities.FileUtil.readBase64FromFile;
+
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -41,12 +43,21 @@ public class ExtractIngredient extends AppCompatActivity {
 
         Intent intent = getIntent();
         String ingredients = intent.getStringExtra("ingredients");
+        String filePath = intent.getStringExtra("file_path");
 
         if (ingredients != null && ingredients.length() > 10) { // Ensure string is long enough to avoid errors
             String cleanedIngredients = ingredients.substring(2, ingredients.length() - 8);
             IngredientTextView.setText(cleanedIngredients);
         } else {
             IngredientTextView.setText("Invalid ingredients data");
+        }
+
+        // Check if the file path is valid before proceeding
+        if (filePath != null) {
+            String encodedImage = readBase64FromFile(new File(filePath));
+            if (encodedImage != null) {
+                displayImage(encodedImage);
+            }
         }
 
         Button calCalorieBtn = findViewById(R.id.CalcCalorieBtn);
@@ -56,7 +67,7 @@ public class ExtractIngredient extends AppCompatActivity {
                 Log.d("ExtractIngredient", ingredients);
 
                 if (ingredients != null && !ingredients.isEmpty()) {
-                    analyzeNutrition(ingredients);
+                    analyzeNutrition(ingredients, filePath);
                 } else {
                     Toast.makeText(ExtractIngredient.this, "No ingredients to analyze", Toast.LENGTH_SHORT).show();
                 }
@@ -64,7 +75,15 @@ public class ExtractIngredient extends AppCompatActivity {
         });
     }
 
-    private void analyzeNutrition(String ingredients) {
+    private void displayImage(String encodedImage) {
+        byte[] imageBytes = Base64.decode(encodedImage, Base64.DEFAULT);
+        Bitmap bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
+        ImageView capturedImageView = findViewById(R.id.MealImage);
+        capturedImageView.setImageBitmap(bitmap);
+    }
+
+
+    private void analyzeNutrition(String ingredients, String filePath) {
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
         logging.setLevel(HttpLoggingInterceptor.Level.BODY);
 
@@ -92,6 +111,7 @@ public class ExtractIngredient extends AppCompatActivity {
                     // Pass the nutrition analysis result to the Calories activity
                     Intent intent = new Intent(ExtractIngredient.this, Calories.class);
                     intent.putExtra("nutritionData", response.body());
+                    intent.putExtra("file_path", filePath);
                     startActivity(intent);
                 } else {
                     Toast.makeText(ExtractIngredient.this, "Failed to analyze nutrition", Toast.LENGTH_SHORT).show();

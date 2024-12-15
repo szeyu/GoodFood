@@ -106,10 +106,12 @@ public class FoodScanner extends AppCompatActivity {
                     // Get the ingredients from the response
                     String ingredients = String.valueOf(response.body());
 
+                    // Save the Base64 data to a file
+                    File imageFile = FileUtil.saveBase64ToFile(FoodScanner.this, encodedImage, "temp_image.txt");
+
                     // Start the ExtractIngredient activity
                     Intent intent = new Intent(FoodScanner.this, ExtractIngredient.class);
-
-                    Log.d("ExtractIngredient", "Ingredients: " + ingredients);
+                    intent.putExtra("file_path", imageFile.getAbsolutePath());
 
                     intent.putExtra("ingredients", ingredients);
                     startActivity(intent);
