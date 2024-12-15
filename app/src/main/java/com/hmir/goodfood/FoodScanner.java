@@ -13,6 +13,7 @@ import android.widget.Toast;
 import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -28,6 +29,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.hmir.goodfood.models.ExtractRequest;
 import com.hmir.goodfood.services.IngredientService;
+import com.hmir.goodfood.utilities.FileUtil;
 
 public class FoodScanner extends AppCompatActivity {
     private static final int REQUEST_CODE = 22;
@@ -54,7 +56,7 @@ public class FoodScanner extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        if (requestCode == REQUEST_CODE && resultCode == RESULT_OK){
+        if (requestCode == REQUEST_CODE && resultCode == RESULT_OK) {
             Bitmap photo = (Bitmap) data.getExtras().get("data");
             cameraView.setImageBitmap(photo);
         } else {
@@ -71,7 +73,7 @@ public class FoodScanner extends AppCompatActivity {
 
         // Convert Bitmap to Base64
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 80, outputStream);
         byte[] imageBytes = outputStream.toByteArray();
         String encodedImage = Base64.encodeToString(imageBytes, Base64.DEFAULT);
 
@@ -106,6 +108,9 @@ public class FoodScanner extends AppCompatActivity {
 
                     // Start the ExtractIngredient activity
                     Intent intent = new Intent(FoodScanner.this, ExtractIngredient.class);
+
+                    Log.d("ExtractIngredient", "Ingredients: " + ingredients);
+
                     intent.putExtra("ingredients", ingredients);
                     startActivity(intent);
                 } else {
