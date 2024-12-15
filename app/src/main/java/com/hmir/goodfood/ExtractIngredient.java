@@ -1,9 +1,14 @@
 package com.hmir.goodfood;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -12,6 +17,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.hmir.goodfood.models.AnalyzeRequest;
 import com.hmir.goodfood.services.IngredientService;
+
+import java.io.File;
 
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -23,39 +30,17 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ExtractIngredient extends AppCompatActivity {
 
-    Button CalcCalorieBtn;
-    Button backFromExtractIngredientBtn;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_extract_ingredient);
-        String ingredients = getIntent().getStringExtra("ingredients");
-
-        CalcCalorieBtn = findViewById(R.id.CalcCalorieBtn);
-        backFromExtractIngredientBtn = findViewById(R.id.backFromExtractIngredientButton);
-
-        CalcCalorieBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (ingredients != null && !ingredients.isEmpty()) {
-                    analyzeNutrition(ingredients);
-                } else {
-                    Toast.makeText(ExtractIngredient.this, "No ingredients to analyze", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-
-        backFromExtractIngredientBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                finish();
-            }
-        });
 
         // Display these ingredients in a TextView (assuming you have a TextView with id ingredientTextView
         TextView IngredientTextView = findViewById(R.id.IngredientsTextView);
+
+        Intent intent = getIntent();
+        String ingredients = intent.getStringExtra("ingredients");
 
         if (ingredients != null && ingredients.length() > 10) { // Ensure string is long enough to avoid errors
             String cleanedIngredients = ingredients.substring(2, ingredients.length() - 8);
@@ -64,6 +49,19 @@ public class ExtractIngredient extends AppCompatActivity {
             IngredientTextView.setText("Invalid ingredients data");
         }
 
+        Button calCalorieBtn = findViewById(R.id.CalcCalorieBtn);
+        calCalorieBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d("ExtractIngredient", ingredients);
+
+                if (ingredients != null && !ingredients.isEmpty()) {
+                    analyzeNutrition(ingredients);
+                } else {
+                    Toast.makeText(ExtractIngredient.this, "No ingredients to analyze", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
     private void analyzeNutrition(String ingredients) {
