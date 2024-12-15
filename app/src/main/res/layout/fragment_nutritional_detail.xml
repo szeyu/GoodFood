@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nutritionCard"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    android:clickable="true"
+    android:focusable="auto"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="6dp"
+    tools:context=".NutritionalDetailFragment">
+
+    <LinearLayout
+        android:id="@+id/nutritionListView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="8dp">
+
+        <TextView
+            android:id="@+id/nutrientLabel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:fontFamily="@font/poppins_medium_regular"
+            android:padding="4dp"
+            android:paddingStart="8dp"
+            android:text="Nutrient"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/nutrientValue"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:fontFamily="@font/poppins_medium"
+            android:gravity="end"
+            android:padding="4dp"
+            android:paddingEnd="8dp"
+            android:text="Value"
+            android:textSize="20sp" />
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>
