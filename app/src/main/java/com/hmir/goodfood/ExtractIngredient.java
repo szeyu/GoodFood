@@ -30,8 +30,21 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+/**
+ * The {@code ExtractIngredient} class is an {@link AppCompatActivity} that handles the display and analysis
+ * of ingredients extracted from a food image. It receives ingredients and image data from the {@link FoodScanner}
+ * activity, displays the ingredients, and allows users to analyze the nutritional content.
+ * <p>
+ * This activity uses Retrofit to communicate with a backend service for nutrition analysis.
+ */
 public class ExtractIngredient extends AppCompatActivity {
 
+    /**
+     * Initializes the activity, extracts ingredients, and handles image display and nutritional analysis.
+     *
+     * @param savedInstanceState If the activity is being re-initialized after previously being shut down,
+     *                           this contains the saved state data. Otherwise, it is {@code null}.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,6 +73,7 @@ public class ExtractIngredient extends AppCompatActivity {
             }
         }
 
+        // Set up the button listener for analyzing nutrition
         Button calCalorieBtn = findViewById(R.id.CalcCalorieBtn);
         calCalorieBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -75,6 +89,11 @@ public class ExtractIngredient extends AppCompatActivity {
         });
     }
 
+    /**
+     * Displays an image from the Base64-encoded string by decoding it and setting it in an {@link ImageView}.
+     *
+     * @param encodedImage The Base64-encoded image string.
+     */
     private void displayImage(String encodedImage) {
         byte[] imageBytes = Base64.decode(encodedImage, Base64.DEFAULT);
         Bitmap bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
@@ -82,7 +101,13 @@ public class ExtractIngredient extends AppCompatActivity {
         capturedImageView.setImageBitmap(bitmap);
     }
 
-
+    /**
+     * Analyzes the nutritional content of the ingredients by making a network request to the backend.
+     * The nutritional data is then passed to the {@link Calories} activity.
+     *
+     * @param ingredients The ingredients string to analyze.
+     * @param filePath    The path of the image file associated with the ingredients.
+     */
     private void analyzeNutrition(String ingredients, String filePath) {
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
         logging.setLevel(HttpLoggingInterceptor.Level.BODY);

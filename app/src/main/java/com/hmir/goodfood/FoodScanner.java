@@ -31,10 +31,30 @@ import com.hmir.goodfood.models.ExtractRequest;
 import com.hmir.goodfood.services.IngredientService;
 import com.hmir.goodfood.utilities.FileUtil;
 
+/**
+ * The {@code FoodScanner} class is an {@link AppCompatActivity} responsible for capturing an image
+ * using the device camera, encoding it to Base64, and sending it to a backend service for ingredient extraction.
+ * <p>
+ * This activity integrates with Retrofit for network communication and provides a user interface
+ * for capturing and processing food images.
+ */
 public class FoodScanner extends AppCompatActivity {
+    /**
+     * Request code used to identify camera capture intents.
+     */
     private static final int REQUEST_CODE = 22;
+
+    /**
+     * The {@link ImageView} where the captured image is displayed.
+     */
     private ImageView cameraView;
 
+    /**
+     * Initializes the activity and sets up the UI components and event listeners.
+     *
+     * @param savedInstanceState If the activity is being re-initialized after previously being shut down,
+     *                           this contains the saved state data. Otherwise, it is {@code null}.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,6 +74,13 @@ public class FoodScanner extends AppCompatActivity {
         });
     }
 
+    /**
+     * Handles the result of the camera capture intent.
+     *
+     * @param requestCode The integer request code originally supplied to startActivityForResult.
+     * @param resultCode  The integer result code returned by the child activity.
+     * @param data        An {@link Intent} containing the result data from the camera activity.
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (requestCode == REQUEST_CODE && resultCode == RESULT_OK) {
@@ -65,6 +92,11 @@ public class FoodScanner extends AppCompatActivity {
         }
     }
 
+    /**
+     * Extracts ingredients from the image displayed in the {@link ImageView} and processes the result.
+     *
+     * @param cameraView The {@link ImageView} containing the captured image.
+     */
     private void extractIngredient(ImageView cameraView) {
         // Convert ImageView to Bitmap
         cameraView.setDrawingCacheEnabled(true);
@@ -100,7 +132,6 @@ public class FoodScanner extends AppCompatActivity {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    // Log the entire response body
                     Log.d("ExtractIngredient", "Response: " + response.body());
 
                     // Get the ingredients from the response
@@ -112,7 +143,6 @@ public class FoodScanner extends AppCompatActivity {
                     // Start the ExtractIngredient activity
                     Intent intent = new Intent(FoodScanner.this, ExtractIngredient.class);
                     intent.putExtra("file_path", imageFile.getAbsolutePath());
-
                     intent.putExtra("ingredients", ingredients);
                     startActivity(intent);
                 } else {
