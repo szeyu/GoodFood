@@ -24,7 +24,6 @@ public class MainActivity extends AppCompatActivity {
 
         // Check the user's authentication status
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-
         if (currentUser != null) {
             // User is signed in
             // Print all user info
