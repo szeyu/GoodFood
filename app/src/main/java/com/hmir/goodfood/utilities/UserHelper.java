@@ -69,16 +69,19 @@ public class UserHelper {
     */
 
     private final static String email = FirebaseAuth.getInstance().getCurrentUser().getEmail();
-//    private final static String email = "test1@gmail.com";
-    private boolean isUserLoaded = false;
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final NutritionalRecordHelper nutritionalRecordHelper = new NutritionalRecordHelper();
     private final FavouriteRecipeHelper favouriteRecipeHelper = new FavouriteRecipeHelper();
     private final Queue<Runnable> pendingOperations = new LinkedList<>();
     protected User currentUser;
+    //    private final static String email = "test1@gmail.com";
+    private boolean isUserLoaded = false;
 
     public UserHelper() {
         initializeCurrentUser();
+    }
+
+    public UserHelper(int indicator) {
     }
 
     private void initializeCurrentUser() {
@@ -91,6 +94,7 @@ public class UserHelper {
                     isUserLoaded = true;
                     processPendingOperations();
                 } else {
+                    currentUser = null;
                     Log.e("UserHelper", "User not found");
                 }
             } else {
@@ -173,29 +177,29 @@ public class UserHelper {
 
     // Add new user
     public void addNewUser(Map<String, Object> user) {
-        enqueueOrExecute(() -> {
-            if (email == null || email.isEmpty()) {
-                throw new IllegalArgumentException("Email is null or empty");
-            }
+        if (email == null || email.isEmpty()) {
+            throw new IllegalArgumentException("Email is null or empty");
+        }
 
-            Map<String, Object> defaultUser = new HashMap<>();
-            defaultUser.put("username", null);
-            defaultUser.put("age", 0);
-            defaultUser.put("height", 0);
-            defaultUser.put("weight", 0);
-            defaultUser.put("health_label", null);
-            defaultUser.put("favourite_recipes", null);
-            defaultUser.put("nutritional_records", null);
-            defaultUser.putAll(user);
+        Map<String, Object> defaultUser = new HashMap<>();
+        defaultUser.put("username", null);
+        defaultUser.put("age", 0);
+        defaultUser.put("height", 0);
+        defaultUser.put("weight", 0);
+        defaultUser.put("health_labels", null);
+        defaultUser.put("favourite_recipes", null);
+        defaultUser.put("nutritional_records", null);
+        defaultUser.putAll(user);
 
-            db.collection("user")
-                    .document(email)
-                    .set(defaultUser, SetOptions.merge())  // Overwrite existing data or add new user
-                    .addOnSuccessListener(aVoid ->
-                            Log.d("UserHelper", "User added or updated"))
-                    .addOnFailureListener(e ->
-                            Log.e("UserHelper", "Error adding or updating user", e));
-        });
+        db.collection("user")
+                .document(email)
+                .set(defaultUser, SetOptions.merge())  // Overwrite existing data or add new user
+                .addOnSuccessListener(aVoid ->
+                        Log.d("UserHelper", "User added or updated"))
+                .addOnFailureListener(e ->
+                        Log.e("UserHelper", "Error adding or updating user", e));
+
+        initializeCurrentUser();
     }
 
     // Delete user
@@ -536,26 +540,31 @@ public class UserHelper {
     // Callback interfaces
     public interface OnRecordFetchedCallback {
         void onRecordFetched(NutritionalRecord record);
+
         void onError(Exception e);
     }
 
     public interface OnRecipeFetchedCallback {
         void onRecipeFetched(FavouriteRecipe recipe);
+
         void onError(Exception e);
     }
 
     public interface OnRecordListFetchedCallback {
         void onRecordListFetched(List<NutritionalRecord> records);
+
         void onError(Exception e);
     }
 
     public interface OnRecipeListFetchedCallback {
         void onRecipeListFetched(List<FavouriteRecipe> recipes);
+
         void onError(Exception e);
     }
 
     public interface OnUserFetchedCallback {
         void onUserFetched(User user);
+
         void onError(Exception e);
     }
 }
