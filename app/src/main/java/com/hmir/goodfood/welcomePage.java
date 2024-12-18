@@ -12,11 +12,21 @@ import androidx.core.view.WindowInsetsCompat;
 import android.content.SharedPreferences;
 import android.text.InputFilter;
 import android.text.InputType;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.hmir.goodfood.utilities.UserHelper;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 public class welcomePage extends AppCompatActivity {
@@ -38,14 +48,38 @@ public class welcomePage extends AppCompatActivity {
         confirmButton = findViewById(R.id.button_confirm);
 
         // Restrict age to integers only
-        InputFilter[] integerFilter = new InputFilter[]{(source, start, end, dest, dstart, dend) -> {
-            for (int i = start; i < end; i++) {
-                if (!Character.isDigit(source.charAt(i))) {
-                    return "";
+        InputFilter[] integerFilter = new InputFilter[]{
+                (source, start, end, dest, dstart, dend) -> {
+                    // Combine the existing text with the new input
+                    StringBuilder newInput = new StringBuilder(dest);
+                    newInput.replace(dstart, dend, source.subSequence(start, end).toString());
+                    // Check if the input starts with 0
+                    if (newInput.length() > 0 && newInput.charAt(0) == '0') {
+                        return "";
+                    }
+                    // Check if input is all digits
+                    for (int i = 0; i < newInput.length(); i++) {
+                        if (!Character.isDigit(newInput.charAt(i))) {
+                            return "";
+                        }
+                    }
+                    // Limit to 3 digits
+                    if (newInput.length() > 3) {
+                        return "";
+                    }
+                    // Check if input exceeds 150
+                    try {
+                        int age = Integer.parseInt(newInput.toString());
+                        if (age > 150) {
+                            return "";
+                        }
+                    } catch (NumberFormatException e) {
+                        return "";
+                    }
+
+                    return null;
                 }
-            }
-            return null;
-        }};
+        };
         ageEditText.setFilters(integerFilter);
         ageEditText.setInputType(InputType.TYPE_CLASS_NUMBER);
 
@@ -127,6 +161,20 @@ public class welcomePage extends AppCompatActivity {
             editor.putString("DietTypes", selectedDietTypes.toString());
             editor.apply();
 
+            // Save data to FireStore
+            UserHelper newUser = new UserHelper(1);
+            List<String> health_labels = convertHealthLabelsToList(selectedDietTypes);
+            Map<String, Object> newUserMapping = new HashMap<>();
+            newUserMapping.put("username", username);
+            newUserMapping.put("age", Long.parseLong(age));
+            newUserMapping.put("height", Double.parseDouble(height));
+            newUserMapping.put("weight", Double.parseDouble(weight));
+            newUserMapping.put("health_labels", health_labels);
+            newUserMapping.put("favourite_recipes", null);
+            newUserMapping.put("nutritional_records", null);
+
+            newUser.addNewUser(newUserMapping);
+
             // Show confirmation
             Toast.makeText(welcomePage.this, "Data saved successfully!", Toast.LENGTH_SHORT).show();
 
@@ -135,5 +183,20 @@ public class welcomePage extends AppCompatActivity {
             startActivity(intent);
             finish(); // Optional: Close the welcomePage activity
         });
+    }
+
+    private static List<String> convertHealthLabelsToList(StringBuilder sb) {
+        // Check if StringBuilder is empty or null
+        List<String> list = new ArrayList<>();
+        if (sb == null || sb.length() == 0) {
+            return list;
+        }
+
+        // Convert StringBuilder to String and split by ','
+        String str = sb.toString();
+        String[] health_labels = str.split(",");
+
+        // Convert the array to a List
+        return new ArrayList<>(Arrays.asList(health_labels));
     }
 }
