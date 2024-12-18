@@ -5,6 +5,7 @@ import static com.hmir.goodfood.utilities.FileUtil.readBase64FromFile;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Base64;
 import android.util.Log;
@@ -17,14 +18,22 @@ import android.widget.Toast;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.firebase.Timestamp;
 import com.google.gson.Gson;
 import com.hmir.goodfood.models.GeminiApiResponse;
 import com.hmir.goodfood.models.GeminiRequestBody;
 import com.hmir.goodfood.services.GeminiApiService;
+import com.hmir.goodfood.utilities.NutritionalRecord;
+import com.hmir.goodfood.utilities.UserHelper;
+
+import org.json.JSONObject;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -71,14 +80,64 @@ public class ExtractIngredient extends AppCompatActivity {
             }
         }
 
-        Button calCalorieBtn = findViewById(R.id.CalcCalorieBtn);
-        calCalorieBtn.setOnClickListener(view -> {
-            Log.d("ExtractIngredient", ingredients);
+        Log.d("ExtractIngredient", ingredients);
+        analyzeNutrition(ingredients, new NutritionCallback() {
+            @Override
+            public void onSuccess(String nutritionData) {
 
-            if (ingredients != null && !ingredients.isEmpty()) {
-                analyzeNutrition(ingredients);
-            } else {
-                Toast.makeText(ExtractIngredient.this, "No ingredients to analyze", Toast.LENGTH_SHORT).show();
+                Button calCalorieBtn = findViewById(R.id.CalcCalorieBtn);
+                calCalorieBtn.setOnClickListener(view -> {
+                    if (ingredients != null && !ingredients.isEmpty()) {
+                        startCalorieActivity(nutritionData);
+                    } else {
+                        Toast.makeText(ExtractIngredient.this, "No ingredients to analyze", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+                Button saveRecordBtn = findViewById(R.id.SaveRecordBtn);
+                saveRecordBtn.setOnClickListener(view -> {
+                    UserHelper user = new UserHelper();
+                    try {
+                        // Convert the file_path into Uri class object
+                        File file = new File(filePath);
+                        Uri imageUri = Uri.fromFile(file);
+
+                        // Parse the JSON into a NutritionalRecord object
+                        JSONObject jsonObject = new JSONObject(nutritionData);
+
+                        Map<String, Object> newNutritionalRecord = new HashMap<>();
+                        newNutritionalRecord.put("calcium", jsonObject.optDouble("total_calcium", 0));
+                        newNutritionalRecord.put("calories", jsonObject.optDouble("total_calories", 0));
+                        newNutritionalRecord.put("carbs", jsonObject.optDouble("total_carbs", 0));
+                        newNutritionalRecord.put("cholesterol", jsonObject.optDouble("total_cholesterol", 0));
+                        newNutritionalRecord.put("fat", jsonObject.optDouble("total_fat", 0));
+                        newNutritionalRecord.put("iron", jsonObject.optDouble("total_iron", 0));
+                        newNutritionalRecord.put("magnesium", jsonObject.optDouble("total_magnesium", 0));
+                        newNutritionalRecord.put("potassium", jsonObject.optDouble("total_potassium", 0));
+                        newNutritionalRecord.put("protein", jsonObject.optDouble("total_protein", 0));
+                        newNutritionalRecord.put("sodium", jsonObject.optDouble("total_sodium", 0));
+                        newNutritionalRecord.put("ingredients", ingredients);
+                        newNutritionalRecord.put("date_time", new Timestamp(new Date()));
+
+                        try {
+                            user.addUserNutritionalRecord(newNutritionalRecord, imageUri);
+                            Toast.makeText(ExtractIngredient.this, "Record saved successfully", Toast.LENGTH_SHORT).show();
+                        } catch (Exception e) {
+                            Toast.makeText(ExtractIngredient.this, "Save error", Toast.LENGTH_SHORT).show();
+                        }
+
+                        // End the activity after saving the record
+                        finish(); // This will close the current activity
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                });
+            }
+
+            @Override
+            public void onError(String errorMessage) {
+                Log.e("NutritionError", errorMessage);
             }
         });
     }
@@ -100,7 +159,7 @@ public class ExtractIngredient extends AppCompatActivity {
      *
      * @param ingredients The ingredients to analyze.
      */
-    private void analyzeNutrition(String ingredients) {
+    private void analyzeNutrition(String ingredients, NutritionCallback callback) {
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
         logging.setLevel(HttpLoggingInterceptor.Level.BODY);
 
@@ -157,12 +216,10 @@ public class ExtractIngredient extends AppCompatActivity {
             public void onResponse(Call<GeminiApiResponse> call, Response<GeminiApiResponse> response) {
                 if (response.isSuccessful() && response.body() != null && !response.body().getCandidates().isEmpty()) {
                     String nutritionData = response.body().getCandidates().get(0).getContent().getParts().get(0).getText();
-                    Intent intent = new Intent(ExtractIngredient.this, Calories.class);
-                    intent.putExtra("nutritionData", nutritionData);
-                    intent.putExtra("file_path", getIntent().getStringExtra("file_path"));
-                    startActivity(intent);
+                    callback.onSuccess(nutritionData);
                 } else {
                     Toast.makeText(ExtractIngredient.this, "Failed to analyze nutrition", Toast.LENGTH_SHORT).show();
+                    callback.onError("Failed to analyze nutrition");
                 }
             }
 
@@ -187,5 +244,24 @@ public class ExtractIngredient extends AppCompatActivity {
         contents.add(new GeminiRequestBody.Content(parts));
 
         return new GeminiRequestBody(contents);
+    }
+
+    /**
+     * Calls an Intent and start Calorie activity.
+     *
+     * @param nutritionData The analyzed nutrition data from image.
+     */
+
+    private void startCalorieActivity(String nutritionData) {
+        Intent intent = new Intent(ExtractIngredient.this, Calories.class);
+        intent.putExtra("nutritionData", nutritionData);
+        intent.putExtra("file_path", getIntent().getStringExtra("file_path"));
+        startActivity(intent);
+    }
+
+
+    public interface NutritionCallback {
+        void onSuccess(String nutritionData);
+        void onError(String errorMessage);
     }
 }

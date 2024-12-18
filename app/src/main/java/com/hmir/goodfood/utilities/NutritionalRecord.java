@@ -1,8 +1,9 @@
 package com.hmir.goodfood.utilities;
 
 import android.annotation.SuppressLint;
+import android.net.Uri;
+
 import com.google.firebase.Timestamp;
-import com.google.firebase.firestore.DocumentReference;
 
 public class NutritionalRecord {
     private String record_id;
@@ -18,10 +19,10 @@ public class NutritionalRecord {
     private double cholesterol;
     private double potassium;
     private double magnesium;
-    private DocumentReference image;
+    private Uri image;
 
     public NutritionalRecord(String record_id, double calcium, double calories, double carbs,
-                             double cholesterol, Timestamp date_time, double fat, DocumentReference image,
+                             double cholesterol, Timestamp date_time, double fat, Uri image,
                              String ingredients, double iron, double potassium, double protein,
                              double sodium, double magnesium) {
         this.record_id = record_id;
@@ -110,11 +111,11 @@ public class NutritionalRecord {
         this.fat = fat;
     }
 
-    public DocumentReference getImage() {
+    public Uri getImage() {
         return image;
     }
 
-    public void setImage(DocumentReference image) {
+    public void setImage(Uri image) {
         this.image = image;
     }
 
