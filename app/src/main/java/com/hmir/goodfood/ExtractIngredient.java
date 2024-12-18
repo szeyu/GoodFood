@@ -36,6 +36,11 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+/**
+ * Activity for extracting ingredients and analyzing nutrition information from a scanned food image.
+ * This activity displays the ingredients extracted from an image and allows the user to analyze
+ * the nutritional content of those ingredients.
+ */
 public class ExtractIngredient extends AppCompatActivity {
 
     private static final String GEMINI_API_BASE_URL = "https://generativelanguage.googleapis.com/";
@@ -78,6 +83,11 @@ public class ExtractIngredient extends AppCompatActivity {
         });
     }
 
+    /**
+     * Displays the image from a base64 encoded string.
+     *
+     * @param encodedImage The base64 encoded image string.
+     */
     private void displayImage(String encodedImage) {
         byte[] imageBytes = Base64.decode(encodedImage, Base64.DEFAULT);
         Bitmap bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
@@ -85,6 +95,11 @@ public class ExtractIngredient extends AppCompatActivity {
         capturedImageView.setImageBitmap(bitmap);
     }
 
+    /**
+     * Analyzes the nutrition information based on the provided ingredients.
+     *
+     * @param ingredients The ingredients to analyze.
+     */
     private void analyzeNutrition(String ingredients) {
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
         logging.setLevel(HttpLoggingInterceptor.Level.BODY);
@@ -158,6 +173,12 @@ public class ExtractIngredient extends AppCompatActivity {
         });
     }
 
+    /**
+     * Creates a GeminiRequestBody with the specified prompt.
+     *
+     * @param prompt The prompt to be included in the request.
+     * @return A GeminiRequestBody object containing the prompt.
+     */
     private GeminiRequestBody createGeminiRequestBody(String prompt) {
         List<GeminiRequestBody.Part> parts = new ArrayList<>();
         parts.add(new GeminiRequestBody.Part(prompt));
