@@ -144,6 +144,13 @@ public class FoodScanner extends AppCompatActivity {
         });
     }
 
+    /**
+     * Creates a GeminiRequestBody with the specified prompt and encoded image.
+     *
+     * @param prompt The prompt to be included in the request.
+     * @param encodedImage The base64 encoded image to be included in the request.
+     * @return A GeminiRequestBody object containing the prompt and image.
+     */
     private GeminiRequestBody createGeminiRequestBody(String prompt, String encodedImage) {
         List<GeminiRequestBody.Part> parts = new ArrayList<>();
         parts.add(new GeminiRequestBody.Part(prompt));
