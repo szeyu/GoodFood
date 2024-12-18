@@ -58,11 +58,10 @@ public class ExtractIngredient extends AppCompatActivity {
         String ingredients = intent.getStringExtra("ingredients");
         String filePath = intent.getStringExtra("file_path");
 
-        if (ingredients != null && ingredients.length() > 10) { // Ensure string is long enough to avoid errors
-            String cleanedIngredients = ingredients.substring(2, ingredients.length() - 8);
-            IngredientTextView.setText(cleanedIngredients);
+        if (ingredients != null) { // Ensure string is not null to avoid errors
+            IngredientTextView.setText(ingredients);
         } else {
-            IngredientTextView.setText("Invalid ingredients data");
+            IngredientTextView.setText("Unable to Analyse Ingredients");
         }
 
         // Check if the file path is valid before proceeding
