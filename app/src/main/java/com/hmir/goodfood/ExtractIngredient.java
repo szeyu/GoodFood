@@ -36,6 +36,11 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+/**
+ * Activity for extracting ingredients and analyzing nutrition information from a scanned food image.
+ * This activity displays the ingredients extracted from an image and allows the user to analyze
+ * the nutritional content of those ingredients.
+ */
 public class ExtractIngredient extends AppCompatActivity {
 
     private static final String GEMINI_API_BASE_URL = "https://generativelanguage.googleapis.com/";
