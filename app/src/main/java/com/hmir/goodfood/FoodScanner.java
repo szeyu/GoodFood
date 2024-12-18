@@ -37,6 +37,9 @@ import com.hmir.goodfood.models.GeminiRequestBody;
 import com.hmir.goodfood.services.GeminiApiService;
 import com.hmir.goodfood.utilities.FileUtil;
 
+/**
+ * Activity for scanning food and extracting ingredients.
+ */
 public class FoodScanner extends AppCompatActivity {
     private static final int REQUEST_CODE = 22;
     private ImageView cameraView;
@@ -72,6 +75,11 @@ public class FoodScanner extends AppCompatActivity {
         }
     }
 
+    /**
+     * Extracts ingredients from the captured image.
+     *
+     * @param cameraView The ImageView containing the captured image.
+     */
     private void extractIngredient(ImageView cameraView) {
         cameraView.setDrawingCacheEnabled(true);
         cameraView.buildDrawingCache();
