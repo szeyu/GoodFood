@@ -17,12 +17,18 @@ import android.widget.Toast;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.hmir.goodfood.models.AnalyzeRequest;
-import com.hmir.goodfood.services.IngredientService;
+import com.google.gson.Gson;
+import com.hmir.goodfood.models.GeminiApiResponse;
+import com.hmir.goodfood.models.GeminiRequestBody;
+import com.hmir.goodfood.services.GeminiApiService;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
+import okhttp3.RequestBody;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -30,41 +36,29 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-/**
- * The {@code ExtractIngredient} class is an {@link AppCompatActivity} that handles the display and analysis
- * of ingredients extracted from a food image. It receives ingredients and image data from the {@link FoodScanner}
- * activity, displays the ingredients, and allows users to analyze the nutritional content.
- * <p>
- * This activity uses Retrofit to communicate with a backend service for nutrition analysis.
- */
 public class ExtractIngredient extends AppCompatActivity {
 
-    /**
-     * Initializes the activity, extracts ingredients, and handles image display and nutritional analysis.
-     *
-     * @param savedInstanceState If the activity is being re-initialized after previously being shut down,
-     *                           this contains the saved state data. Otherwise, it is {@code null}.
-     */
+    private static final String GEMINI_API_BASE_URL = "https://generativelanguage.googleapis.com/";
+    private static final String GEMINI_API_KEY = BuildConfig.GEMINI_API_KEY;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_extract_ingredient);
 
-        // Display these ingredients in a TextView (assuming you have a TextView with id ingredientTextView
         TextView IngredientTextView = findViewById(R.id.IngredientsTextView);
 
         Intent intent = getIntent();
         String ingredients = intent.getStringExtra("ingredients");
         String filePath = intent.getStringExtra("file_path");
 
-        if (ingredients != null) { // Ensure string is not null to avoid errors
+        if (ingredients != null) {
             IngredientTextView.setText(ingredients);
         } else {
             IngredientTextView.setText("Unable to Analyse Ingredients");
         }
 
-        // Check if the file path is valid before proceeding
         if (filePath != null) {
             String encodedImage = readBase64FromFile(new File(filePath));
             if (encodedImage != null) {
@@ -72,27 +66,18 @@ public class ExtractIngredient extends AppCompatActivity {
             }
         }
 
-        // Set up the button listener for analyzing nutrition
         Button calCalorieBtn = findViewById(R.id.CalcCalorieBtn);
-        calCalorieBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Log.d("ExtractIngredient", ingredients);
+        calCalorieBtn.setOnClickListener(view -> {
+            Log.d("ExtractIngredient", ingredients);
 
-                if (ingredients != null && !ingredients.isEmpty()) {
-                    analyzeNutrition(ingredients, filePath);
-                } else {
-                    Toast.makeText(ExtractIngredient.this, "No ingredients to analyze", Toast.LENGTH_SHORT).show();
-                }
+            if (ingredients != null && !ingredients.isEmpty()) {
+                analyzeNutrition(ingredients);
+            } else {
+                Toast.makeText(ExtractIngredient.this, "No ingredients to analyze", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    /**
-     * Displays an image from the Base64-encoded string by decoding it and setting it in an {@link ImageView}.
-     *
-     * @param encodedImage The Base64-encoded image string.
-     */
     private void displayImage(String encodedImage) {
         byte[] imageBytes = Base64.decode(encodedImage, Base64.DEFAULT);
         Bitmap bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
@@ -100,14 +85,7 @@ public class ExtractIngredient extends AppCompatActivity {
         capturedImageView.setImageBitmap(bitmap);
     }
 
-    /**
-     * Analyzes the nutritional content of the ingredients by making a network request to the backend.
-     * The nutritional data is then passed to the {@link Calories} activity.
-     *
-     * @param ingredients The ingredients string to analyze.
-     * @param filePath    The path of the image file associated with the ingredients.
-     */
-    private void analyzeNutrition(String ingredients, String filePath) {
+    private void analyzeNutrition(String ingredients) {
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
         logging.setLevel(HttpLoggingInterceptor.Level.BODY);
 
@@ -116,26 +94,57 @@ public class ExtractIngredient extends AppCompatActivity {
                 .build();
 
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://10.0.2.2:8080/") // Use Android Emulator's localhost
+                .baseUrl(GEMINI_API_BASE_URL)
                 .client(client)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
-        IngredientService service = retrofit.create(IngredientService.class);
+        GeminiApiService service = retrofit.create(GeminiApiService.class);
 
-        // Create the request
-        AnalyzeRequest request = new AnalyzeRequest(ingredients);
+        String prompt = "Based on the " + ingredients + ", Give me the nutrition information in JSON format ONLY. " +
+                "Don't provide explanation. Please follow the output format. " +
+                "Just output with your assumption. " +
+                "Don't output backquote character. " +
+                "Example output: " +
+                "{ " +
+                "\"total_calories\": 100, " +
+                "\"total_protein\": 20, " +
+                "\"total_fat\": 10, " +
+                "\"total_carbs\": 20, " +
+                "\"total_cholesterol\": 50, " +
+                "\"total_sodium\": 1000, " +
+                "\"total_calcium\": 10, " +
+                "\"total_iron\": 5, " +
+                "\"total_magnesium\": 100, " +
+                "\"total_potassium\": 200 " +
+                "} " +
+                "Output format: " +
+                "{ " +
+                "\"total_calories\": <cal unit>, " +
+                "\"total_protein\": <gram unit>, " +
+                "\"total_fat\": <gram unit>, " +
+                "\"total_carbs\": <gram unit>, " +
+                "\"total_cholesterol\": <gram unit>, " +
+                "\"total_sodium\": <milligram unit>, " +
+                "\"total_calcium\": <milligram unit>, " +
+                "\"total_iron\": <milligram unit>, " +
+                "\"total_magnesium\": <milligram unit>, " +
+                "\"total_potassium\": <milligram unit> " +
+                "}";
 
-        // Call the nutrition analysis endpoint
-        Call<String> call = service.analyzeNutrition(request);
-        call.enqueue(new Callback<String>() {
+        GeminiRequestBody requestBody = createGeminiRequestBody(prompt);
+        String jsonBody = new Gson().toJson(requestBody);
+        RequestBody body = RequestBody.create(MediaType.parse("application/json"), jsonBody);
+
+        Call<GeminiApiResponse> call = service.callGemini(GEMINI_API_KEY, body);
+        call.enqueue(new Callback<GeminiApiResponse>() {
             @Override
-            public void onResponse(Call<String> call, Response<String> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    // Pass the nutrition analysis result to the Calories activity
+            public void onResponse(Call<GeminiApiResponse> call, Response<GeminiApiResponse> response) {
+                if (response.isSuccessful() && response.body() != null && !response.body().getCandidates().isEmpty()) {
+                    String nutritionData = response.body().getCandidates().get(0).getContent().getParts().get(0).getText();
                     Intent intent = new Intent(ExtractIngredient.this, Calories.class);
-                    intent.putExtra("nutritionData", response.body());
-                    intent.putExtra("file_path", filePath);
+                    intent.putExtra("nutritionData", nutritionData);
+                    intent.putExtra("file_path", getIntent().getStringExtra("file_path"));
                     startActivity(intent);
                 } else {
                     Toast.makeText(ExtractIngredient.this, "Failed to analyze nutrition", Toast.LENGTH_SHORT).show();
@@ -143,9 +152,19 @@ public class ExtractIngredient extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<String> call, Throwable t) {
+            public void onFailure(Call<GeminiApiResponse> call, Throwable t) {
                 Toast.makeText(ExtractIngredient.this, "Error: " + t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
+    }
+
+    private GeminiRequestBody createGeminiRequestBody(String prompt) {
+        List<GeminiRequestBody.Part> parts = new ArrayList<>();
+        parts.add(new GeminiRequestBody.Part(prompt));
+
+        List<GeminiRequestBody.Content> contents = new ArrayList<>();
+        contents.add(new GeminiRequestBody.Content(parts));
+
+        return new GeminiRequestBody(contents);
     }
 }

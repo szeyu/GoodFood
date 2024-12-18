@@ -47,8 +47,7 @@ public class Calories extends AppCompatActivity {
 
         Intent intent = getIntent();
         String nutritionData = intent.getStringExtra("nutritionData");
-        String cleanedIngredients = nutritionData.substring(2, nutritionData.length() - 8);
-        Log.d("Ingredients", cleanedIngredients);
+        Log.d("Ingredients", nutritionData);
 
         String filePath = intent.getStringExtra("file_path");
         // Check if the file path is valid before proceeding
@@ -64,7 +63,7 @@ public class Calories extends AppCompatActivity {
         if (nutritionContainer != null && !nutritionData.isEmpty()) {
             try {
                 // Parse the JSON into a NutritionalRecord object
-                JSONObject jsonObject = new JSONObject(cleanedIngredients);
+                JSONObject jsonObject = new JSONObject(nutritionData);
                 NutritionalRecord record = new NutritionalRecord(
                         null,
                         jsonObject.optDouble("total_calcium", 0),
