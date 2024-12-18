@@ -1,19 +1,20 @@
 package com.hmir.goodfood.models;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class GeminiRequestBody {
-    private List<Content> contents;
+    private final List<Content> contents;
 
     public GeminiRequestBody(List<Content> contents) {
-        this.contents = contents;
+        this.contents = new ArrayList<>(contents);
     }
 
     public static class Content {
         private List<Part> parts;
 
         public Content(List<Part> parts) {
-            this.parts = parts;
+            this.parts = new ArrayList<>(parts);
         }
     }
 

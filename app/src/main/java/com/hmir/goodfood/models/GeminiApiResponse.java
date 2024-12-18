@@ -1,5 +1,6 @@
 package com.hmir.goodfood.models;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class GeminiApiResponse {
@@ -10,7 +11,7 @@ public class GeminiApiResponse {
     }
 
     public void setCandidates(List<Candidate> candidates) {
-        this.candidates = candidates;
+        this.candidates = new ArrayList<>(candidates);
     }
 
     public static class Candidate {
@@ -32,7 +33,7 @@ public class GeminiApiResponse {
             }
 
             public void setParts(List<Part> parts) {
-                this.parts = parts;
+                this.parts = new ArrayList<>(parts);
             }
 
             public static class Part {
