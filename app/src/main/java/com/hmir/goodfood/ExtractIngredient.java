@@ -23,6 +23,7 @@ import com.google.gson.Gson;
 import com.hmir.goodfood.models.GeminiApiResponse;
 import com.hmir.goodfood.models.GeminiRequestBody;
 import com.hmir.goodfood.services.GeminiApiService;
+import com.hmir.goodfood.utilities.NetworkUtil;
 import com.hmir.goodfood.utilities.NutritionalRecord;
 import com.hmir.goodfood.utilities.UserHelper;
 
@@ -119,15 +120,15 @@ public class ExtractIngredient extends AppCompatActivity {
                         newNutritionalRecord.put("ingredients", ingredients);
                         newNutritionalRecord.put("date_time", new Timestamp(new Date()));
 
-                        try {
+                        if (NetworkUtil.isInternetAvailable(getApplicationContext())) {
                             user.addUserNutritionalRecord(newNutritionalRecord, imageUri);
                             Toast.makeText(ExtractIngredient.this, "Record saved successfully", Toast.LENGTH_SHORT).show();
-                        } catch (Exception e) {
-                            Toast.makeText(ExtractIngredient.this, "Save error", Toast.LENGTH_SHORT).show();
-                        }
 
-                        // End the activity after saving the record
-                        finish(); // This will close the current activity
+                            // End the activity after saving the record
+                            finish(); // This will close the current activity
+                        } else {
+                            Toast.makeText(ExtractIngredient.this, "Unable to connect to Internet", Toast.LENGTH_SHORT).show();
+                        }
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
