@@ -13,6 +13,12 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 
+/**
+ * The ProfilePage class represents an activity where users can view and manage their profile details.
+ * This includes options for signing out, editing profile information, accessing activity history,
+ * adjusting settings, and reviewing the privacy policy. It also integrates with Google Sign-In
+ * and Firebase for authentication purposes.
+ */
 public class ProfilePage extends AppCompatActivity {
 
     private GoogleSignInClient googleSignInClient;
