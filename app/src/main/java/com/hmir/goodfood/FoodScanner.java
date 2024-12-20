@@ -7,6 +7,7 @@ import android.provider.MediaStore;
 import android.util.Base64;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -60,8 +61,9 @@ public class FoodScanner extends AppCompatActivity {
         Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         startActivityForResult(cameraIntent, REQUEST_CODE);
 
-        Button extractIngredientButton = findViewById(R.id.extractIngredientButton);
-        extractIngredientButton.setOnClickListener(v -> extractIngredient(cameraView));
+        ImageButton ExtractIngredientButton = findViewById(R.id.ExtractIngredientButton);
+        ExtractIngredientButton.setOnClickListener(v -> extractIngredient(cameraView));
+
     }
 
     @Override
