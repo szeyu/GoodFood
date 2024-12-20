@@ -11,7 +11,7 @@
         android:id="@+id/TVWeight"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="20dp"
         android:fontFamily="@font/poppins_medium"
         android:text="Weight"
         android:textSize="20sp"
@@ -22,7 +22,7 @@
         android:id="@+id/TVDietTypes"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="20dp"
         android:fontFamily="@font/poppins_medium"
         android:text="Diet Types"
         android:textSize="20sp"
@@ -34,7 +34,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="28dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="20dp"
         android:fontFamily="@font/poppins_medium"
         android:text="Username"
         android:textSize="20sp"
@@ -56,7 +56,7 @@
         android:id="@+id/TVHeight"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="20dp"
         android:fontFamily="@font/poppins_medium"
         android:text="Height"
         android:textSize="20sp"
@@ -67,7 +67,7 @@
         android:id="@+id/IVProfile2"
         android:layout_width="172dp"
         android:layout_height="172dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="20dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
@@ -78,7 +78,7 @@
         android:id="@+id/TVEditProfileTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="10dp"
         android:fontFamily="@font/poppins_semibold"
         android:text="Edit Profile"
         android:textSize="30sp"
@@ -91,13 +91,11 @@
         android:id="@+id/IBDone"
         android:layout_width="54dp"
         android:layout_height="57dp"
-        android:layout_marginEnd="40dp"
+        android:layout_marginEnd="5dp"
         android:contentDescription="EditProfileDone"
         android:src="?android:attr/textCheckMark"
-        app:layout_constraintBottom_toBottomOf="@+id/TVEditProfileTitle"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/TVEditProfileTitle"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintTop_toTopOf="@+id/TVEditProfileTitle" />
 
     <com.google.android.material.textfield.TextInputEditText
         android:id="@+id/ETUsername"
@@ -148,61 +146,97 @@
         app:layout_constraintTop_toTopOf="@+id/TVHeight"
         app:layout_constraintVertical_bias="0.466" />
 
-    <CheckBox
-        android:id="@+id/CBHalal"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:fontFamily="sans-serif-medium"
-        android:text="Halal "
+    <GridLayout
+        android:layout_width="432dp"
+        android:layout_height="190dp"
+        android:layout_gravity="center"
+        android:columnCount="3"
+        android:orientation="horizontal"
+        android:padding="14dp"
+        android:rowCount="3"
         app:layout_constraintStart_toStartOf="@+id/TVDietTypes"
-        app:layout_constraintTop_toBottomOf="@+id/TVDietTypes" />
+        app:layout_constraintTop_toBottomOf="@+id/TVDietTypes">
 
-    <CheckBox
-        android:id="@+id/CBSeafood"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="40dp"
-        android:fontFamily="sans-serif-medium"
-        android:text="Seafood"
-        android:textSize="14sp"
-        app:layout_constraintStart_toEndOf="@+id/CBHalal"
-        app:layout_constraintTop_toTopOf="@+id/CBHalal" />
+        <Button
+            android:id="@+id/button_halal"
+            android:layout_width="108dp"
+            android:layout_height="37dp"
+            android:layout_margin="3dp"
+            android:background="@drawable/diet_button_selector"
+            android:fontFamily="serif"
+            android:text="Halal"
+            android:textSize="9sp" />
 
-    <CheckBox
-        android:id="@+id/CBDairy"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:fontFamily="sans-serif-medium"
-        android:text="Dairy"
-        app:layout_constraintStart_toStartOf="@+id/TVDietTypes"
-        app:layout_constraintTop_toBottomOf="@+id/CBHalal" />
+        <Button
+            android:id="@+id/button_vegan"
+            android:layout_width="108dp"
+            android:layout_height="37dp"
+            android:layout_margin="3dp"
+            android:background="@drawable/diet_button_selector"
+            android:fontFamily="serif"
+            android:text="Vegan"
+            android:textSize="9sp" />
 
-    <CheckBox
-        android:id="@+id/CBPescetarian"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:fontFamily="sans-serif-medium"
-        android:text="Pescetarian"
-        app:layout_constraintStart_toStartOf="@+id/CBSeafood"
-        app:layout_constraintTop_toBottomOf="@+id/CBSeafood" />
+        <Button
+            android:id="@+id/button_pescatarian"
+            android:layout_width="108dp"
+            android:layout_height="37dp"
+            android:layout_margin="3dp"
+            android:background="@drawable/diet_button_selector"
+            android:fontFamily="serif"
+            android:text="Pescatarian"
+            android:textSize="9sp" />
 
-    <CheckBox
-        android:id="@+id/CBOthers"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:fontFamily="sans-serif-medium"
-        android:text="Others"
-        app:layout_constraintStart_toStartOf="@+id/CBVegan"
-        app:layout_constraintTop_toBottomOf="@+id/CBVegan" />
+        <Button
+            android:id="@+id/button_custom"
+            android:layout_width="108dp"
+            android:layout_height="37dp"
+            android:layout_margin="3dp"
+            android:background="@drawable/diet_button_selector"
+            android:fontFamily="serif"
+            android:text="Custom"
+            android:textSize="9sp" />
 
-    <CheckBox
-        android:id="@+id/CBVegan"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="40dp"
-        android:fontFamily="sans-serif-medium"
-        android:text="Vegan"
-        app:layout_constraintStart_toEndOf="@+id/CBSeafood"
-        app:layout_constraintTop_toTopOf="@+id/CBSeafood" />
+        <Button
+            android:id="@+id/button_dairy"
+            android:layout_width="108dp"
+            android:layout_height="37dp"
+            android:layout_margin="3dp"
+            android:background="@drawable/diet_button_selector"
+            android:fontFamily="serif"
+            android:text="Dairy"
+            android:textSize="9sp" />
+
+        <Button
+            android:id="@+id/button_nuts"
+            android:layout_width="108dp"
+            android:layout_height="37dp"
+            android:layout_margin="3dp"
+            android:background="@drawable/diet_button_selector"
+            android:fontFamily="serif"
+            android:text="Nuts"
+            android:textSize="9sp" />
+
+        <Button
+            android:id="@+id/button_seafood"
+            android:layout_width="108dp"
+            android:layout_height="37dp"
+            android:layout_margin="3dp"
+            android:background="@drawable/diet_button_selector"
+            android:fontFamily="serif"
+            android:text="Seafood"
+            android:textSize="9sp" />
+
+        <Button
+            android:id="@+id/button_others"
+            android:layout_width="108dp"
+            android:layout_height="37dp"
+            android:layout_margin="3dp"
+            android:background="@drawable/diet_button_selector"
+            android:fontFamily="serif"
+            android:text="Others"
+            android:textSize="9sp" />
+
+    </GridLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

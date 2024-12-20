@@ -10,6 +10,7 @@ import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -71,8 +72,8 @@ public class ExtractIngredient extends AppCompatActivity {
             }
         }
 
-        Button calCalorieBtn = findViewById(R.id.CalcCalorieBtn);
-        calCalorieBtn.setOnClickListener(view -> {
+        ImageButton CalculateCaloriesButton = findViewById(R.id.CalculateCaloriesButton);
+        CalculateCaloriesButton.setOnClickListener(view -> {
             Log.d("ExtractIngredient", ingredients);
 
             if (ingredients != null && !ingredients.isEmpty()) {
