@@ -33,13 +33,28 @@ import java.util.List;
 
 public class EditProfileFragment extends Fragment {
 
-    private TextInputEditText etUsername, etAge, etHeight, etWeight;
+    private TextInputEditText etUsername;
+    private TextInputEditText etAge;
+    private TextInputEditText etHeight;
+    private TextInputEditText etWeight;
     private ImageButton btnSave;
 
     private SharedPreferences sharedPreferences;
 
-    private String originalUsername, originalAge, originalHeight, originalWeight, originalDietPreferences;
-    private Button halalButton, veganButton, pescatarianButton, customButton, dairyButton, nutsButton, seafoodButton, othersButton;
+    private String originalUsername;
+    private String originalAge;
+    private String originalHeight;
+    private String originalWeight;
+    private String originalDietPreferences;
+
+    private Button halalButton;
+    private Button veganButton;
+    private Button pescatarianButton;
+    private Button customButton;
+    private Button dairyButton;
+    private Button nutsButton;
+    private Button seafoodButton;
+    private Button othersButton;
 
     private String selectedDietPreference;
 
