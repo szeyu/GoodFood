@@ -31,6 +31,13 @@ import com.hmir.goodfood.utilities.UserHelper;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * EditProfileFragment is a fragment that allows users to edit their profile details,
+ * including username, age, height, weight, and dietary preferences.
+ *
+ * This fragment handles input validation for numerical fields, manages diet preference buttons,
+ * and saves the data to SharedPreferences and Firebase.
+ */
 public class EditProfileFragment extends Fragment {
 
     private TextInputEditText etUsername;
@@ -127,6 +134,17 @@ public class EditProfileFragment extends Fragment {
         return view;
     }
 
+    /**
+     * Loads the user's original profile data from SharedPreferences.
+     * Populates the UI fields with stored values.
+     * Initializes the following fields:
+     * - Username
+     * - Age
+     * - Height
+     * - Weight
+     * - Diet Preferences
+     * Hides the save button initially.
+     */
     private void loadOriginalData() {
         originalUsername = sharedPreferences.getString("Username", "");
         originalAge = sharedPreferences.getString("Age", "");
@@ -146,6 +164,11 @@ public class EditProfileFragment extends Fragment {
         btnSave.setVisibility(View.GONE); // Hide Save button initially
     }
 
+    /**
+     * Adds text change listeners to all editable fields.
+     * Monitors real-time changes in username, age, height, and weight fields.
+     * Triggers detectChanges() whenever text is modified in any field.
+     */
     private void addTextWatchers() {
         TextWatcher textWatcher = new TextWatcher() {
             @Override
@@ -166,8 +189,12 @@ public class EditProfileFragment extends Fragment {
         etWeight.addTextChangedListener(textWatcher);
     }
 
+    /**
+     * Sets up click listeners for all diet preference buttons.
+     * Updates the selectedDietPreference variable when a button is clicked.
+     * Triggers detectChanges() to update the UI accordingly.
+     */
     private void setDietButtonListeners() {
-
             View.OnClickListener dietButtonClickListener = v -> {
                 int id = v.getId();
                 if (id == R.id.button_halal) {
@@ -202,6 +229,11 @@ public class EditProfileFragment extends Fragment {
         othersButton.setOnClickListener(dietButtonClickListener);
     }
 
+    /**
+     * Monitors changes in the profile fields and compares them with original values.
+     * Shows or hides the save button based on whether changes have been made.
+     * Fields monitored: username, age, height, weight, and diet preferences.
+     */
     private void detectChanges() {
         String newUsername = etUsername.getText().toString();
         String newAge = etAge.getText().toString();
@@ -219,6 +251,12 @@ public class EditProfileFragment extends Fragment {
         }
     }
 
+    /**
+     * Saves the changes made to the user profile.
+     * Updates both local SharedPreferences and Firebase (if internet is available).
+     * Displays appropriate toast messages based on the success of the operation.
+     * Reloads the original data after saving to maintain consistency.
+     */
     private void saveChanges() {
         // Save updated data to SharedPreferences
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -256,6 +294,11 @@ public class EditProfileFragment extends Fragment {
     }
 
 
+    /**
+     * Checks if an internet connection is available.
+     *
+     * @return true if the device has an active internet connection, false otherwise
+     */
     private boolean isInternetAvailable() {
 
         //return true;
