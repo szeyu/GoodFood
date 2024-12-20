@@ -82,21 +82,12 @@ public class ExtractIngredient extends AppCompatActivity {
             }
         }
 
-        ImageButton CalculateCaloriesButton = findViewById(R.id.CalculateCaloriesButton);
-        CalculateCaloriesButton.setOnClickListener(view -> {
-            Log.d("ExtractIngredient", ingredients);
-
-            if (ingredients != null && !ingredients.isEmpty()) {
-                analyzeNutrition(ingredients);
-            } else {
-                Toast.makeText(ExtractIngredient.this, "No ingredients to analyze", Toast.LENGTH_SHORT).show();
-        Log.d("ExtractIngredient", ingredients);
         analyzeNutrition(ingredients, new NutritionCallback() {
             @Override
             public void onSuccess(String nutritionData) {
 
-                Button calCalorieBtn = findViewById(R.id.CalcCalorieBtn);
-                calCalorieBtn.setOnClickListener(view -> {
+                ImageButton CalculateCaloriesButton = findViewById(R.id.CalculateCaloriesButton);
+                CalculateCaloriesButton.setOnClickListener(view -> {
                     if (ingredients != null && !ingredients.isEmpty()) {
                         startCalorieActivity(nutritionData);
                     } else {
