@@ -50,12 +50,15 @@ public class MainActivity extends AppCompatActivity {
         // Finish MainActivity as it's only for redirection purposes
         finish();
     }
+
+    // Check if the user's email matches the email stored in SharedPreferences
     private boolean isUserEmailMatched() {
         SharedPreferences sharedPreferences = getSharedPreferences("UserPreferences", MODE_PRIVATE);
         Log.d("MainActivity", "Email from SharedPreferences: " + sharedPreferences.getString("Email", ""));
         return sharedPreferences.getString("Email", "")
                 .equals(FirebaseAuth.getInstance().getCurrentUser().getEmail());
     }
+    // Check if user exists in Firestore
     private void isUserExistInFirestore(OnUserExistListener listener) {
         UserHelper userHelper = new UserHelper(1);
         userHelper.isUserExist()
@@ -68,6 +71,7 @@ public class MainActivity extends AppCompatActivity {
                     listener.onResult(false);
                 });
     }
+    // Print user info
     private void printUserInfo(FirebaseUser user) {
         String TAG = "Firebase";
         if (user != null) {
