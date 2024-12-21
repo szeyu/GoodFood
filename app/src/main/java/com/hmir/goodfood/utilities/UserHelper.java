@@ -165,6 +165,7 @@ public class UserHelper {
         });
     }
 
+    // For MainActivity, saving user data to SharedPreferences when user exists in Firestore
     public void saveUserDataFromFirestoreToSharedPreferences(Context context) {
         enqueueOrExecute(() -> {
             // Save data in Shared Preferences
