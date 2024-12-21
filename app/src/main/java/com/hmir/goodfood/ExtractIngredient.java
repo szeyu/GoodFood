@@ -9,7 +9,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Base64;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -21,11 +20,11 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.Timestamp;
 import com.google.gson.Gson;
+import com.hmir.goodfood.callbacks.NutritionCallback;
 import com.hmir.goodfood.models.GeminiApiResponse;
 import com.hmir.goodfood.models.GeminiRequestBody;
 import com.hmir.goodfood.services.GeminiApiService;
 import com.hmir.goodfood.utilities.NetworkUtil;
-import com.hmir.goodfood.utilities.NutritionalRecord;
 import com.hmir.goodfood.utilities.UserHelper;
 
 import org.json.JSONObject;
@@ -258,11 +257,5 @@ public class ExtractIngredient extends AppCompatActivity {
         intent.putExtra("nutritionData", nutritionData);
         intent.putExtra("file_path", getIntent().getStringExtra("file_path"));
         startActivity(intent);
-    }
-
-
-    public interface NutritionCallback {
-        void onSuccess(String nutritionData);
-        void onError(String errorMessage);
     }
 }
