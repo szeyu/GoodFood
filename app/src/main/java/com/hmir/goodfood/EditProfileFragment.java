@@ -32,11 +32,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * EditProfileFragment is a fragment that allows users to edit their profile details,
- * including username, age, height, weight, and dietary preferences.
- *
- * This fragment handles input validation for numerical fields, manages diet preference buttons,
- * and saves the data to SharedPreferences and Firebase.
+ * The EditProfileFragment class provides a user interface for editing the user's profile details.
+ * Users can update their username, age, height, weight, and dietary preferences.
+ * Changes are saved locally in SharedPreferences and optionally synced to Firebase if internet connectivity is available.
  */
 public class EditProfileFragment extends Fragment {
 
@@ -195,6 +193,7 @@ public class EditProfileFragment extends Fragment {
      * Triggers detectChanges() to update the UI accordingly.
      */
     private void setDietButtonListeners() {
+
             View.OnClickListener dietButtonClickListener = v -> {
                 int id = v.getId();
                 if (id == R.id.button_halal) {
@@ -300,9 +299,6 @@ public class EditProfileFragment extends Fragment {
      * @return true if the device has an active internet connection, false otherwise
      */
     private boolean isInternetAvailable() {
-
-        //return true;
-
         ConnectivityManager connectivityManager = (ConnectivityManager) requireContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         if (connectivityManager != null) {
             NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
