@@ -1,6 +1,7 @@
 package com.hmir.goodfood;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -41,6 +42,10 @@ public class ProfilePage extends AppCompatActivity {
     }
 
     public void logoutGoogle(View view) {
+        // Remove SharedPreference user data
+        SharedPreferences sharedPreferences = getSharedPreferences("UserPreferences", MODE_PRIVATE);
+        sharedPreferences.edit().clear().apply();
+
         // Firebase sign out
         FirebaseAuth.getInstance().signOut();
 

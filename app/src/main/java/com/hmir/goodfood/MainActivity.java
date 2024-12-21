@@ -12,7 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.hmir.goodfood.utilities.User;
+import com.hmir.goodfood.utilities.UserHelper;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -22,41 +22,53 @@ public class MainActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         FirebaseApp.initializeApp(MainActivity.this);
 
-        // Check the user's authentication status
-        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-        if (currentUser != null) {
-            // User is signed in
-            // Print all user info
-            printUserInfo(currentUser);
+        // Check if user exists in Firestore using email
+        isUserExistInFirestore(exist -> {
+            if (exist) {
+                UserHelper userHelper = new UserHelper();
+                // Check the user's authentication status
+                FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+                if (currentUser != null) {
+                    // User is signed in
+                    // Print all user info
+                    printUserInfo(currentUser);
 
-            // Check if user data exists in SharedPreferences
-            if (isUserDataAvailable()) {
-                // Redirect to home page
-                redirectToHomePage();
+                    // Save user data from Firestore to SharedPreferences
+                    if(!isUserEmailMatched())
+                        userHelper.saveUserDataFromFirestoreToSharedPreferences(getApplicationContext());
+                    redirectToHomePage();
+                } else {
+                    // User is not signed in
+                    redirectToLoginPage();
+                }
             } else {
-                // Redirect to welcome page to collect user info
+                // Go to welcome page if user doesn't exist in Firestore
                 redirectToWelcomePage();
             }
-        } else {
-            // User is not signed in, redirect to login page
-            redirectToLoginPage();
-        }
+        });
 
         // Finish MainActivity as it's only for redirection purposes
         finish();
     }
-
-    private boolean isUserDataAvailable() {
+    private boolean isUserEmailMatched() {
         SharedPreferences sharedPreferences = getSharedPreferences("UserPreferences", MODE_PRIVATE);
-
-        // Check if the key "Username" or any other mandatory field exists
-        return sharedPreferences.contains("Username") &&
-                sharedPreferences.contains("Age") &&
-                sharedPreferences.contains("Height") &&
-                sharedPreferences.contains("Weight")&&
-                sharedPreferences.contains("DietTypes");
+        Log.d("MainActivity", "Email from SharedPreferences: " + sharedPreferences.getString("Email", ""));
+        return sharedPreferences.getString("Email", "")
+                .equals(FirebaseAuth.getInstance().getCurrentUser().getEmail());
     }
-    private void printUserInfo(FirebaseUser user){
+    private void isUserExistInFirestore(OnUserExistListener listener) {
+        UserHelper userHelper = new UserHelper(1);
+        userHelper.isUserExist()
+                .addOnSuccessListener(exist -> {
+                    Log.d("UserExist", "User exists in Firestore: " + exist + FirebaseAuth.getInstance().getCurrentUser().getEmail());
+                    listener.onResult(exist);
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("UserExist", "Error checking user existence", e);
+                    listener.onResult(false);
+                });
+    }
+    private void printUserInfo(FirebaseUser user) {
         String TAG = "Firebase";
         if (user != null) {
             // Print user info
@@ -80,5 +92,9 @@ public class MainActivity extends AppCompatActivity {
     private void redirectToWelcomePage() {
         Intent intent = new Intent(MainActivity.this, welcomePage.class);
         startActivity(intent);
+    }
+
+    private interface OnUserExistListener {
+        void onResult(boolean exists);
     }
 }

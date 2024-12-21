@@ -1,5 +1,9 @@
 package com.hmir.goodfood.utilities;
 
+import static android.content.Context.MODE_PRIVATE;
+
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Log;
 
 import com.google.android.gms.tasks.Task;
@@ -21,6 +25,7 @@ public class UserHelper {
       In this class, there will be multiple sections of methods relating to a user:
       Section 1 : User Specifics
                     - fetchUser()
+                    - isUserExist()
                     - addNewUser()
                     - updateUserInfo()
                     - deleteUser()
@@ -73,7 +78,7 @@ public class UserHelper {
     private final NutritionalRecordHelper nutritionalRecordHelper = new NutritionalRecordHelper();
     private final FavouriteRecipeHelper favouriteRecipeHelper = new FavouriteRecipeHelper();
     private final Queue<Runnable> pendingOperations = new LinkedList<>();
-    protected User currentUser;
+    public User currentUser;
     //    private final static String email = "test1@gmail.com";
     private boolean isUserLoaded = false;
 
@@ -140,6 +145,41 @@ public class UserHelper {
             } else {
                 throw task.getException() != null ? task.getException() : new Exception("Failed to fetch user record");
             }
+        });
+    }
+
+    // Fetch user and check if it exists
+    public Task<Boolean> isUserExist() {
+        if (email == null || email.isEmpty()) {
+            return Tasks.forException(new Exception("Email is null or empty"));
+        }
+
+        // Check if document exists
+        return db.collection("user").document(email).get().continueWith(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot documentSnapshot = task.getResult();
+                return documentSnapshot.exists();
+            } else {
+                throw task.getException() != null ? task.getException() : new Exception("Failed to check user existence");
+            }
+        });
+    }
+
+    public void saveUserDataFromFirestoreToSharedPreferences(Context context) {
+        enqueueOrExecute(() -> {
+            // Save data in Shared Preferences
+            SharedPreferences sharedPreferences = context.getSharedPreferences("UserPreferences", MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+
+            editor.putString("Email", FirebaseAuth.getInstance().getCurrentUser().getEmail());
+            editor.putString("Username", currentUser.getUsername());
+            editor.putString("Age", Long.toString(currentUser.getAge()));
+            editor.putString("Height", Double.toString(currentUser.getHeight()));
+            editor.putString("Weight", Double.toString(currentUser.getWeight()));
+            editor.putString("DietTypes", currentUser.getHealth_labels().toString());
+            editor.apply();
+
+            Log.d("UserHelper","SharedPreferences saved");
         });
     }
 

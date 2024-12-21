@@ -19,6 +19,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.hmir.goodfood.utilities.UserHelper;
 
 import java.util.ArrayList;
@@ -138,11 +139,16 @@ public class welcomePage extends AppCompatActivity {
 
         // Confirm button listener
         confirmButton.setOnClickListener(v -> {
-            // Get input data
+            // Get input data and also email
+            String email = FirebaseAuth.getInstance().getCurrentUser().getEmail();
             String username = usernameEditText.getText().toString();
             String age = ageEditText.getText().toString();
             String height = heightEditText.getText().toString();
             String weight = weightEditText.getText().toString();
+
+            // Check email
+            if(email == null)
+                Log.e("WelcomePage", "While saving data in SharedPreference, email is null");
 
             // Validate inputs
             if (username.isEmpty() || age.isEmpty() || height.isEmpty() || weight.isEmpty()) {
@@ -154,6 +160,7 @@ public class welcomePage extends AppCompatActivity {
             SharedPreferences sharedPreferences = getSharedPreferences("UserPreferences", MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPreferences.edit();
 
+            editor.putString("Email", email);
             editor.putString("Username", username);
             editor.putString("Age", age);
             editor.putString("Height", height);
