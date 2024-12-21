@@ -84,54 +84,13 @@ public class ExtractIngredient extends AppCompatActivity {
         analyzeNutrition(ingredients, new NutritionCallback() {
             @Override
             public void onSuccess(String nutritionData) {
-
                 ImageButton CalculateCaloriesButton = findViewById(R.id.CalculateCaloriesButton);
                 CalculateCaloriesButton.setOnClickListener(view -> {
                     if (ingredients != null && !ingredients.isEmpty()) {
-                        startCalorieActivity(nutritionData);
+                        startCalorieActivity(nutritionData, ingredients);
                     } else {
                         Toast.makeText(ExtractIngredient.this, "No ingredients to analyze", Toast.LENGTH_SHORT).show();
                     }
-                });
-
-                Button saveRecordBtn = findViewById(R.id.SaveRecordBtn);
-                saveRecordBtn.setOnClickListener(view -> {
-                    UserHelper user = new UserHelper();
-                    try {
-                        // Convert the file_path into Uri class object
-                        File file = new File(filePath);
-                        Uri imageUri = Uri.fromFile(file);
-
-                        // Parse the JSON into a NutritionalRecord object
-                        JSONObject jsonObject = new JSONObject(nutritionData);
-
-                        Map<String, Object> newNutritionalRecord = new HashMap<>();
-                        newNutritionalRecord.put("calcium", jsonObject.optDouble("total_calcium", 0));
-                        newNutritionalRecord.put("calories", jsonObject.optDouble("total_calories", 0));
-                        newNutritionalRecord.put("carbs", jsonObject.optDouble("total_carbs", 0));
-                        newNutritionalRecord.put("cholesterol", jsonObject.optDouble("total_cholesterol", 0));
-                        newNutritionalRecord.put("fat", jsonObject.optDouble("total_fat", 0));
-                        newNutritionalRecord.put("iron", jsonObject.optDouble("total_iron", 0));
-                        newNutritionalRecord.put("magnesium", jsonObject.optDouble("total_magnesium", 0));
-                        newNutritionalRecord.put("potassium", jsonObject.optDouble("total_potassium", 0));
-                        newNutritionalRecord.put("protein", jsonObject.optDouble("total_protein", 0));
-                        newNutritionalRecord.put("sodium", jsonObject.optDouble("total_sodium", 0));
-                        newNutritionalRecord.put("ingredients", ingredients);
-                        newNutritionalRecord.put("date_time", new Timestamp(new Date()));
-
-                        if (NetworkUtil.isInternetAvailable(getApplicationContext())) {
-                            user.addUserNutritionalRecord(newNutritionalRecord, imageUri);
-                            Toast.makeText(ExtractIngredient.this, "Record saved successfully", Toast.LENGTH_SHORT).show();
-
-                            // End the activity after saving the record
-                            finish(); // This will close the current activity
-                        } else {
-                            Toast.makeText(ExtractIngredient.this, "Unable to connect to Internet", Toast.LENGTH_SHORT).show();
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-
                 });
             }
 
@@ -252,9 +211,10 @@ public class ExtractIngredient extends AppCompatActivity {
      * @param nutritionData The analyzed nutrition data from image.
      */
 
-    private void startCalorieActivity(String nutritionData) {
+    private void startCalorieActivity(String nutritionData, String ingredients) {
         Intent intent = new Intent(ExtractIngredient.this, Calories.class);
         intent.putExtra("nutritionData", nutritionData);
+        intent.putExtra("ingredients", ingredients);
         intent.putExtra("file_path", getIntent().getStringExtra("file_path"));
         startActivity(intent);
     }
