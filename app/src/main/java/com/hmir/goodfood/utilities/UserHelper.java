@@ -20,6 +20,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 
+/**
+ * Helper class for managing user-related operations in the application.
+ * This class handles user data management, nutritional records, and favorite recipes.
+ * It provides methods for CRUD operations on user data and related entities.
+ *
+ * The class is organized into four main sections:
+ * 1. User Specifics - Basic user operations (fetch, add, update, delete)
+ * 2. User Nutritional Records - Managing user's nutritional data
+ * 3. User Favourite Recipes - Managing user's favorite recipes
+ * 4. Callbacks - Interfaces for handling asynchronous operations
+ */
 public class UserHelper {
     /*
       In this class, there will be multiple sections of methods relating to a user:
@@ -653,6 +664,14 @@ public class UserHelper {
         void onError(Exception e);
     }
 
+    /**
+     * Uploads a photo to Firebase Storage and returns a Task containing the download URL.
+     *
+     * @param imageUri The URI of the image to be uploaded
+     * @param userEmail The email of the user uploading the image, used to create a unique file name
+     * @return Task<Uri> A task that resolves to the download URL of the uploaded image
+     * @throws IllegalArgumentException if imageUri is null
+     */
     public Task<Uri> uploadPhotoToStorage(Uri imageUri, String userEmail) {
         if (imageUri == null) {
             Log.e("Firebase", "Image URI is null");
