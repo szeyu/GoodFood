@@ -83,21 +83,23 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    // Begin HomePage activity
     private void redirectToHomePage() {
         Intent intent = new Intent(MainActivity.this, HomePage.class);
         startActivity(intent);
     }
-
+    // Begin LoginPage activity
     private void redirectToLoginPage() {
         Intent intent = new Intent(MainActivity.this, LoginPage.class);
         startActivity(intent);
     }
-
+    // Begin WelcomePage activity
     private void redirectToWelcomePage() {
         Intent intent = new Intent(MainActivity.this, welcomePage.class);
         startActivity(intent);
     }
 
+    // Callback interface for asynchronous listener in checking user existence
     private interface OnUserExistListener {
         void onResult(boolean exists);
     }
