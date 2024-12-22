@@ -5,6 +5,7 @@ import static com.hmir.goodfood.utilities.FileUtil.readBase64FromFile;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Base64;
 import android.util.Log;
@@ -13,15 +14,23 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.Timestamp;
+import com.hmir.goodfood.utilities.NetworkUtil;
 import com.hmir.goodfood.utilities.NutritionalRecord;
+import com.hmir.goodfood.utilities.UserHelper;
 
 import org.json.JSONObject;
 
 import java.io.File;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * The {@code Calories} class is an {@link AppCompatActivity} responsible for displaying the nutritional data
@@ -47,6 +56,7 @@ public class Calories extends AppCompatActivity {
 
         Intent intent = getIntent();
         String nutritionData = intent.getStringExtra("nutritionData");
+        String ingredients = intent.getStringExtra("ingredients");
         Log.d("Ingredients", nutritionData);
 
         String filePath = intent.getStringExtra("file_path");
@@ -97,6 +107,46 @@ public class Calories extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
+
+        FloatingActionButton saveRecordBtn = findViewById(R.id.SaveRecordButton);
+        saveRecordBtn.setOnClickListener(view -> {
+            UserHelper user = new UserHelper();
+            try {
+                // Convert the file_path into Uri class object
+                File file = new File(filePath);
+                Uri imageUri = Uri.fromFile(file);
+
+                // Parse the JSON into a NutritionalRecord object
+                JSONObject jsonObject = new JSONObject(nutritionData);
+
+                Map<String, Object> newNutritionalRecord = new HashMap<>();
+                newNutritionalRecord.put("calcium", jsonObject.optDouble("total_calcium", 0));
+                newNutritionalRecord.put("calories", jsonObject.optDouble("total_calories", 0));
+                newNutritionalRecord.put("carbs", jsonObject.optDouble("total_carbs", 0));
+                newNutritionalRecord.put("cholesterol", jsonObject.optDouble("total_cholesterol", 0));
+                newNutritionalRecord.put("fat", jsonObject.optDouble("total_fat", 0));
+                newNutritionalRecord.put("iron", jsonObject.optDouble("total_iron", 0));
+                newNutritionalRecord.put("magnesium", jsonObject.optDouble("total_magnesium", 0));
+                newNutritionalRecord.put("potassium", jsonObject.optDouble("total_potassium", 0));
+                newNutritionalRecord.put("protein", jsonObject.optDouble("total_protein", 0));
+                newNutritionalRecord.put("sodium", jsonObject.optDouble("total_sodium", 0));
+                newNutritionalRecord.put("ingredients", ingredients);
+                newNutritionalRecord.put("date_time", new Timestamp(new Date()));
+
+                if (NetworkUtil.isInternetAvailable(getApplicationContext())) {
+                    user.addUserNutritionalRecord(newNutritionalRecord, imageUri);
+                    Toast.makeText(Calories.this, "Record saved successfully", Toast.LENGTH_SHORT).show();
+
+                    // End the activity after saving the record
+                    finish(); // This will close the current activity
+                } else {
+                    Toast.makeText(Calories.this, "Unable to connect to Internet", Toast.LENGTH_SHORT).show();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        });
 
     }
 
