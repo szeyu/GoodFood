@@ -24,6 +24,7 @@ import com.hmir.goodfood.services.GeminiApiService;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import okhttp3.MediaType;
@@ -70,6 +71,14 @@ public class ExtractIngredient extends AppCompatActivity {
                 displayImage(encodedImage);
             }
         }
+        Button searchRecipeBtn = findViewById(R.id.searchRecipeBtn);
+        searchRecipeBtn.setOnClickListener(view -> {
+            if (ingredients != null && !ingredients.isEmpty()) {
+                searchRecipes(ingredients);  // Call the method to search for recipes
+            } else {
+                Toast.makeText(ExtractIngredient.this, "No ingredients to search recipes for", Toast.LENGTH_SHORT).show();
+            }
+        });
 
         Button calCalorieBtn = findViewById(R.id.CalcCalorieBtn);
         calCalorieBtn.setOnClickListener(view -> {
@@ -94,6 +103,8 @@ public class ExtractIngredient extends AppCompatActivity {
         ImageView capturedImageView = findViewById(R.id.MealImage);
         capturedImageView.setImageBitmap(bitmap);
     }
+
+
 
     /**
      * Analyzes the nutrition information based on the provided ingredients.
@@ -172,7 +183,68 @@ public class ExtractIngredient extends AppCompatActivity {
             }
         });
     }
+    private void searchRecipes(String ingredients) {
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
 
+        OkHttpClient client = new OkHttpClient.Builder()
+                .addInterceptor(logging)
+                .build();
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(GEMINI_API_BASE_URL)
+                .client(client)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        GeminiApiService service = retrofit.create(GeminiApiService.class);
+
+        String prompt = "Based on the ingredients: " + ingredients + ", suggest a list of recipes. " +
+                "For each recipe, provide the name, ingredients, and cooking steps in this format:\n" +
+                "- Recipe Name: <recipe_name>\n" +
+                "  Ingredients: <ingredient_1, ingredient_2, ...>\n" +
+                "  Steps: <step_1, step_2, ...>";
+
+        GeminiRequestBody requestBody = createGeminiRequestBody(prompt);
+        String jsonBody = new Gson().toJson(requestBody);
+        RequestBody body = RequestBody.create(MediaType.parse("application/json"), jsonBody);
+
+        Call<GeminiApiResponse> call = service.callGemini(GEMINI_API_KEY, body);
+        call.enqueue(new Callback<GeminiApiResponse>() {
+            @Override
+            public void onResponse(Call<GeminiApiResponse> call, Response<GeminiApiResponse> response) {
+                if (response.isSuccessful() && response.body() != null && !response.body().getCandidates().isEmpty()) {
+                    String recipesText = response.body().getCandidates().get(0).getContent().getParts().get(0).getText();
+                    List<Recipe> recipes = parseRecipes(recipesText);
+
+                    Intent intent = new Intent(ExtractIngredient.this, RecipeListActivity.class);
+                    intent.putParcelableArrayListExtra("recipes", new ArrayList<>(recipes));
+                    startActivity(intent);
+                } else {
+                    Toast.makeText(ExtractIngredient.this, "Failed to search for recipes", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<GeminiApiResponse> call, Throwable t) {
+                Toast.makeText(ExtractIngredient.this, "Error: " + t.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    private List<Recipe> parseRecipes(String recipesText) {
+        List<Recipe> recipes = new ArrayList<>();
+        // Example of parsing the text into Recipe objects (you can adjust the parsing logic as needed)
+        String[] recipeStrings = recipesText.split("\n- ");
+        for (String recipeString : recipeStrings) {
+            String[] parts = recipeString.split("\n  ");
+            String name = parts[0].replace("Recipe Name: ", "");
+            List<String> ingredients = Arrays.asList(parts[1].replace("Ingredients: ", "").split(", "));
+            List<String> steps = Arrays.asList(parts[2].replace("Steps: ", "").split(", "));
+            recipes.add(new Recipe(name, ingredients, steps));
+        }
+        return recipes;
+    }
     /**
      * Creates a GeminiRequestBody with the specified prompt.
      *

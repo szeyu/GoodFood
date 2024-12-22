@@ -2,6 +2,7 @@ package com.hmir.goodfood;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Base64;
@@ -37,11 +38,9 @@ import com.hmir.goodfood.models.GeminiRequestBody;
 import com.hmir.goodfood.services.GeminiApiService;
 import com.hmir.goodfood.utilities.FileUtil;
 
-/**
- * Activity for scanning food and extracting ingredients.
- */
 public class FoodScanner extends AppCompatActivity {
     private static final int REQUEST_CODE = 22;
+    private static final int PICK_IMAGE_REQUEST = 1; // Request code for gallery
     private ImageView cameraView;
 
     private static final String GEMINI_API_KEY = BuildConfig.GEMINI_API_KEY;
@@ -53,34 +52,65 @@ public class FoodScanner extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_food_scanner);
 
-        Log.d("Gemini", GEMINI_API_KEY);
-        Log.d("Gemini", GEMINI_API_BASE_URL);
-
         cameraView = findViewById(R.id.cameraView);
+
+        // Start camera intent
         Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         startActivityForResult(cameraIntent, REQUEST_CODE);
 
+        // Button to extract ingredients from the camera image
         Button extractIngredientButton = findViewById(R.id.extractIngredientButton);
-        extractIngredientButton.setOnClickListener(v -> extractIngredient(cameraView));
+        extractIngredientButton.setOnClickListener(v -> extractIngredientFromImageView(cameraView));
+
+
+        // Button to select image from the gallery
+        Button selectFromGalleryButton = findViewById(R.id.selectFromGalleryButton);
+        selectFromGalleryButton.setOnClickListener(v -> selectImageFromGallery());
+    }
+
+    // Start the gallery activity to pick an image
+    private void selectImageFromGallery() {
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        intent.setType("image/*");
+        startActivityForResult(intent, PICK_IMAGE_REQUEST);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
         if (requestCode == REQUEST_CODE && resultCode == RESULT_OK) {
+            // Handle camera image
             Bitmap photo = (Bitmap) data.getExtras().get("data");
             cameraView.setImageBitmap(photo);
-        } else {
-            Toast.makeText(this, "Cancelled", Toast.LENGTH_SHORT).show();
-            super.onActivityResult(requestCode, resultCode, data);
+        } else if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null) {
+            // Handle gallery image
+            try {
+                Uri imageUri = data.getData();
+                Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
+                cameraView.setImageBitmap(bitmap);
+
+                // Pass the bitmap for ingredient extraction
+                extractIngredientFromBitmap(bitmap);
+            } catch (Exception e) {
+                Toast.makeText(this, "Error loading image", Toast.LENGTH_SHORT).show();
+                e.printStackTrace();
+            }
         }
     }
 
-    /**
-     * Extracts ingredients from the captured image.
-     *
-     * @param cameraView The ImageView containing the captured image.
-     */
-    private void extractIngredient(ImageView cameraView) {
+    // Convert the Bitmap to base64 and pass to extractIngredient
+    private void extractIngredientFromBitmap(Bitmap bitmap) {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 80, outputStream);
+        byte[] imageBytes = outputStream.toByteArray();
+        String encodedImage = Base64.encodeToString(imageBytes, Base64.NO_WRAP);
+
+        // Call your existing API logic with the encoded image
+        extractIngredient(encodedImage);
+    }
+
+    private void extractIngredientFromImageView(ImageView cameraView) {
         cameraView.setDrawingCacheEnabled(true);
         cameraView.buildDrawingCache();
         Bitmap bitmap = cameraView.getDrawingCache();
@@ -90,6 +120,11 @@ public class FoodScanner extends AppCompatActivity {
         byte[] imageBytes = outputStream.toByteArray();
         String encodedImage = Base64.encodeToString(imageBytes, Base64.NO_WRAP);
 
+        // Call your existing API logic with the encoded image
+        extractIngredient(encodedImage);
+    }
+
+    private void extractIngredient(String encodedImage) {
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
         logging.setLevel(HttpLoggingInterceptor.Level.BODY);
 
@@ -105,10 +140,11 @@ public class FoodScanner extends AppCompatActivity {
 
         GeminiApiService service = retrofit.create(GeminiApiService.class);
 
-        String prompt = "Based on the food scanned, extract the quantity and ingredients used in the food image. " +
+        String prompt = "Based on the food scanned, extract the ingredients used in the food image, but normalize the output to represent just 1 piece or unit of the food. " +
                 "Don't provide explanations. Please follow the output format:\n\n" +
-                "Example output:\n- 4 pieces of Wedges\n\n" +
-                "Output format:\n- <quantity> <unit> <Ingredient>";
+                "Example output:\n- 1 piece of Chicken\n\n" +
+                "Output format:\n- 1 <unit> <Ingredient>";
+
 
         GeminiRequestBody requestBody = createGeminiRequestBody(prompt, encodedImage);
         String jsonBody = new Gson().toJson(requestBody);
@@ -120,6 +156,9 @@ public class FoodScanner extends AppCompatActivity {
             public void onResponse(Call<GeminiApiResponse> call, Response<GeminiApiResponse> response) {
                 if (response.isSuccessful() && response.body() != null && !response.body().getCandidates().isEmpty()) {
                     String ingredients = response.body().getCandidates().get(0).getContent().getParts().get(0).getText();
+
+// Normalize the quantity to "1"
+                    ingredients = normalizeToSingleUnit(ingredients);
                     Log.d("ExtractIngredient", "Response: " + ingredients);
 
                     File imageFile = FileUtil.saveBase64ToFile(FoodScanner.this, encodedImage, "temp_image.txt");
@@ -132,6 +171,10 @@ public class FoodScanner extends AppCompatActivity {
                     Log.d("ExtractIngredient", "Response unsuccessful: " + response.toString());
                     Toast.makeText(FoodScanner.this, "Failed to extract ingredients", Toast.LENGTH_SHORT).show();
                 }
+            }
+            private String normalizeToSingleUnit(String ingredients) {
+                // Regex to match quantities at the start of the line (e.g., "6 pieces of Chicken")
+                return ingredients.replaceAll("^(\\d+)\\s", "1 ");
             }
 
             @Override
