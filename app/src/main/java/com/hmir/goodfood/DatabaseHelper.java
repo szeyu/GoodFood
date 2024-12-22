@@ -29,23 +29,33 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "protein TEXT, " +
                 "description TEXT, " +
                 "ingredients TEXT" +
+                "carbs TEXT, " +
+                "sodium TEXT, " +
+                "calcium TEXT, " +
+                "iron TEXT, " +
+                "cholesterol TEXT, " +
+                "potassium TEXT, " +
+                "magnesium TEXT" +
                 ")";
         db.execSQL(createTable);
 
         // Insert initial data with drawable resource names as image references
-        db.execSQL("INSERT INTO items (name, image, fat, calories, protein, description, ingredients) " +
-                "VALUES ('Burger', 'burger_image', '20g', '300', '15g', 'A delicious burger', 'Bun, Patty, Lettuce')");
-
-        db.execSQL("INSERT INTO items (name, image, fat, calories, protein, description, ingredients) " +
-                "VALUES ('Hamburger', 'hamburger_image', '18g', '280', '12g', 'Classic hamburger', 'Bun, Patty, Pickles')");
-        db.execSQL("INSERT INTO items (name, image, fat, calories, protein, description, ingredients) " +
-                "VALUES ('Cheese Burger', 'cheese_burger_image', '25g', '400', '20g', 'Cheesy and tasty', 'Bun, Patty, Cheese, Lettuce')");
-        db.execSQL("INSERT INTO items (name, image, fat, calories, protein, description, ingredients) " +
-                "VALUES ('Vegetarian Burger', 'veggie_burger_image', '15g', '250', '10g', 'Healthy vegetarian burger', 'Bun, Veggie Patty, Lettuce')");
-        db.execSQL("INSERT INTO items (name, image, fat, calories, protein, description, ingredients) " +
-                "VALUES ('Pizza', 'pizza_image', '30g', '500', '22g', 'Cheesy pizza', 'Dough, Tomato Sauce, Cheese')");
-        db.execSQL("INSERT INTO items (name, image, fat, calories, protein, description, ingredients) " +
-                "VALUES ('Pasta', 'pasta_image', '10g', '350', '8g', 'Italian pasta', 'Pasta, Sauce, Cheese')");
+        db.execSQL("INSERT INTO items (name, calories, protein, carbs, fat, sodium, calcium, iron, cholesterol, potassium, magnesium) " +
+                "VALUES ('Burger', '300', '15g', '40g', '20g', '500mg', '100mg', '2mg', '50mg', '200mg', '50mg')");
+        // Add more records as needed
+//        db.execSQL("INSERT INTO items (name, image, fat, calories, protein, description, ingredients) " +
+//                "VALUES ('Burger', 'burger_image', '20g', '300', '15g', 'A delicious burger', 'Bun, Patty, Lettuce')");
+//
+//        db.execSQL("INSERT INTO items (name, image, fat, calories, protein, description, ingredients) " +
+//                "VALUES ('Hamburger', 'hamburger_image', '18g', '280', '12g', 'Classic hamburger', 'Bun, Patty, Pickles')");
+//        db.execSQL("INSERT INTO items (name, image, fat, calories, protein, description, ingredients) " +
+//                "VALUES ('Cheese Burger', 'cheese_burger_image', '25g', '400', '20g', 'Cheesy and tasty', 'Bun, Patty, Cheese, Lettuce')");
+//        db.execSQL("INSERT INTO items (name, image, fat, calories, protein, description, ingredients) " +
+//                "VALUES ('Vegetarian Burger', 'veggie_burger_image', '15g', '250', '10g', 'Healthy vegetarian burger', 'Bun, Veggie Patty, Lettuce')");
+//        db.execSQL("INSERT INTO items (name, image, fat, calories, protein, description, ingredients) " +
+//                "VALUES ('Pizza', 'pizza_image', '30g', '500', '22g', 'Cheesy pizza', 'Dough, Tomato Sauce, Cheese')");
+//        db.execSQL("INSERT INTO items (name, image, fat, calories, protein, description, ingredients) " +
+//                "VALUES ('Pasta', 'pasta_image', '10g', '350', '8g', 'Italian pasta', 'Pasta, Sauce, Cheese')");
     }
 
     private String getColumnValue(Cursor cursor, String columnName) {
@@ -196,6 +206,37 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         return items;
     }
+
+    public List<NutritionalRecord> getAllNutritionalRecords() {
+        List<NutritionalRecord> records = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT id, name, calories, protein, carbs, fat, sodium, calcium, iron, cholesterol, potassium, magnesium FROM items", null);
+
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                int id = cursor.getInt(cursor.getColumnIndex("id"));
+                String name = cursor.getString(cursor.getColumnIndex("name"));
+                String calories = cursor.getString(cursor.getColumnIndex("calories"));
+                String protein = cursor.getString(cursor.getColumnIndex("protein"));
+                String carbs = cursor.getString(cursor.getColumnIndex("carbs"));
+                String fat = cursor.getString(cursor.getColumnIndex("fat"));
+                String sodium = cursor.getString(cursor.getColumnIndex("sodium"));
+                String calcium = cursor.getString(cursor.getColumnIndex("calcium"));
+                String iron = cursor.getString(cursor.getColumnIndex("iron"));
+                String cholesterol = cursor.getString(cursor.getColumnIndex("cholesterol"));
+                String potassium = cursor.getString(cursor.getColumnIndex("potassium"));
+                String magnesium = cursor.getString(cursor.getColumnIndex("magnesium"));
+
+                // Add the record to the list
+                records.add(new NutritionalRecord(id, name, calories, protein, carbs, fat, sodium, calcium, iron, cholesterol, potassium, magnesium));
+            }
+            cursor.close();
+        }
+
+        return records;
+    }
+
+
 
 
 

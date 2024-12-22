@@ -29,26 +29,11 @@
                 android:textSize="24sp"
                 android:textStyle="bold" />
 
+            <!-- ProgressBar Section -->
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/todayCalorieLinearLayout"
                 android:layout_width="match_parent"
                 android:layout_height="110dp">
-
-                <TextView
-                    android:id="@+id/todayPercentSymbol"
-                    android:layout_width="51dp"
-                    android:layout_height="46dp"
-                    android:layout_marginStart="72dp"
-                    android:fontFamily="@font/poppins_medium_regular"
-                    android:text="%"
-                    android:textAlignment="viewStart"
-                    android:textColor="@android:color/black"
-                    android:textSize="34sp"
-                    android:textStyle="bold"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/todayProgressBar"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="0.343" />
 
                 <ProgressBar
                     android:id="@+id/todayProgressBar"
@@ -57,10 +42,7 @@
                     android:layout_height="52dp"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="16dp"
-                    android:layout_weight="1"
-                    android:indeterminateDrawable="@android:drawable/progress_indeterminate_horizontal"
                     android:max="100"
-                    android:padding="5dp"
                     android:progress="0"
                     android:progressDrawable="@drawable/rounded_grey_container"
                     android:progressTint="@color/red"
@@ -68,26 +50,9 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
-                    android:id="@+id/todayPercentageText"
-                    android:layout_width="51dp"
-                    android:layout_height="46dp"
-                    android:layout_marginStart="20dp"
-                    android:fontFamily="@font/poppins_medium_regular"
-                    android:text="0%"
-                    android:textAlignment="textEnd"
-                    android:textColor="@android:color/black"
-                    android:textSize="34sp"
-                    android:textStyle="bold"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/todayProgressBar"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="0.343" />
-
-                <TextView
                     android:id="@+id/todayCalorieText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
                     android:layout_marginStart="28dp"
                     android:layout_marginTop="8dp"
                     android:fontFamily="@font/poppins_semibold_regular"
@@ -99,6 +64,7 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
+            <!-- Nutrient Intake Section -->
             <LinearLayout
                 android:id="@+id/thisMonthNutrientIntakeLayout"
                 android:layout_width="match_parent"
@@ -130,17 +96,17 @@
                     android:src="@drawable/info_square" />
             </LinearLayout>
 
+            <!-- Bar Chart Section -->
             <com.github.mikephil.charting.charts.BarChart
                 android:id="@+id/todayBarChart"
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
-                android:layout_centerInParent="true"
                 android:layout_marginLeft="24dp"
                 android:layout_marginRight="24dp"
                 android:layout_marginBottom="24dp"
-                android:padding="16dp"
-                android:background="@drawable/rounded_border"/>
+                android:background="@drawable/rounded_border" />
 
+            <!-- Meal History Section -->
             <TextView
                 android:id="@+id/todayMealHistoryText"
                 android:layout_width="wrap_content"
@@ -153,6 +119,7 @@
                 android:textSize="24sp"
                 android:textStyle="bold" />
 
+            <!-- Meal History Items -->
             <LinearLayout
                 android:id="@+id/todayMealHistoryLinearLayout"
                 android:layout_width="match_parent"
