@@ -1,14 +1,10 @@
 package com.hmir.goodfood;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
+
 import android.content.SharedPreferences;
 import android.text.InputFilter;
 import android.text.InputType;
@@ -16,7 +12,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -24,17 +19,26 @@ import com.hmir.goodfood.utilities.UserHelper;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 
 public class welcomePage extends AppCompatActivity {
-    private EditText usernameEditText, ageEditText, heightEditText, weightEditText;
-    private Button confirmButton;
-    private Button halalButton, veganButton, pescatarianButton, customButton, dairyButton, nutsButton, seafoodButton, othersButton;
+    private EditText usernameEditText;
+    private EditText ageEditText;
+    private EditText heightEditText;
+    private EditText weightEditText;
 
+    private Button confirmButton;
+    private Button halalButton;
+    private Button veganButton;
+    private Button pescatarianButton;
+    private Button customButton;
+    private Button dairyButton;
+    private Button nutsButton;
+    private Button seafoodButton;
+    private Button othersButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
