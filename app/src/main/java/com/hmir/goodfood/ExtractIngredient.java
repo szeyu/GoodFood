@@ -275,6 +275,12 @@ public class ExtractIngredient extends AppCompatActivity {
         });
     }
 
+    /**
+     * Parses a string of recipes text into a list of Recipe objects.
+     *
+     * @param recipesText The text containing recipe information.
+     * @return A list of Recipe objects parsed from the text.
+     */
     private List<Recipe> parseRecipes(String recipesText) {
         List<Recipe> recipes = new ArrayList<>();
         // Example of parsing the text into Recipe objects (you can adjust the parsing logic as needed)
@@ -311,6 +317,12 @@ public class ExtractIngredient extends AppCompatActivity {
         return new GeminiRequestBody(contents);
     }
 
+    /**
+     * Starts the Calorie Activity with the provided nutrition data and ingredients.
+     *
+     * @param nutritionData The nutrition data to be passed to the activity.
+     * @param ingredients The ingredients to be passed to the activity.
+     */
     private void startCalorieActivity(String nutritionData, String ingredients) {
         Intent intent = new Intent(ExtractIngredient.this, Calories.class);
         intent.putExtra("nutritionData", nutritionData);

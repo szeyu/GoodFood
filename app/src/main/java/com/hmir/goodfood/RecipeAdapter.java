@@ -25,6 +25,11 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
      * The implementing class should define what happens when a recipe is clicked.
      */
     public interface OnRecipeClickListener {
+        /**
+         * Called when a recipe has been clicked.
+         *
+         * @param recipe The recipe that was clicked.
+         */
         void onRecipeClick(Recipe recipe);
     }
 
