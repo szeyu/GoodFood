@@ -30,6 +30,7 @@
                 android:textStyle="bold" />
 
             <!-- ProgressBar Section -->
+
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/todayCalorieLinearLayout"
                 android:layout_width="match_parent"
@@ -44,8 +45,8 @@
                     android:layout_marginTop="16dp"
                     android:max="100"
                     android:progress="0"
-                    android:progressDrawable="@drawable/rounded_grey_container"
-                    android:progressTint="@color/red"
+                    android:progressDrawable="@drawable/progress_bar_drawable"
+                    android:visibility="visible"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
@@ -56,11 +57,24 @@
                     android:layout_marginStart="28dp"
                     android:layout_marginTop="8dp"
                     android:fontFamily="@font/poppins_semibold_regular"
-                    android:text="0 / 1000 cal"
+                    android:text="0/1000 cal"
                     android:textColor="@android:color/black"
                     android:textSize="16sp"
+                    android:visibility="visible"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/todayProgressBar" />
+
+                <TextView
+                    android:id="@+id/percentage_cal"
+                    android:layout_width="98dp"
+                    android:layout_height="60dp"
+                    android:layout_marginTop="24dp"
+                    android:layout_marginEnd="4dp"
+                    android:fontFamily="@font/poppins_extrabold"
+                    android:text="80%"
+                    android:textSize="40sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -68,7 +82,7 @@
             <LinearLayout
                 android:id="@+id/thisMonthNutrientIntakeLayout"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="62dp"
                 android:orientation="horizontal">
 
                 <TextView
@@ -95,23 +109,26 @@
                     android:padding="32dp"
                     android:src="@drawable/info_square" />
 
-                <!-- Bar Chart Section -->
-                <com.github.mikephil.charting.charts.BarChart
-                    android:id="@+id/todayBarChart"
-                    android:layout_width="match_parent"
-                    android:layout_height="200dp"
-                    android:layout_marginLeft="24dp"
-                    android:layout_marginRight="24dp"
-                    android:layout_marginBottom="24dp"
-                    android:background="@drawable/rounded_border" />
+
             </LinearLayout>
 
             <!-- Meal History Section -->
+            <com.github.mikephil.charting.charts.BarChart
+                android:id="@+id/todayBarChart"
+                android:layout_width="343dp"
+                android:layout_height="180dp"
+                android:layout_marginLeft="24dp"
+                android:layout_marginRight="24dp"
+                android:layout_marginBottom="24dp"
+                android:background="@drawable/rounded_border"
+                android:visibility="visible" />
+
             <TextView
                 android:id="@+id/todayMealHistoryText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
                 android:fontFamily="@font/poppins_medium_regular"
                 android:padding="8dp"
                 android:text="@string/mealHistoryText"
@@ -119,14 +136,16 @@
                 android:textSize="24sp"
                 android:textStyle="bold" />
 
+
             <!-- Meal History Items -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rv_meals_history"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
+                android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginTop="8dp"/>
+                android:layout_marginTop="8dp"
+                android:paddingHorizontal="16dp"
+                android:clipToPadding="false" />
 
         </LinearLayout>
     </ScrollView>
