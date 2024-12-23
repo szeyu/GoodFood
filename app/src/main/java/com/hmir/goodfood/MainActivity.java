@@ -14,6 +14,13 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.hmir.goodfood.utilities.UserHelper;
 
+/**
+ * The MainActivity class is the entry point of the application. It checks the user's
+ * authentication and Firestore status to redirect them to the appropriate page:
+ * - If the user exists in Firestore and is authenticated, they are redirected to the HomePage.
+ * - If the user does not exist in Firestore, they are redirected to the WelcomePage.
+ * - If the user is not authenticated, they are redirected to the LoginPage.
+ */
 public class MainActivity extends AppCompatActivity {
 
     @Override
@@ -51,14 +58,23 @@ public class MainActivity extends AppCompatActivity {
         finish();
     }
 
-    // Check if the user's email matches the email stored in SharedPreferences
+    /**
+     * Checks if the user's email matches the one stored in SharedPreferences.
+     *
+     * @return True if emails match, false otherwise.
+     */
     private boolean isUserEmailMatched() {
         SharedPreferences sharedPreferences = getSharedPreferences("UserPreferences", MODE_PRIVATE);
         Log.d("MainActivity", "Email from SharedPreferences: " + sharedPreferences.getString("Email", ""));
         return sharedPreferences.getString("Email", "")
                 .equals(FirebaseAuth.getInstance().getCurrentUser().getEmail());
     }
-    // Check if user exists in Firestore
+
+    /**
+     * Checks if the user exists in Firestore.
+     *
+     * @param listener A callback listener to handle the asynchronous result.
+     */
     private void isUserExistInFirestore(OnUserExistListener listener) {
         UserHelper userHelper = new UserHelper(1);
         userHelper.isUserExist()
@@ -71,7 +87,12 @@ public class MainActivity extends AppCompatActivity {
                     listener.onResult(false);
                 });
     }
-    // Print user info
+
+    /**
+     * Prints the user's information for debugging purposes.
+     *
+     * @param user The FirebaseUser object representing the currently signed-in user.
+     */
     private void printUserInfo(FirebaseUser user) {
         String TAG = "Firebase";
         if (user != null) {
@@ -83,23 +104,33 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    // Begin HomePage activity
+    /**
+     * Redirects the user to the HomePage activity.
+     */
     private void redirectToHomePage() {
         Intent intent = new Intent(MainActivity.this, HomePage.class);
         startActivity(intent);
     }
-    // Begin LoginPage activity
+
+    /**
+     * Redirects the user to the LoginPage activity.
+     */
     private void redirectToLoginPage() {
         Intent intent = new Intent(MainActivity.this, LoginPage.class);
         startActivity(intent);
     }
-    // Begin WelcomePage activity
+
+    /**
+     * Redirects the user to the WelcomePage activity.
+     */
     private void redirectToWelcomePage() {
         Intent intent = new Intent(MainActivity.this, WelcomePage.class);
         startActivity(intent);
     }
 
-    // Callback interface for asynchronous listener in checking user existence
+    /**
+     * A callback interface for handling the asynchronous result of the Firestore user existence check.
+     */
     private interface OnUserExistListener {
         void onResult(boolean exists);
     }
