@@ -187,12 +187,19 @@ public class UserHelper {
             SharedPreferences sharedPreferences = context.getSharedPreferences("UserPreferences", MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPreferences.edit();
 
-            editor.putString("Email", FirebaseAuth.getInstance().getCurrentUser().getEmail());
-            editor.putString("Username", currentUser.getUsername());
-            editor.putString("Age", Long.toString(currentUser.getAge()));
-            editor.putString("Height", Double.toString(currentUser.getHeight()));
-            editor.putString("Weight", Double.toString(currentUser.getWeight()));
-            editor.putString("DietTypes", currentUser.getHealth_labels().toString());
+            String email = FirebaseAuth.getInstance().getCurrentUser().getEmail();
+            String username = currentUser.getUsername();
+            String age = Long.toString(currentUser.getAge());
+            String height = Double.toString(currentUser.getHeight());
+            String weight = Double.toString(currentUser.getWeight());
+            String dietTypes = currentUser.getHealth_labels().toString();
+
+            editor.putString("Email", email);
+            editor.putString("Username", username);
+            editor.putString("Age", age);
+            editor.putString("Height", height);
+            editor.putString("Weight", weight);
+            editor.putString("DietTypes", dietTypes);
             editor.apply();
 
             Log.d("UserHelper","SharedPreferences saved");
