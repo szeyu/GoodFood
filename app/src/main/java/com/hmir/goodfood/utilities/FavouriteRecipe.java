@@ -1,6 +1,7 @@
 package com.hmir.goodfood.utilities;
 
 import android.annotation.SuppressLint;
+import android.net.Uri;
 import android.util.Log;
 
 import com.google.android.gms.tasks.Task;
@@ -30,13 +31,13 @@ public class FavouriteRecipe {
     private double cholesterol;
     private double potassium;
     private double iron;
-    private DocumentReference image;
+    private Uri image;
 
     public FavouriteRecipe (){
     }
 
     public FavouriteRecipe(double calcium, double calories, double carbs, List<String> diet_labels,
-                           double fat, DocumentReference image, double iron, double magnesium, String name,
+                           double fat, Uri image, double iron, double magnesium, String name,
                            double potassium, double protein, int servings, double sodium,
                            double cholesterol, String recipe_id) {
         this.recipe_id = recipe_id;
@@ -222,11 +223,11 @@ public class FavouriteRecipe {
         this.fat = fat;
     }
 
-    public DocumentReference getImage() {
+    public Uri getImage() {
         return image;
     }
 
-    public void setImage(DocumentReference image) {
+    public void setImage(Uri image) {
         this.image = image;
     }
 
