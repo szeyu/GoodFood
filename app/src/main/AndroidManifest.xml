@@ -34,9 +34,8 @@
         <activity android:name=".SearchActivity" android:windowSoftInputMode="adjustPan" android:exported="false" />
         <activity android:name=".FoodScanner" android:exported="false" />
         <activity android:name=".TipsActivity" android:exported="false" />
+        <activity android:name=".WelcomePage" android:exported="false"/>
         <activity android:name=".RecipeDetailActivity" />
-
-        <activity android:name=".welcomePage" android:exported="false"/>
 
         <!-- SplashActivity is now the launcher activity -->
         <activity
