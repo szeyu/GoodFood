@@ -1,4 +1,4 @@
-package com.hmir.goodfood;
+package com.hmir.goodfood.utilities;
 
 import android.graphics.Canvas;
 import android.graphics.Path;

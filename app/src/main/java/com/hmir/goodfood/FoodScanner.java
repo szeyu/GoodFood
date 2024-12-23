@@ -7,14 +7,20 @@ import android.provider.MediaStore;
 import android.util.Base64;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
+import okhttp3.RequestBody;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -26,12 +32,21 @@ import androidx.activity.EdgeToEdge;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.hmir.goodfood.models.ExtractRequest;
-import com.hmir.goodfood.services.IngredientService;
+import com.google.gson.Gson;
+import com.hmir.goodfood.models.GeminiApiResponse;
+import com.hmir.goodfood.models.GeminiRequestBody;
+import com.hmir.goodfood.services.GeminiApiService;
+import com.hmir.goodfood.utilities.FileUtil;
 
+/**
+ * Activity for scanning food and extracting ingredients.
+ */
 public class FoodScanner extends AppCompatActivity {
     private static final int REQUEST_CODE = 22;
     private ImageView cameraView;
+
+    private static final String GEMINI_API_KEY = BuildConfig.GEMINI_API_KEY;
+    private static final String GEMINI_API_BASE_URL = "https://generativelanguage.googleapis.com/";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,22 +54,21 @@ public class FoodScanner extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_food_scanner);
 
+        Log.d("Gemini", GEMINI_API_KEY);
+        Log.d("Gemini", GEMINI_API_BASE_URL);
+
         cameraView = findViewById(R.id.cameraView);
         Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         startActivityForResult(cameraIntent, REQUEST_CODE);
 
-        Button extractIngredientButton = findViewById(R.id.extractIngredientButton);
-        extractIngredientButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                extractIngredient(cameraView);
-            }
-        });
+        ImageButton ExtractIngredientButton = findViewById(R.id.ExtractIngredientButton);
+        ExtractIngredientButton.setOnClickListener(v -> extractIngredient(cameraView));
+
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        if (requestCode == REQUEST_CODE && resultCode == RESULT_OK){
+        if (requestCode == REQUEST_CODE && resultCode == RESULT_OK) {
             Bitmap photo = (Bitmap) data.getExtras().get("data");
             cameraView.setImageBitmap(photo);
         } else {
@@ -63,17 +77,20 @@ public class FoodScanner extends AppCompatActivity {
         }
     }
 
+    /**
+     * Extracts ingredients from the captured image.
+     *
+     * @param cameraView The ImageView containing the captured image.
+     */
     private void extractIngredient(ImageView cameraView) {
-        // Convert ImageView to Bitmap
         cameraView.setDrawingCacheEnabled(true);
         cameraView.buildDrawingCache();
         Bitmap bitmap = cameraView.getDrawingCache();
 
-        // Convert Bitmap to Base64
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 80, outputStream);
         byte[] imageBytes = outputStream.toByteArray();
-        String encodedImage = Base64.encodeToString(imageBytes, Base64.DEFAULT);
+        String encodedImage = Base64.encodeToString(imageBytes, Base64.NO_WRAP);
 
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
         logging.setLevel(HttpLoggingInterceptor.Level.BODY);
@@ -82,30 +99,35 @@ public class FoodScanner extends AppCompatActivity {
                 .addInterceptor(logging)
                 .build();
 
-        // Create Retrofit instance
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://10.0.2.2:8080/")
+                .baseUrl(GEMINI_API_BASE_URL)
                 .client(client)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
-        IngredientService service = retrofit.create(IngredientService.class);
-        ExtractRequest request = new ExtractRequest(encodedImage);
+        GeminiApiService service = retrofit.create(GeminiApiService.class);
 
-        // Make the network request
-        Call<String> call = service.extractIngredients(request);
-        call.enqueue(new Callback<String>() {
+        String prompt = "Based on the food scanned, extract the quantity and ingredients used in the food image. " +
+                "Don't provide explanations. Please follow the output format:\n\n" +
+                "Example output:\n- 4 pieces of Wedges\n\n" +
+                "Output format:\n- <quantity> <unit> <Ingredient>";
+
+        GeminiRequestBody requestBody = createGeminiRequestBody(prompt, encodedImage);
+        String jsonBody = new Gson().toJson(requestBody);
+        RequestBody body = RequestBody.create(MediaType.parse("application/json"), jsonBody);
+
+        Call<GeminiApiResponse> call = service.callGemini(GEMINI_API_KEY, body);
+        call.enqueue(new Callback<GeminiApiResponse>() {
             @Override
-            public void onResponse(Call<String> call, Response<String> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    // Log the entire response body
-                    Log.d("ExtractIngredient", "Response: " + response.body());
+            public void onResponse(Call<GeminiApiResponse> call, Response<GeminiApiResponse> response) {
+                if (response.isSuccessful() && response.body() != null && !response.body().getCandidates().isEmpty()) {
+                    String ingredients = response.body().getCandidates().get(0).getContent().getParts().get(0).getText();
+                    Log.d("ExtractIngredient", "Response: " + ingredients);
 
-                    // Get the ingredients from the response
-                    String ingredients = String.valueOf(response.body());
+                    File imageFile = FileUtil.saveBase64ToFile(FoodScanner.this, encodedImage, "temp_image.txt");
 
-                    // Start the ExtractIngredient activity
                     Intent intent = new Intent(FoodScanner.this, ExtractIngredient.class);
+                    intent.putExtra("file_path", imageFile.getAbsolutePath());
                     intent.putExtra("ingredients", ingredients);
                     startActivity(intent);
                 } else {
@@ -115,7 +137,7 @@ public class FoodScanner extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<String> call, Throwable t) {
+            public void onFailure(Call<GeminiApiResponse> call, Throwable t) {
                 Toast.makeText(FoodScanner.this, "Error: " + t.getMessage(), Toast.LENGTH_LONG).show();
                 Log.e("ExtractIngredient", "Error: " + t.getMessage(), t);
                 TextView description = findViewById(R.id.adviceText);
@@ -123,5 +145,22 @@ public class FoodScanner extends AppCompatActivity {
             }
         });
     }
-}
 
+    /**
+     * Creates a GeminiRequestBody with the specified prompt and encoded image.
+     *
+     * @param prompt The prompt to be included in the request.
+     * @param encodedImage The base64 encoded image to be included in the request.
+     * @return A GeminiRequestBody object containing the prompt and image.
+     */
+    private GeminiRequestBody createGeminiRequestBody(String prompt, String encodedImage) {
+        List<GeminiRequestBody.Part> parts = new ArrayList<>();
+        parts.add(new GeminiRequestBody.Part(prompt));
+        parts.add(new GeminiRequestBody.Part(encodedImage, "image/jpeg"));
+
+        List<GeminiRequestBody.Content> contents = new ArrayList<>();
+        contents.add(new GeminiRequestBody.Content(parts));
+
+        return new GeminiRequestBody(contents);
+    }
+}
