@@ -62,20 +62,34 @@ public class ExtractIngredient extends AppCompatActivity {
         String filePath = intent.getStringExtra("file_path");
 
         // If ingredients from the image (intent) are present, set them to the TextView
-        if (ingredients != null && !ingredients.isEmpty()) {
-            IngredientTextView.setText(ingredients);
-        } else {
-            IngredientTextView.setText("Unable to Analyse Ingredients");
-        }
+        validateExtraIngredients(ingredients, IngredientTextView);
 
         // If filePath is not null, display the image
+        validateExtraFilePath(filePath);
+
+        setupSearchRecipeBtn(IngredientTextView);
+        setupCalorieBtn(IngredientTextView);
+
+    }
+
+    private void validateExtraFilePath(String filePath) {
         if (filePath != null) {
             String encodedImage = readBase64FromFile(new File(filePath));
             if (encodedImage != null) {
                 displayImage(encodedImage);
             }
         }
+    }
 
+    private static void validateExtraIngredients(String ingredients, TextView IngredientTextView) {
+        if (ingredients != null && !ingredients.isEmpty()) {
+            IngredientTextView.setText(ingredients);
+        } else {
+            IngredientTextView.setText("Unable to Analyse Ingredients");
+        }
+    }
+
+    private void setupSearchRecipeBtn(TextView IngredientTextView) {
         // ImageButton for searching recipes
         ImageButton searchRecipeBtn = findViewById(R.id.searchRecipeBtn);
         searchRecipeBtn.setOnClickListener(view -> {
@@ -88,7 +102,9 @@ public class ExtractIngredient extends AppCompatActivity {
                 Toast.makeText(ExtractIngredient.this, "No ingredients to search recipes for", Toast.LENGTH_SHORT).show();
             }
         });
+    }
 
+    private void setupCalorieBtn(TextView IngredientTextView) {
         // ImageButton for calculating calories
         ImageButton calCalorieBtn = findViewById(R.id.CalculateCaloriesButton);
         calCalorieBtn.setOnClickListener(view -> {
@@ -116,7 +132,6 @@ public class ExtractIngredient extends AppCompatActivity {
                 Toast.makeText(ExtractIngredient.this, "No ingredients to analyze", Toast.LENGTH_SHORT).show();
             }
         });
-
     }
 
     /**
