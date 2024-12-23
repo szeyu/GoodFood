@@ -25,7 +25,10 @@ import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
-
+import com.github.mikephil.charting.formatter.ValueFormatter;
+import com.hmir.goodfood.utilities.Meal;
+import com.hmir.goodfood.utilities.Nutrient;
+import com.hmir.goodfood.utilities.RoundedBarChart;
 import java.util.ArrayList;
 import java.util.List;
 
