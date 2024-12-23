@@ -5,10 +5,10 @@ import static com.hmir.goodfood.utilities.FileUtil.readBase64FromFile;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Base64;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -18,14 +18,23 @@ import android.widget.Toast;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.firebase.Timestamp;
 import com.google.gson.Gson;
+import com.hmir.goodfood.callbacks.NutritionCallback;
 import com.hmir.goodfood.models.GeminiApiResponse;
 import com.hmir.goodfood.models.GeminiRequestBody;
 import com.hmir.goodfood.services.GeminiApiService;
+import com.hmir.goodfood.utilities.NetworkUtil;
+import com.hmir.goodfood.utilities.UserHelper;
+
+import org.json.JSONObject;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -72,14 +81,22 @@ public class ExtractIngredient extends AppCompatActivity {
             }
         }
 
-        ImageButton CalculateCaloriesButton = findViewById(R.id.CalculateCaloriesButton);
-        CalculateCaloriesButton.setOnClickListener(view -> {
-            Log.d("ExtractIngredient", ingredients);
+        analyzeNutrition(ingredients, new NutritionCallback() {
+            @Override
+            public void onSuccess(String nutritionData) {
+                ImageButton CalculateCaloriesButton = findViewById(R.id.CalculateCaloriesButton);
+                CalculateCaloriesButton.setOnClickListener(view -> {
+                    if (ingredients != null && !ingredients.isEmpty()) {
+                        startCalorieActivity(nutritionData, ingredients);
+                    } else {
+                        Toast.makeText(ExtractIngredient.this, "No ingredients to analyze", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
 
-            if (ingredients != null && !ingredients.isEmpty()) {
-                analyzeNutrition(ingredients);
-            } else {
-                Toast.makeText(ExtractIngredient.this, "No ingredients to analyze", Toast.LENGTH_SHORT).show();
+            @Override
+            public void onError(String errorMessage) {
+                Log.e("NutritionError", errorMessage);
             }
         });
     }
@@ -101,7 +118,7 @@ public class ExtractIngredient extends AppCompatActivity {
      *
      * @param ingredients The ingredients to analyze.
      */
-    private void analyzeNutrition(String ingredients) {
+    private void analyzeNutrition(String ingredients, NutritionCallback callback) {
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
         logging.setLevel(HttpLoggingInterceptor.Level.BODY);
 
@@ -158,12 +175,10 @@ public class ExtractIngredient extends AppCompatActivity {
             public void onResponse(Call<GeminiApiResponse> call, Response<GeminiApiResponse> response) {
                 if (response.isSuccessful() && response.body() != null && !response.body().getCandidates().isEmpty()) {
                     String nutritionData = response.body().getCandidates().get(0).getContent().getParts().get(0).getText();
-                    Intent intent = new Intent(ExtractIngredient.this, Calories.class);
-                    intent.putExtra("nutritionData", nutritionData);
-                    intent.putExtra("file_path", getIntent().getStringExtra("file_path"));
-                    startActivity(intent);
+                    callback.onSuccess(nutritionData);
                 } else {
                     Toast.makeText(ExtractIngredient.this, "Failed to analyze nutrition", Toast.LENGTH_SHORT).show();
+                    callback.onError("Failed to analyze nutrition");
                 }
             }
 
@@ -188,5 +203,19 @@ public class ExtractIngredient extends AppCompatActivity {
         contents.add(new GeminiRequestBody.Content(parts));
 
         return new GeminiRequestBody(contents);
+    }
+
+    /**
+     * Calls an Intent and start Calorie activity.
+     *
+     * @param nutritionData The analyzed nutrition data from image.
+     */
+
+    private void startCalorieActivity(String nutritionData, String ingredients) {
+        Intent intent = new Intent(ExtractIngredient.this, Calories.class);
+        intent.putExtra("nutritionData", nutritionData);
+        intent.putExtra("ingredients", ingredients);
+        intent.putExtra("file_path", getIntent().getStringExtra("file_path"));
+        startActivity(intent);
     }
 }
