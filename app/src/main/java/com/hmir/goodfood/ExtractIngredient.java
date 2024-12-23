@@ -213,18 +213,6 @@ public class ExtractIngredient extends AppCompatActivity {
         });
     }
 
-
-    // Helper method to combine nutritional values
-    private double getCombinedValue(JsonObject nutritionJson, String key) {
-        double value = 0;
-        if (nutritionJson.has(key)) {
-            value = nutritionJson.get(key).getAsDouble();
-        }
-        return value;
-    }
-
-
-
     /**
      * Searches for recipes based on the ingredients provided.
      *
