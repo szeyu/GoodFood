@@ -124,7 +124,7 @@ public class UserHelper {
         });
     }
 
-    // Add an operation to the queue
+    // Add an operation to the queue for execution
     private void enqueueOrExecute(Runnable operation) {
         if (isUserLoaded) {
             operation.run();
