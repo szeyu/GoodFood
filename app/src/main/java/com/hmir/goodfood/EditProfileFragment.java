@@ -268,7 +268,7 @@ public class EditProfileFragment extends Fragment {
         editor.putString("Age", updatedAge);
         editor.putString("Height", updatedHeight);
         editor.putString("Weight", updatedWeight);
-        editor.putString("DietPreferences", selectedDietPreference);
+        editor.putString("DietTypes", selectedDietPreference);
         editor.apply();
 
         // Firebase sync using UserHelper
