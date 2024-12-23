@@ -8,12 +8,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.hmir.goodfood.R;
-import com.hmir.goodfood.Recipe;
-import com.hmir.goodfood.RecipeAdapter;
-
 import java.util.List;
 
+/**
+ * This activity displays a list of recipes passed from the previous activity.
+ * It sets up a RecyclerView with a RecipeAdapter to display the recipes in a list format.
+ * It also handles clicks on individual recipes, navigating to the RecipeDetailActivity to display more details.
+ */
 public class RecipeListActivity extends AppCompatActivity implements RecipeAdapter.OnRecipeClickListener {
 
     @Override

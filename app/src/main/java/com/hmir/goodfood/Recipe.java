@@ -6,6 +6,10 @@ import android.os.Parcelable;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Represents a recipe with a name, list of ingredients, and list of steps.
+ * Implements Parcelable to allow passing Recipe objects between activities.
+ */
 public class Recipe implements Parcelable {
     private String name;
     private List<String> ingredients;

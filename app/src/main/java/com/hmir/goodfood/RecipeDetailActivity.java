@@ -5,6 +5,11 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+/**
+ * This activity displays the details of a single recipe, including its name, ingredients, and steps.
+ * It retrieves the recipe object passed from the previous activity and updates the UI accordingly.
+ * If any information is missing, a default message is shown.
+ */
 public class RecipeDetailActivity extends AppCompatActivity {
 
     @Override

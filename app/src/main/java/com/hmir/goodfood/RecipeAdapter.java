@@ -11,11 +11,19 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Adapter class for displaying a list of recipes in a RecyclerView.
+ * It binds each recipe to a view and handles clicks on individual recipe items through the OnRecipeClickListener.
+ */
 public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeViewHolder> {
 
     private final List<Recipe> recipes;
     private final OnRecipeClickListener listener;
 
+    /**
+     * Interface to handle clicks on individual recipes in the RecipeAdapter.
+     * The implementing class should define what happens when a recipe is clicked.
+     */
     public interface OnRecipeClickListener {
         void onRecipeClick(Recipe recipe);
     }
@@ -44,6 +52,10 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
         return recipes.size();
     }
 
+    /**
+     * ViewHolder class for holding and recycling views for individual recipe items.
+     * This class is used by the RecipeAdapter to bind data to the RecyclerView.
+     */
     static class RecipeViewHolder extends RecyclerView.ViewHolder {
         TextView recipeNameTextView;
 
