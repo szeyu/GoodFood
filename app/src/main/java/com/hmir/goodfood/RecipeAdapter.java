@@ -8,6 +8,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeViewHolder> {
@@ -20,7 +21,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
     }
 
     public RecipeAdapter(List<Recipe> recipes, OnRecipeClickListener listener) {
-        this.recipes = recipes;
+        this.recipes = new ArrayList<>(recipes); // Defensive copy
         this.listener = listener;
     }
 

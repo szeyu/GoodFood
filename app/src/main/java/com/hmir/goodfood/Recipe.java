@@ -3,6 +3,7 @@ package com.hmir.goodfood;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Recipe implements Parcelable {
@@ -13,8 +14,8 @@ public class Recipe implements Parcelable {
     // Constructor
     public Recipe(String name, List<String> ingredients, List<String> steps) {
         this.name = name;
-        this.ingredients = ingredients;
-        this.steps = steps;
+        this.ingredients = new ArrayList<>(ingredients); // Defensive copy
+        this.steps = new ArrayList<>(steps); // Defensive copy
     }
 
     // Getters
@@ -23,11 +24,11 @@ public class Recipe implements Parcelable {
     }
 
     public List<String> getIngredients() {
-        return ingredients;
+        return new ArrayList<>(ingredients); // Defensive copy
     }
 
     public List<String> getSteps() {
-        return steps;
+        return new ArrayList<>(ingredients); // Defensive copy
     }
 
     // Parcelable implementation
