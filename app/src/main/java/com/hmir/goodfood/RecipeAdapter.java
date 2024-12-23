@@ -33,6 +33,12 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
         void onRecipeClick(Recipe recipe);
     }
 
+    /**
+     * Constructs a new RecipeAdapter.
+     *
+     * @param recipes List of Recipe objects to be displayed in the RecyclerView
+     * @param listener Listener for handling recipe click events
+     */
     public RecipeAdapter(List<Recipe> recipes, OnRecipeClickListener listener) {
         this.recipes = new ArrayList<>(recipes); // Defensive copy
         this.listener = listener;
@@ -64,6 +70,12 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
     static class RecipeViewHolder extends RecyclerView.ViewHolder {
         TextView recipeNameTextView;
 
+        /**
+         * Constructs a new RecipeViewHolder.
+         *
+         * @param itemView The view object containing the recipe item layout.
+         *                 This view should contain a TextView with id 'recipeName'.
+         */
         public RecipeViewHolder(@NonNull View itemView) {
             super(itemView);
             recipeNameTextView = itemView.findViewById(R.id.recipeName);
