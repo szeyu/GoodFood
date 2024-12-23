@@ -1,5 +1,9 @@
 package com.hmir.goodfood.utilities;
 
+import static android.content.Context.MODE_PRIVATE;
+
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.util.Log;
 
@@ -36,6 +40,7 @@ public class UserHelper {
       In this class, there will be multiple sections of methods relating to a user:
       Section 1 : User Specifics
                     - fetchUser()
+                    - isUserExist()
                     - addNewUser()
                     - updateUserInfo()
                     - deleteUser()
@@ -88,7 +93,7 @@ public class UserHelper {
     private final NutritionalRecordHelper nutritionalRecordHelper = new NutritionalRecordHelper();
     private final FavouriteRecipeHelper favouriteRecipeHelper = new FavouriteRecipeHelper();
     private final Queue<Runnable> pendingOperations = new LinkedList<>();
-    protected User currentUser;
+    public User currentUser;
     //    private final static String email = "test1@gmail.com";
     private boolean isUserLoaded = false;
 
@@ -119,7 +124,7 @@ public class UserHelper {
         });
     }
 
-    // Add an operation to the queue
+    // Add an operation to the queue for execution
     private void enqueueOrExecute(Runnable operation) {
         if (isUserLoaded) {
             operation.run();
@@ -158,9 +163,51 @@ public class UserHelper {
         });
     }
 
+    // Fetch user and check if it exists
+    public Task<Boolean> isUserExist() {
+        if (email == null || email.isEmpty()) {
+            return Tasks.forException(new Exception("Email is null or empty"));
+        }
+
+        // Check if document exists
+        return db.collection("user").document(email).get().continueWith(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot documentSnapshot = task.getResult();
+                return documentSnapshot.exists();
+            } else {
+                throw task.getException() != null ? task.getException() : new Exception("Failed to check user existence");
+            }
+        });
+    }
+
+    // For MainActivity, saving user data to SharedPreferences when user exists in Firestore
+    public void saveUserDataFromFirestoreToSharedPreferences(Context context) {
+        enqueueOrExecute(() -> {
+            // Save data in Shared Preferences
+            SharedPreferences sharedPreferences = context.getSharedPreferences("UserPreferences", MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+
+            String email = FirebaseAuth.getInstance().getCurrentUser().getEmail();
+            String username = currentUser.getUsername();
+            String age = Long.toString(currentUser.getAge());
+            String height = Double.toString(currentUser.getHeight());
+            String weight = Double.toString(currentUser.getWeight());
+            String dietTypes = currentUser.getHealth_labels().toString();
+
+            editor.putString("Email", email);
+            editor.putString("Username", username);
+            editor.putString("Age", age);
+            editor.putString("Height", height);
+            editor.putString("Weight", weight);
+            editor.putString("DietTypes", dietTypes);
+            editor.apply();
+
+            Log.d("UserHelper","SharedPreferences saved");
+        });
+    }
+
     // Update User document
-    public void updateUserInfo(String username, List<String> health_labels, long age, double height, double weight,
-                               List<String> favourite_recipes, List<String> nutritional_records) {
+    public void updateUserInfo(String username, List<String> health_labels, long age, double height, double weight) {
         enqueueOrExecute(() -> {
             if (email == null || email.isEmpty()) {
                 throw new IllegalArgumentException("Email is null or empty");
@@ -171,9 +218,7 @@ public class UserHelper {
                     "health_labels", health_labels,
                     "age", age,
                     "height", height,
-                    "weight", weight,
-                    "favourite_recipes", favourite_recipes,
-                    "nutritional_records", nutritional_records
+                    "weight", weight
             );
 
             db.collection("user").document(email).get().addOnSuccessListener(documentSnapshot -> {
