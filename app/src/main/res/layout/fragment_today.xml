@@ -50,7 +50,7 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
-                    android:id="@+id/todayCalorieText"
+                    android:id="@+id/tv_calorie_intake"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="28dp"
@@ -94,17 +94,17 @@
                     android:contentDescription="Information"
                     android:padding="32dp"
                     android:src="@drawable/info_square" />
-            </LinearLayout>
 
-            <!-- Bar Chart Section -->
-            <com.github.mikephil.charting.charts.BarChart
-                android:id="@+id/todayBarChart"
-                android:layout_width="match_parent"
-                android:layout_height="200dp"
-                android:layout_marginLeft="24dp"
-                android:layout_marginRight="24dp"
-                android:layout_marginBottom="24dp"
-                android:background="@drawable/rounded_border" />
+                <!-- Bar Chart Section -->
+                <com.github.mikephil.charting.charts.BarChart
+                    android:id="@+id/todayBarChart"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:layout_marginLeft="24dp"
+                    android:layout_marginRight="24dp"
+                    android:layout_marginBottom="24dp"
+                    android:background="@drawable/rounded_border" />
+            </LinearLayout>
 
             <!-- Meal History Section -->
             <TextView
@@ -120,21 +120,13 @@
                 android:textStyle="bold" />
 
             <!-- Meal History Items -->
-            <LinearLayout
-                android:id="@+id/todayMealHistoryLinearLayout"
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_meals_history"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="24dp"
-                android:layout_marginRight="24dp"
-                android:background="@drawable/rounded_orange_container"
-                android:orientation="vertical">
-
-                <View
-                    android:id="@+id/todayEmptyViewForSeparation"
-                    android:layout_width="match_parent"
-                    android:layout_height="8dp"/>
-
-            </LinearLayout>
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:orientation="horizontal"
+                android:layout_marginTop="8dp"/>
 
         </LinearLayout>
     </ScrollView>

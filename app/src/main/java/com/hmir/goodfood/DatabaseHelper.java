@@ -6,6 +6,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.hmir.goodfood.utilities.NutritionalRecord;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -207,34 +209,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return items;
     }
 
-    public List<NutritionalRecord> getAllNutritionalRecords() {
-        List<NutritionalRecord> records = new ArrayList<>();
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT id, name, calories, protein, carbs, fat, sodium, calcium, iron, cholesterol, potassium, magnesium FROM items", null);
 
-        if (cursor != null) {
-            while (cursor.moveToNext()) {
-                int id = cursor.getInt(cursor.getColumnIndex("id"));
-                String name = cursor.getString(cursor.getColumnIndex("name"));
-                String calories = cursor.getString(cursor.getColumnIndex("calories"));
-                String protein = cursor.getString(cursor.getColumnIndex("protein"));
-                String carbs = cursor.getString(cursor.getColumnIndex("carbs"));
-                String fat = cursor.getString(cursor.getColumnIndex("fat"));
-                String sodium = cursor.getString(cursor.getColumnIndex("sodium"));
-                String calcium = cursor.getString(cursor.getColumnIndex("calcium"));
-                String iron = cursor.getString(cursor.getColumnIndex("iron"));
-                String cholesterol = cursor.getString(cursor.getColumnIndex("cholesterol"));
-                String potassium = cursor.getString(cursor.getColumnIndex("potassium"));
-                String magnesium = cursor.getString(cursor.getColumnIndex("magnesium"));
-
-                // Add the record to the list
-                records.add(new NutritionalRecord(id, name, calories, protein, carbs, fat, sodium, calcium, iron, cholesterol, potassium, magnesium));
-            }
-            cursor.close();
-        }
-
-        return records;
-    }
 
 
 
