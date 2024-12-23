@@ -132,6 +132,11 @@ public class MainActivity extends AppCompatActivity {
      * A callback interface for handling the asynchronous result of the Firestore user existence check.
      */
     private interface OnUserExistListener {
+        /**
+         * Called when the user existence check completes.
+         *
+         * @param exists true if the user exists, false otherwise.
+         */
         void onResult(boolean exists);
     }
 }

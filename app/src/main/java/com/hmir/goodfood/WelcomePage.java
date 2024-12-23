@@ -60,6 +60,10 @@ public class WelcomePage extends AppCompatActivity {
         setupConfirmButton();
     }
 
+    /**
+     * Sets up the functionality for the confirm button.
+     * Validates input fields, saves the data, and navigates to the HomePage activity.
+     */
     private void setupConfirmButton() {
         confirmButton.setOnClickListener(v -> {
             // Get input data and also email
@@ -84,12 +88,24 @@ public class WelcomePage extends AppCompatActivity {
         });
     }
 
+    /**
+     * Navigates the user to the HomePage activity after successful data submission.
+     */
     private void navigateToHomePage() {
         Intent intent = new Intent(WelcomePage.this, HomePage.class);
         startActivity(intent);
         finish(); // Close the welcomePage activity
     }
 
+    /**
+     * Saves user data in SharedPreferences and uploads it to Firestore.
+     *
+     * @param email the email of the current user.
+     * @param username the username entered by the user.
+     * @param age the age of the user.
+     * @param height the height of the user.
+     * @param weight the weight of the user.
+     */
     private void saveUserData(String email, String username, String age, String height, String weight) {
         // Save data in Shared Preferences
         SharedPreferences sharedPreferences = getSharedPreferences("UserPreferences", MODE_PRIVATE);
@@ -121,6 +137,10 @@ public class WelcomePage extends AppCompatActivity {
         Toast.makeText(WelcomePage.this, "Data saved successfully!", Toast.LENGTH_SHORT).show();
     }
 
+    /**
+     * Sets up the functionality for dietary preference buttons.
+     * Tracks selected diet types and manages the state of each button.
+     */
     private void setupDietButtons() {
         View.OnClickListener dietButtonListener = view -> {
             Button button = (Button) view;
@@ -149,6 +169,9 @@ public class WelcomePage extends AppCompatActivity {
         othersButton.setOnClickListener(dietButtonListener);
     }
 
+    /**
+     * Sets up input filters for age, height, and weight fields to ensure valid input.
+     */
     private void setupInputFilters() {
         // Restrict age to integers only
         InputFilter[] integerFilter = new InputFilter[]{
@@ -197,6 +220,9 @@ public class WelcomePage extends AppCompatActivity {
         weightEditText.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
     }
 
+    /**
+     * Initializes UI elements such as EditTexts and Buttons by finding their references in the layout.
+     */
     private void initializeUIElements() {
         usernameEditText = findViewById(R.id.editText_username);
         ageEditText = findViewById(R.id.editText_age);
@@ -214,6 +240,13 @@ public class WelcomePage extends AppCompatActivity {
         othersButton = findViewById(R.id.button_others);
     }
 
+    /**
+     * Converts a StringBuilder containing comma-separated health labels into a List of Strings.
+     *
+     * @param sb the StringBuilder containing health labels, separated by commas.
+     *            Example: "Vegan,Gluten-Free,Low-Carb".
+     * @return a List of health labels as Strings. If the StringBuilder is empty or null, returns an empty List.
+     */
     private static List<String> convertHealthLabelsToList(StringBuilder sb) {
         // Check if StringBuilder is empty or null
         List<String> list = new ArrayList<>();
