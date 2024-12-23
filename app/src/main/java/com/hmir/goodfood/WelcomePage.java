@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 
-public class welcomePage extends AppCompatActivity {
+public class WelcomePage extends AppCompatActivity {
     private EditText usernameEditText;
     private EditText ageEditText;
     private EditText heightEditText;
@@ -156,7 +156,7 @@ public class welcomePage extends AppCompatActivity {
 
             // Validate inputs
             if (username.isEmpty() || age.isEmpty() || height.isEmpty() || weight.isEmpty()) {
-                Toast.makeText(welcomePage.this, "Please fill in all fields!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(WelcomePage.this, "Please fill in all fields!", Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -187,10 +187,10 @@ public class welcomePage extends AppCompatActivity {
             newUser.addNewUser(newUserMapping);
 
             // Show confirmation
-            Toast.makeText(welcomePage.this, "Data saved successfully!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(WelcomePage.this, "Data saved successfully!", Toast.LENGTH_SHORT).show();
 
             // Navigate to homepage
-            Intent intent = new Intent(welcomePage.this, HomePage.class);
+            Intent intent = new Intent(WelcomePage.this, HomePage.class);
             startActivity(intent);
             finish(); // Optional: Close the welcomePage activity
         });

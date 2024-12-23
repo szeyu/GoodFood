@@ -95,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
     }
     // Begin WelcomePage activity
     private void redirectToWelcomePage() {
-        Intent intent = new Intent(MainActivity.this, welcomePage.class);
+        Intent intent = new Intent(MainActivity.this, WelcomePage.class);
         startActivity(intent);
     }
 
