@@ -207,8 +207,7 @@ public class UserHelper {
     }
 
     // Update User document
-    public void updateUserInfo(String username, List<String> health_labels, long age, double height, double weight,
-                               List<String> favourite_recipes, List<String> nutritional_records) {
+    public void updateUserInfo(String username, List<String> health_labels, long age, double height, double weight) {
         enqueueOrExecute(() -> {
             if (email == null || email.isEmpty()) {
                 throw new IllegalArgumentException("Email is null or empty");
@@ -219,9 +218,7 @@ public class UserHelper {
                     "health_labels", health_labels,
                     "age", age,
                     "height", height,
-                    "weight", weight,
-                    "favourite_recipes", favourite_recipes,
-                    "nutritional_records", nutritional_records
+                    "weight", weight
             );
 
             db.collection("user").document(email).get().addOnSuccessListener(documentSnapshot -> {

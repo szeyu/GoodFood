@@ -279,9 +279,7 @@ public class EditProfileFragment extends Fragment {
                     List.of(selectedDietPreference), // Assuming single diet preference; adapt as needed
                     Long.parseLong(updatedAge),
                     Double.parseDouble(updatedHeight),
-                    Double.parseDouble(updatedWeight),
-                    new ArrayList<>(), // Placeholder for favourite_recipes
-                    new ArrayList<>()  // Placeholder for nutritional_records
+                    Double.parseDouble(updatedWeight)
             );
             Toast.makeText(requireContext(), "Changes saved and synced to Firebase.", Toast.LENGTH_SHORT).show();
         } else {
