@@ -23,7 +23,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
+/**
+ * The WelcomePage class is an activity that collects user details such as username, age,
+ * height, weight, and dietary preferences. The data is saved to SharedPreferences and
+ * uploaded to Firestore for further use.
+ */
 public class WelcomePage extends AppCompatActivity {
     private EditText usernameEditText;
     private EditText ageEditText;
@@ -155,8 +159,20 @@ public class WelcomePage extends AppCompatActivity {
                 Log.e("WelcomePage", "While saving data in SharedPreference, email is null");
 
             // Validate inputs
-            if (username.isEmpty() || age.isEmpty() || height.isEmpty() || weight.isEmpty()) {
-                Toast.makeText(WelcomePage.this, "Please fill in all fields!", Toast.LENGTH_SHORT).show();
+            if (username.isEmpty()) {
+                Toast.makeText(this, "Username cannot be empty!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (age.isEmpty() || Integer.parseInt(age) <= 0) {
+                Toast.makeText(this, "Please enter a valid age!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (height.isEmpty() || Double.parseDouble(height) <= 0) {
+                Toast.makeText(this, "Please enter a valid height!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (weight.isEmpty() || Double.parseDouble(weight) <= 0) {
+                Toast.makeText(this, "Please enter a valid weight!", Toast.LENGTH_SHORT).show();
                 return;
             }
 
