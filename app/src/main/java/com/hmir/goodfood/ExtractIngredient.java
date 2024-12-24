@@ -5,10 +5,11 @@ import static com.hmir.goodfood.utilities.FileUtil.readBase64FromFile;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Base64;
 import android.util.Log;
-import android.widget.EditText;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -17,17 +18,24 @@ import android.widget.Toast;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.firebase.Timestamp;
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import com.hmir.goodfood.callbacks.NutritionCallback;
 import com.hmir.goodfood.models.GeminiApiResponse;
 import com.hmir.goodfood.models.GeminiRequestBody;
 import com.hmir.goodfood.services.GeminiApiService;
+import com.hmir.goodfood.utilities.NetworkUtil;
+import com.hmir.goodfood.utilities.UserHelper;
+
+import org.json.JSONObject;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -61,75 +69,37 @@ public class ExtractIngredient extends AppCompatActivity {
         String ingredients = intent.getStringExtra("ingredients");
         String filePath = intent.getStringExtra("file_path");
 
-        // If ingredients from the image (intent) are present, set them to the TextView
-        validateExtraIngredients(ingredients, IngredientTextView);
+        if (ingredients != null) {
+            IngredientTextView.setText(ingredients);
+        } else {
+            IngredientTextView.setText("Unable to Analyse Ingredients");
+        }
 
-        // If filePath is not null, display the image
-        validateExtraFilePath(filePath);
-
-        setupSearchRecipeBtn(IngredientTextView);
-        setupCalorieBtn(IngredientTextView);
-
-    }
-
-    private void validateExtraFilePath(String filePath) {
         if (filePath != null) {
             String encodedImage = readBase64FromFile(new File(filePath));
             if (encodedImage != null) {
                 displayImage(encodedImage);
             }
+            setupSearchRecipeBtn(IngredientTextView);
+
         }
-    }
 
-    private static void validateExtraIngredients(String ingredients, TextView IngredientTextView) {
-        if (ingredients != null && !ingredients.isEmpty()) {
-            IngredientTextView.setText(ingredients);
-        } else {
-            IngredientTextView.setText("Unable to Analyse Ingredients");
-        }
-    }
-
-    private void setupSearchRecipeBtn(TextView IngredientTextView) {
-        // ImageButton for searching recipes
-        ImageButton searchRecipeBtn = findViewById(R.id.searchRecipeBtn);
-        searchRecipeBtn.setOnClickListener(view -> {
-            // Get the ingredients from the IngredientTextView
-            String ingredientsFromTextView = IngredientTextView.getText().toString().trim();
-
-            if (!ingredientsFromTextView.isEmpty()) {
-                searchRecipes(ingredientsFromTextView);  // Call the method to search for recipes with the ingredients from the TextView
-            } else {
-                Toast.makeText(ExtractIngredient.this, "No ingredients to search recipes for", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    private void setupCalorieBtn(TextView IngredientTextView) {
-        // ImageButton for calculating calories
-        ImageButton calCalorieBtn = findViewById(R.id.CalculateCaloriesButton);
-        calCalorieBtn.setOnClickListener(view -> {
-            // Get the ingredients from the IngredientTextView
-            String ingredientsFromTextView = IngredientTextView.getText().toString().trim();
-
-            if (!ingredientsFromTextView.isEmpty()) {
-                // Call analyzeNutrition with the ingredients from the IngredientTextView
-                analyzeNutrition(ingredientsFromTextView, new NutritionCallback() {
-                    @Override
-                    public void onSuccess(String nutritionData) {
-                        // Pass the nutritional data and ingredients to the next activity
-                        startCalorieActivity(nutritionData, ingredientsFromTextView);
-                    }
-
-                    @Override
-                    public void onError(String errorMessage) {
-                        Log.e("NutritionError", errorMessage);
-                        // Optionally show a toast for the error
-                        Toast.makeText(ExtractIngredient.this, "Failed to analyze nutrition", Toast.LENGTH_SHORT).show();
+        analyzeNutrition(ingredients, new NutritionCallback() {
+            @Override
+            public void onSuccess(String nutritionData) {
+                ImageButton CalculateCaloriesButton = findViewById(R.id.CalculateCaloriesButton);
+                CalculateCaloriesButton.setOnClickListener(view -> {
+                    if (ingredients != null && !ingredients.isEmpty()) {
+                        startCalorieActivity(nutritionData, ingredients);
+                    } else {
+                        Toast.makeText(ExtractIngredient.this, "No ingredients to analyze", Toast.LENGTH_SHORT).show();
                     }
                 });
-            } else {
-                // Show a toast if no ingredients are provided
-                Toast.makeText(ExtractIngredient.this, "No ingredients to analyze", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onError(String errorMessage) {
+                Log.e("NutritionError", errorMessage);
             }
         });
     }
@@ -167,14 +137,40 @@ public class ExtractIngredient extends AppCompatActivity {
 
         GeminiApiService service = retrofit.create(GeminiApiService.class);
 
-        // Improved prompt with ingredients explicitly mentioned
-        String prompt = "Based on the following ingredients: " + ingredients + ", provide the nutritional information in JSON format. Output only the nutritional data, without any explanations. The format should be: {\"total_calories\": <value>, \"total_protein\": <value>, \"total_fat\": <value>, \"total_carbs\": <value>, ...}";
+        String prompt = "Based on the " + ingredients + ", Give me the nutrition information in JSON format ONLY. " +
+                "Don't provide explanation. Please follow the output format. " +
+                "Just output with your assumption. " +
+                "Don't output backquote character. " +
+                "Example output: " +
+                "{ " +
+                "\"total_calories\": 100, " +
+                "\"total_protein\": 20, " +
+                "\"total_fat\": 10, " +
+                "\"total_carbs\": 20, " +
+                "\"total_cholesterol\": 50, " +
+                "\"total_sodium\": 1000, " +
+                "\"total_calcium\": 10, " +
+                "\"total_iron\": 5, " +
+                "\"total_magnesium\": 100, " +
+                "\"total_potassium\": 200 " +
+                "} " +
+                "Output format: " +
+                "{ " +
+                "\"total_calories\": <cal unit>, " +
+                "\"total_protein\": <gram unit>, " +
+                "\"total_fat\": <gram unit>, " +
+                "\"total_carbs\": <gram unit>, " +
+                "\"total_cholesterol\": <gram unit>, " +
+                "\"total_sodium\": <milligram unit>, " +
+                "\"total_calcium\": <milligram unit>, " +
+                "\"total_iron\": <milligram unit>, " +
+                "\"total_magnesium\": <milligram unit>, " +
+                "\"total_potassium\": <milligram unit> " +
+                "}";
 
         GeminiRequestBody requestBody = createGeminiRequestBody(prompt);
         String jsonBody = new Gson().toJson(requestBody);
         RequestBody body = RequestBody.create(MediaType.parse("application/json"), jsonBody);
-
-        Log.d("GeminiRequest", "Request Body: " + jsonBody);  // Log the request body for debugging
 
         Call<GeminiApiResponse> call = service.callGemini(GEMINI_API_KEY, body);
         call.enqueue(new Callback<GeminiApiResponse>() {
@@ -182,39 +178,8 @@ public class ExtractIngredient extends AppCompatActivity {
             public void onResponse(Call<GeminiApiResponse> call, Response<GeminiApiResponse> response) {
                 if (response.isSuccessful() && response.body() != null && !response.body().getCandidates().isEmpty()) {
                     String nutritionData = response.body().getCandidates().get(0).getContent().getParts().get(0).getText();
-
-                    // Debugging the raw response data
-                    Log.d("GeminiResponse", "Raw response: " + nutritionData);
-
-                    // Clean the nutrition data to remove the disclaimer
-                    nutritionData = nutritionData.replaceAll("(?s)^.*?\\{", "{");  // Remove everything before the JSON part
-                    nutritionData = nutritionData.replaceAll("(?s)\\}.*$", "}");  // Remove everything after the JSON part
-                    nutritionData = nutritionData.trim();
-
-                    // Log the cleaned nutrition data
-                    Log.d("GeminiResponse", "Cleaned Nutrition Data: " + nutritionData);
-
-                    // Attempt to parse the nutrition data as JSON
-                    try {
-                        JsonObject nutritionJson = new Gson().fromJson(nutritionData, JsonObject.class);
-
-                        // Handle missing values by assigning defaults (0 or placeholder)
-                        JsonObject combinedNutrition = new JsonObject();
-                        combinedNutrition.addProperty("total_calories", nutritionJson.has("total_calories") && !nutritionJson.get("total_calories").isJsonNull() ? nutritionJson.get("total_calories").getAsDouble() : 0);
-                        combinedNutrition.addProperty("total_protein", nutritionJson.has("total_protein") && !nutritionJson.get("total_protein").isJsonNull() ? nutritionJson.get("total_protein").getAsDouble() : 0);
-                        combinedNutrition.addProperty("total_fat", nutritionJson.has("total_fat") && !nutritionJson.get("total_fat").isJsonNull() ? nutritionJson.get("total_fat").getAsDouble() : 0);
-                        combinedNutrition.addProperty("total_carbs", nutritionJson.has("total_carbs") && !nutritionJson.get("total_carbs").isJsonNull() ? nutritionJson.get("total_carbs").getAsDouble() : 0);
-                        combinedNutrition.addProperty("total_sugar", nutritionJson.has("total_sugar") && !nutritionJson.get("total_sugar").isJsonNull() ? nutritionJson.get("total_sugar").getAsDouble() : 0);
-                        combinedNutrition.addProperty("total_fiber", nutritionJson.has("total_fiber") && !nutritionJson.get("total_fiber").isJsonNull() ? nutritionJson.get("total_fiber").getAsDouble() : 0);
-
-                        // Return the combined nutrition data
-                        callback.onSuccess(combinedNutrition.toString());
-                    } catch (Exception e) {
-                        Log.e("NutritionError", "Failed to parse nutrition data: " + e.getMessage());
-                        callback.onError("Failed to parse nutrition data");
-                    }
+                    callback.onSuccess(nutritionData);
                 } else {
-                    Log.e("GeminiResponse", "Response failed or no candidates found.");
                     Toast.makeText(ExtractIngredient.this, "Failed to analyze nutrition", Toast.LENGTH_SHORT).show();
                     callback.onError("Failed to analyze nutrition");
                 }
@@ -222,12 +187,55 @@ public class ExtractIngredient extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<GeminiApiResponse> call, Throwable t) {
-                Log.e("GeminiRequest", "Request failed: " + t.getMessage());
                 Toast.makeText(ExtractIngredient.this, "Error: " + t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
     }
 
+    /**
+     * Creates a GeminiRequestBody with the specified prompt.
+     *
+     * @param prompt The prompt to be included in the request.
+     * @return A GeminiRequestBody object containing the prompt.
+     */
+    private GeminiRequestBody createGeminiRequestBody(String prompt) {
+        List<GeminiRequestBody.Part> parts = new ArrayList<>();
+        parts.add(new GeminiRequestBody.Part(prompt));
+
+        List<GeminiRequestBody.Content> contents = new ArrayList<>();
+        contents.add(new GeminiRequestBody.Content(parts));
+
+        return new GeminiRequestBody(contents);
+    }
+
+    /**
+     * Calls an Intent and start Calorie activity.
+     *
+     * @param nutritionData The analyzed nutrition data from image.
+     */
+
+    private void startCalorieActivity(String nutritionData, String ingredients) {
+        Intent intent = new Intent(ExtractIngredient.this, Calories.class);
+        intent.putExtra("nutritionData", nutritionData);
+        intent.putExtra("ingredients", ingredients);
+        intent.putExtra("file_path", getIntent().getStringExtra("file_path"));
+        startActivity(intent);
+    }
+
+    private void setupSearchRecipeBtn(TextView IngredientTextView) {
+        // ImageButton for searching recipes
+        ImageButton searchRecipeBtn = findViewById(R.id.searchRecipeBtn);
+        searchRecipeBtn.setOnClickListener(view -> {
+            // Get the ingredients from the IngredientTextView
+            String ingredientsFromTextView = IngredientTextView.getText().toString().trim();
+
+            if (!ingredientsFromTextView.isEmpty()) {
+                searchRecipes(ingredientsFromTextView);  // Call the method to search for recipes with the ingredients from the TextView
+            } else {
+                Toast.makeText(ExtractIngredient.this, "No ingredients to search recipes for", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
     /**
      * Searches for recipes based on the ingredients provided.
      *
@@ -322,27 +330,5 @@ public class ExtractIngredient extends AppCompatActivity {
      * @param prompt The prompt to be included in the request.
      * @return A GeminiRequestBody object containing the prompt.
      */
-    private GeminiRequestBody createGeminiRequestBody(String prompt) {
-        List<GeminiRequestBody.Part> parts = new ArrayList<>();
-        parts.add(new GeminiRequestBody.Part(prompt));
 
-        List<GeminiRequestBody.Content> contents = new ArrayList<>();
-        contents.add(new GeminiRequestBody.Content(parts));
-
-        return new GeminiRequestBody(contents);
-    }
-
-    /**
-     * Starts the Calorie Activity with the provided nutrition data and ingredients.
-     *
-     * @param nutritionData The nutrition data to be passed to the activity.
-     * @param ingredients The ingredients to be passed to the activity.
-     */
-    private void startCalorieActivity(String nutritionData, String ingredients) {
-        Intent intent = new Intent(ExtractIngredient.this, Calories.class);
-        intent.putExtra("nutritionData", nutritionData);
-        intent.putExtra("ingredients", ingredients);
-        startActivity(intent);
-    }
 }
-

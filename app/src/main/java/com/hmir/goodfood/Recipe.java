@@ -31,8 +31,8 @@ public class Recipe implements Parcelable {
         return new ArrayList<>(ingredients); // Defensive copy
     }
 
-    public List<String> getSteps() {
-        return new ArrayList<>(ingredients); // Defensive copy
+     public List<String> getSteps() {
+        return new ArrayList<>(steps); // Corrected to return steps
     }
 
     // Parcelable implementation
