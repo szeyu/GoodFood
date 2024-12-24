@@ -1,12 +1,16 @@
 package com.hmir.goodfood;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -27,10 +31,14 @@ import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.github.mikephil.charting.formatter.ValueFormatter;
+import com.github.mikephil.charting.highlight.Highlight;
+import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.github.mikephil.charting.utils.ColorTemplate;
 import com.hmir.goodfood.R;
+import com.hmir.goodfood.utilities.Nutrient;
 import com.hmir.goodfood.utilities.NutritionalRecord;
 import com.hmir.goodfood.utilities.NutritionalRecordHelper;
 import com.hmir.goodfood.utilities.RoundedBarChart;
@@ -49,8 +57,8 @@ public class TodayFragment extends Fragment {
     private BarChart barChartNutrition;
     private RecyclerView rvMealsHistory;
     private TextView caloriePercentageText;
-
-    //private NutritionalRecordHelper recordHelper = new NutritionalRecordHelper();
+    private ImageButton TdynutrientIntakeInfoButton;
+    private ImageView exceedImageView;
     private UserHelper userHelper = new UserHelper();
 
     @Override
@@ -62,6 +70,7 @@ public class TodayFragment extends Fragment {
         progressCalorieIntake = view.findViewById(R.id.todayProgressBar);
         barChartNutrition = view.findViewById(R.id.todayBarChart);
         rvMealsHistory = view.findViewById(R.id.rv_meals_history);
+        exceedImageView = view.findViewById(R.id.dizzyface);
 
         rvMealsHistory.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
 
@@ -77,7 +86,7 @@ public class TodayFragment extends Fragment {
                 String todayDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
 
                 double totalCalories = 0;
-                double totalProtein = 0, totalCarbs = 0, totalFat = 0, totalSodium = 0, totalCalcium = 0, totalCholesterol = 0, totalMagnesium = 0, totalIron = 0, totalPotassium = 0;
+                float totalProtein = 0, totalCarbs = 0, totalFat = 0, totalSodium = 0, totalCalcium = 0, totalCholesterol = 0, totalMagnesium = 0, totalIron = 0, totalPotassium = 0;
                 List<String> mealImages = new ArrayList<>();
 
                 for (NutritionalRecord record : records) {
@@ -104,8 +113,14 @@ public class TodayFragment extends Fragment {
                     }
                 }
                 updateCalorieIntake(totalCalories);
-                updateNutritionChart(totalProtein, totalCarbs, totalFat, totalSodium, totalIron, totalCalcium, totalCholesterol, totalMagnesium, totalPotassium);
+                //updateNutritionChart(totalProtein, totalCarbs, totalFat, totalSodium, totalIron, totalCalcium, totalCholesterol, totalMagnesium, totalPotassium);
                 updateMealsHistory(mealImages);
+                try {
+                    updateNutritionChart(totalProtein, totalCarbs, totalFat, totalSodium, totalIron, totalCalcium, totalCholesterol, totalMagnesium, totalPotassium);
+                } catch (Exception e) {
+                    Log.e("TodayFragment", "Error in updateNutritionChart: " + e.getMessage(), e);
+                    Toast.makeText(getContext(), "Failed to update chart: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                }
             }
 
             @Override
@@ -128,10 +143,29 @@ public class TodayFragment extends Fragment {
 
     private void updateCalorieIntake(double totalCalories) {
         setupProgressBar();
-        int progress = (int) ((totalCalories / 1000) * 100);
+        // Save the totalCalories in SharedPreferences
+        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("CaloriePrefs", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putFloat("totalCalories", (float) totalCalories);
+        editor.apply();
+
+        // Check if totalCalories exceeds 1000 and adjust the progress bar and percentage text accordingly
+        int progress;
+        String percentageText;
+
+        if (totalCalories > 1000) {
+            progress = 100; // Set progress to 100%
+            // Display the image when exceeding 100%
+            exceedImageView.setVisibility(View.VISIBLE); // Make the image visible
+            caloriePercentageText.setVisibility(View.GONE);
+        } else {
+            progress = (int) ((totalCalories / 1000) * 100); // Calculate the progress percentage
+            percentageText = progress + "%"; // Display the actual progress
+            caloriePercentageText.setText(percentageText);
+            exceedImageView.setVisibility(View.GONE); // Hide the image
+        }
         tvCalorieIntake.setText(String.format("Calories: %.0f/1000", totalCalories));
         progressCalorieIntake.setProgress(progress);
-        caloriePercentageText.setText(progress + "%");
     }
 
     private void setupProgressBar() {
@@ -139,11 +173,15 @@ public class TodayFragment extends Fragment {
         caloriePercentageText = getView().findViewById(R.id.percentage_cal);
     }
 
-    private void updateNutritionChart(double protein, double carbs, double fat, double sodium, double iron, double calcium, double cholesterol, double magnesium, double potassium) {
-        Toast.makeText(getContext(), "nutritions retriving....", Toast.LENGTH_LONG).show();
-        Typeface customFont = ResourcesCompat.getFont(getContext(), R.font.poppins_light_regular);
+    private void updateNutritionChart(float protein, float carbs, float fat, float sodium, float iron, float calcium, float cholesterol, float magnesium, float potassium) {
+        Log.d("TodayFragment", "updateNutritionChart called with values: protein=" + protein + ", carbs=" + carbs + ", fat=" + fat);
 
-        // Prepare data entries
+        if (barChartNutrition == null) {
+            Log.e("TodayFragment", "Bar chart view is null.");
+            return;
+        }
+
+        // Dummy data for testing
         ArrayList<BarEntry> entries = new ArrayList<>();
         entries.add(new BarEntry(0, (float) protein));
         entries.add(new BarEntry(1, (float) carbs));
@@ -155,72 +193,61 @@ public class TodayFragment extends Fragment {
         entries.add(new BarEntry(7, (float) magnesium));
         entries.add(new BarEntry(8, (float) potassium));
 
-        // Labels for X-axis
-        String[] nutrientLabels = {"Protein", "Carbs", "Fat", "Sodium", "Iron", "Calcium", "Cholesterol", "Magnesium", "Potassium"};
-
-        // Color logic for bars
-        ArrayList<Integer> barColors = new ArrayList<>();
-        for (BarEntry entry : entries) {
-            if (entry.getY() < 50) { // Example threshold
-                barColors.add(ContextCompat.getColor(getContext(), R.color.yellow)); // Below threshold
-            } else {
-                barColors.add(ContextCompat.getColor(getContext(), R.color.red)); // Above threshold
-            }
-        }
-
-        // Create BarDataSet
-        BarDataSet dataSet = new BarDataSet(entries, "Nutrition Intake");
-        dataSet.setColors(barColors);
-        dataSet.setValueTextColor(Color.BLACK);
-        dataSet.setValueTypeface(customFont);
-        dataSet.setValueTextSize(12f);
-
-        // Custom value formatter for bar values
-        ValueFormatter valueFormatter = new ValueFormatter() {
-            @Override
-            public String getFormattedValue(float value) {
-                return String.format("%.0f", value); // Display values as integers
-            }
+        // Names for each bar
+        final String[] barNames = {
+                "Protein", "Carbs", "Fat", "Sodium", "Iron", "Calcium", "Cholesterol", "Magnesium", "Potassium"
         };
-        dataSet.setValueFormatter(valueFormatter);
 
-        // Create BarData and set to the chart
+        BarDataSet dataSet = new BarDataSet(entries, "Nutrients");
+        dataSet.setColor(getResources().getColor(R.color.yellow)); // Use a simple color for now
         BarData barData = new BarData(dataSet);
-        barData.setBarWidth(0.4f); // Adjust bar width
+
         barChartNutrition.setData(barData);
 
-        // X-axis configuration
-        XAxis xAxis = barChartNutrition.getXAxis();
-        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-        xAxis.setGranularity(1f);
-        xAxis.setGranularityEnabled(true);
-        xAxis.setValueFormatter(new IndexAxisValueFormatter(nutrientLabels));
-        xAxis.setDrawGridLines(false);
-        xAxis.setTypeface(customFont);
+        // Disable gridlines
+        barChartNutrition.getAxisLeft().setDrawGridLines(false);
+        barChartNutrition.getAxisRight().setDrawGridLines(false);
+        barChartNutrition.getXAxis().setDrawGridLines(false);
 
-        // Y-axis configuration
-        YAxis leftAxis = barChartNutrition.getAxisLeft();
-        leftAxis.setGranularity(10f); // Adjust based on your range
-        leftAxis.setAxisMinimum(0f); // Set minimum value to 0
-        leftAxis.setDrawGridLines(false);
-        leftAxis.setTypeface(customFont);
+        // Disable axis lines
+        barChartNutrition.getAxisLeft().setDrawAxisLine(false);
+        barChartNutrition.getAxisRight().setDrawAxisLine(false);
+        barChartNutrition.getXAxis().setDrawAxisLine(false);
 
-        barChartNutrition.getAxisRight().setEnabled(false); // Disable the right Y-axis
+        // Hide X-axis index number
+        barChartNutrition.getXAxis().setEnabled(false);
+        barChartNutrition.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
+            @Override
+            public void onValueSelected(Entry e, Highlight h) {
+                int index = (int) e.getX(); // Get the index of the clicked bar
+                String barName = barNames[index]; // Get the corresponding name from the barNames array
 
-        // Chart properties
-        barChartNutrition.getDescription().setEnabled(false);
-        barChartNutrition.setDragEnabled(true);
-        barChartNutrition.setExtraRightOffset(12f);
-        barChartNutrition.setExtraLeftOffset(12f);
-        barChartNutrition.setExtraBottomOffset(20f);
+                // Display the selected bar's name (you can use a Toast, Snackbar, or TextView)
+                Toast.makeText(getContext(), "Selected: " + barName, Toast.LENGTH_SHORT).show();
+            }
 
-        // Optional: Use a custom renderer for rounded bars
-        RoundedBarChart render = new RoundedBarChart(barChartNutrition, barChartNutrition.getAnimator(), barChartNutrition.getViewPortHandler());
-        render.setmRadius(20); // Adjust bar corner radius
-        barChartNutrition.setRenderer(render);
+            @Override
+            public void onNothingSelected() {
+                // Optional: Action to perform when nothing is selected
+            }
+        });
+        // Customize the Y-axis labels (optional)
+        barChartNutrition.getAxisLeft().setDrawLabels(true);
+        barChartNutrition.getAxisRight().setEnabled(false); // Hide Y-axis on the right
+        barChartNutrition.getXAxis().setGranularity(1f); // For proper spacing between bars
 
-        // Refresh the chart
-        barChartNutrition.invalidate();
+        // Set a more modern and clean appearance (optional)
+        barChartNutrition.getLegend().setEnabled(false); // Disable the legend if not needed
+        barChartNutrition.setDescription(null);  // Hide description
+
+        // Add animations (optional)
+        barChartNutrition.animateY(1000);
+        // show the values above bars
+        dataSet.setDrawValues(true);
+
+        barChartNutrition.invalidate(); // Refresh the chart
+
+        Log.d("TodayFragment", "updateNutritionChart completed successfully.");
     }
 
 

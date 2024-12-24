@@ -3,226 +3,302 @@ package com.hmir.goodfood;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.github.mikephil.charting.formatter.ValueFormatter;
+import com.github.mikephil.charting.highlight.Highlight;
+import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.hmir.goodfood.utilities.Meal;
 import com.hmir.goodfood.utilities.Nutrient;
+import com.hmir.goodfood.utilities.NutritionalRecord;
 import com.hmir.goodfood.utilities.RoundedBarChart;
+import com.hmir.goodfood.utilities.UserHelper;
 
+import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 
 public class ThisMonthFragment extends Fragment {
 
-    private BarChart thisMonthBarChart;
-
-    private LinearLayout popularMealsLinearLayout;
-
-    private ImageButton nutrientIntakeInfoButton;
+    private BarChart MonthlyBarChart;
+    private ProgressBar MonthlyprogressCalorieIntake;
+    private RecyclerView rvMonthlyMealsHistory;
+    private TextView MonthlyAvgcalorie;
+    private ImageButton MonthlynutrientIntakeInfoButton;
+    private TextView tvMonthlyCalorieIntake;
+    private ImageView exceedMonthlyCalorieImg;
+    private TextView avgtextview;
+    private UserHelper userHelper = new UserHelper();
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_this_month, container, false);
+        Toast.makeText(getContext(), "ThisMonthFragment onCreateView Called and xml file shown", Toast.LENGTH_SHORT).show();
 
-        thisMonthBarChart = view.findViewById(R.id.thisMonthBarChart);
-        popularMealsLinearLayout = view.findViewById(R.id.thisMonthPopularMealsLinearLayout);
-        nutrientIntakeInfoButton = view.findViewById(R.id.thisMonthNutrientIntakeInfoButton);
-
-        // listener for nutrient intake info button
-        nutrientIntakeInfoButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showAlertDialog();
-            }
-        });
-
-        // Calculate average calories
-        int totalCalories = 28500;
-        int caloriesSuggested = 30000;
-        int average = totalCalories / 30;
-
-        int percentage = (int) ((double) totalCalories / caloriesSuggested * 100);
-
-        // Update ProgressBar and TextViews
-        ProgressBar progressBar = view.findViewById(R.id.thisMonthProgressBar);
-        TextView avgCalText = view.findViewById(R.id.thisMonthAvgCalText);
-        TextView calorieText = view.findViewById(R.id.thisMonthCalorieText);
-
-        progressBar.setProgress(percentage);
-        avgCalText.setText(Integer.toString(average));
-        calorieText.setText(totalCalories + " / " + caloriesSuggested + " cal");
-
-        // Create an ArrayList with simulated nutrients data
-        ArrayList<Nutrient> nutrients = new ArrayList<>();
-        nutrients.add(new Nutrient("Cholesterol", 80, 100));
-        nutrients.add(new Nutrient("Carbohydrates", 180, 150));
-        nutrients.add(new Nutrient("Protein", 120, 100));
-        nutrients.add(new Nutrient("Fat", 90, 100));
-        nutrients.add(new Nutrient("Fibre", 25, 30));
-        nutrients.add(new Nutrient("Vitamins", 60, 50));
-        nutrients.add(new Nutrient("Minerals", 50, 60));
-        nutrients.add(new Nutrient("Water", 200, 250));
-
-        // Create an ArrayList with simulated meals data
-        ArrayList<Meal> meals = new ArrayList<>();
-        meals.add(new Meal("Pizza", 300));
-        meals.add(new Meal("Burger", 500));
-        meals.add(new Meal("Salad", 150));
-
-        // Populate the meal container dynamically
-        LayoutInflater inflaterMeal = LayoutInflater.from(getContext());
-        for (Meal meal : meals) {
-            // Inflate each meal item layout
-            View mealView = inflaterMeal.inflate(R.layout.meal_item, popularMealsLinearLayout, false);
-
-            // Set the meal's name and calories dynamically
-            TextView mealName = mealView.findViewById(R.id.meal_name);
-            TextView mealCalories = mealView.findViewById(R.id.meal_calories);
-
-            mealName.setText(meal.getName());
-            mealCalories.setText(meal.getCalories() + " kcal");
-
-            // Add the inflated view to the meal container
-            popularMealsLinearLayout.addView(mealView);
-        }
-
-        // Set up the chart
-        setUpChart(nutrients);
+        tvMonthlyCalorieIntake = view.findViewById(R.id.tv_Monthly_calorie_intake);
+        MonthlyprogressCalorieIntake = view.findViewById(R.id.thisMonthProgressBar);
+        MonthlyBarChart = view.findViewById(R.id.thisMonthBarChart);
+        rvMonthlyMealsHistory = view.findViewById(R.id.thisMonth_rv_meals_history);
+        MonthlyAvgcalorie = view.findViewById(R.id.thisMonthavg_cal);
+        exceedMonthlyCalorieImg = view.findViewById(R.id.exceedMonthCalorie);
+        rvMonthlyMealsHistory.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+        avgtextview = view.findViewById(R.id.avgtext);
+        fetchThisMonthData();
 
         return view;
     }
 
-    private void showAlertDialog () {
-        AlertDialog.Builder alertDialog = new AlertDialog.Builder(requireContext());
-        alertDialog.setTitle("Chart Colour Indicator")
-                .setMessage(String.format("For each bar groups:\n%s: Your Recorded Intake\n - %s: Under suggested amount\n" +
-                                " - %s: Over suggested amount\n\n%s: Recommended Intake\n - %s: Suggested amount\n",
-                        "Left Bar","Yellow","Red","Right Bar","Orange"))
-                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int i) {
-                        dialog.dismiss();
-                    }
-                });
+    private void fetchThisMonthData() {
+        userHelper.fetchAllUserNutritionalRecords(new UserHelper.OnRecordListFetchedCallback() {
+            @Override
+            public void onRecordListFetched(List<NutritionalRecord> records) {
+                String currentMonth = new SimpleDateFormat("yyyy-MM", Locale.getDefault()).format(new Date());
 
-        AlertDialog dialog = alertDialog.create();
-        dialog.show();
+                double totalCalories = 0;
+                float totalProtein = 0, totalCarbs = 0, totalFat = 0, totalSodium = 0, totalCalcium = 0, totalCholesterol = 0, totalMagnesium = 0, totalIron = 0, totalPotassium = 0;
+                List<String> mealImages = new ArrayList<>();
+                int daysInMonth = 0;
+
+                for (NutritionalRecord record : records) {
+                    String recordMonth = new SimpleDateFormat("yyyy-MM", Locale.getDefault())
+                            .format(record.getDate_time().toDate());
+
+                    if (recordMonth.equals(currentMonth)) {
+                        totalCalories += record.getCalories();
+                        totalProtein += record.getProtein();
+                        totalCarbs += record.getCarbs();
+                        totalFat += record.getFat();
+                        totalSodium += record.getSodium();
+                        totalIron += record.getIron();
+                        totalCalcium += record.getCalcium();
+                        totalCholesterol += record.getCholesterol();
+                        totalMagnesium += record.getMagnesium();
+                        totalPotassium += record.getPotassium();
+
+                        // Handle image field safely
+                        if (record.getImage() != null) {
+                            Uri imageUri = Uri.parse(record.getImage());
+                            mealImages.add(imageUri.toString());
+                        }
+
+                        // Count number of days in the current month
+                        daysInMonth++;
+                    }
+                }
+
+                if (daysInMonth > 0) {
+                    // Update calorie intake (average for the month)
+                    updateCalorieIntake(totalCalories, daysInMonth);
+                    // Update nutrition chart (average for the month)
+                    updateNutritionChart(totalProtein, totalCarbs, totalFat, totalSodium, totalIron, totalCalcium, totalCholesterol, totalMagnesium, totalPotassium, daysInMonth);
+                    // Update meals history
+                    updateMealsHistory(mealImages);
+                } else {
+                    Toast.makeText(getContext(), "No records found for this month", Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onError(Exception e) {
+                // Handle error the same way as in TodayFragment
+                if (e != null) {
+                    Toast.makeText(getContext(), "Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(getContext(), "Unknown error occurred", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
     }
 
-    private void setUpChart(ArrayList<Nutrient> nutrients) {
-        Typeface customFont = ResourcesCompat.getFont(getContext(), R.font.poppins_light_regular);
+    private void updateCalorieIntake(double totalCalories, int daysInMonth) {
+        setupProgressBar();
 
-        ArrayList<BarEntry> takenEntries = new ArrayList<>();
-        ArrayList<BarEntry> suggestedEntries = new ArrayList<>();
+        // Calculate average daily calories
+        int averageCalories =  (int) (totalCalories / daysInMonth);
 
-        // Prepare the data for the chart
-        for (int i = 0; i < nutrients.size(); i++) {
-            Nutrient nutrient = nutrients.get(i);
-            takenEntries.add(new BarEntry(i, nutrient.amountTaken));
-            suggestedEntries.add(new BarEntry(i, nutrient.suggestedAmount));
+        int progress;
+        String AvgCalorie;
+
+        if (totalCalories > 30000) {   //assume total suggested calorie intake is 30kcal
+            progress = 100; // Set progress to 100%
+            MonthlyAvgcalorie.setVisibility(View.GONE);
+            avgtextview.setVisibility(View.GONE);
+            exceedMonthlyCalorieImg.setVisibility(View.VISIBLE); // Make the image visible
+        } else {
+            progress = (int) ((totalCalories / 30000) * 100); // Calculate the progress percentage
+            AvgCalorie = averageCalories + " cal"; // Display the average daily intake
+            exceedMonthlyCalorieImg.setVisibility(View.GONE);
+            MonthlyAvgcalorie.setText(AvgCalorie);
+        }
+        tvMonthlyCalorieIntake.setText(String.format("Calories: %.0f/30000", totalCalories));
+        MonthlyprogressCalorieIntake.setProgress(progress);
+    }
+
+    private void setupProgressBar() {
+        MonthlyprogressCalorieIntake = getView().findViewById(R.id.thisMonthProgressBar);
+        MonthlyAvgcalorie = getView().findViewById(R.id.thisMonthavg_cal);
+    }
+
+    private void updateNutritionChart(float protein, float carbs, float fat, float sodium, float iron, float calcium, float cholesterol, float magnesium, float potassium, int daysInMonth) {
+        Log.d("ThisMonthFragment", "updateNutritionChart called with values: protein=" + protein + ", carbs=" + carbs + ", fat=" + fat);
+
+        if (MonthlyBarChart == null) {
+            Log.e("ThisMonthFragment", "Bar chart view is null.");
+            return;
         }
 
-        // Create BarDataSets
-        BarDataSet takenDataSet = new BarDataSet(takenEntries, "Amount Taken");
-        BarDataSet suggestedDataSet = new BarDataSet(suggestedEntries, "Suggested Amount");
+        // Calculate averages for each nutrient
+        float avgProtein = protein / daysInMonth;
+        float avgCarbs = carbs / daysInMonth;
+        float avgFat = fat / daysInMonth;
+        float avgSodium = sodium / daysInMonth;
+        float avgIron = iron / daysInMonth;
+        float avgCalcium = calcium / daysInMonth;
+        float avgCholesterol = cholesterol / daysInMonth;
+        float avgMagnesium = magnesium / daysInMonth;
+        float avgPotassium = potassium / daysInMonth;
 
-        // Set colors and value visibility
-        suggestedDataSet.setColor(getResources().getColor(R.color.orange));
-        suggestedDataSet.setDrawValues(true);
+        // Dummy data for testing
+        ArrayList<BarEntry> entries = new ArrayList<>();
+        entries.add(new BarEntry(0, avgProtein));
+        entries.add(new BarEntry(1, avgCarbs));
+        entries.add(new BarEntry(2, avgFat));
+        entries.add(new BarEntry(3, avgSodium));
+        entries.add(new BarEntry(4, avgIron));
+        entries.add(new BarEntry(5, avgCalcium));
+        entries.add(new BarEntry(6, avgCholesterol));
+        entries.add(new BarEntry(7, avgMagnesium));
+        entries.add(new BarEntry(8, avgPotassium));
 
-        // Color Logic - Handle the color change for both bars
-        ArrayList<Integer> takenColors = new ArrayList<>();
-
-        // Loop through each nutrient to set specific colors based on conditions
-        for (int i = 0; i < nutrients.size(); i++) {
-            Nutrient nutrient = nutrients.get(i);
-            if (nutrient.amountTaken < nutrient.suggestedAmount) {
-                takenColors.add(ContextCompat.getColor(getContext(), R.color.yellow)); // Amount Taken is Yellow
-            } else {
-                takenColors.add(ContextCompat.getColor(getContext(), R.color.red)); // Amount Taken is Red
-            }
-        }
-
-        takenDataSet.setColors(takenColors);
-        takenDataSet.setDrawValues(true);
-
-        // Set the Value Formatter to display the actual value on top of the bars
-        ValueFormatter valueFormatter = new ValueFormatter() {
-            @Override
-            public String getFormattedValue(float value) {
-                return String.format("%.0f", value); // Display values as integers
-            }
+        // Names for each bar
+        final String[] barNames = {
+                "Protein", "Carbs", "Fat", "Sodium", "Iron", "Calcium", "Cholesterol", "Magnesium", "Potassium"
         };
-        takenDataSet.setValueFormatter(valueFormatter);
-        suggestedDataSet.setValueFormatter(valueFormatter);
-        takenDataSet.setValueTypeface(customFont);
-        suggestedDataSet.setValueTypeface(customFont);
 
+        BarDataSet dataSet = new BarDataSet(entries, "Nutrients");
+        dataSet.setColor(getResources().getColor(R.color.yellow)); // Use a simple color for now
+        BarData barData = new BarData(dataSet);
 
-        // X-axis configuration
-        float barWidth = 0.2f;
-        float groupSpace = 0.5f;
-        float barSpace = 0.05f;
-        String [] nutrientLabels = new String [] {"Cholesterol", "Carbohydrates", "Protein", "Fat", "Fibre", "Vitamins", "Minerals", "Water"};
+        MonthlyBarChart.setData(barData);
 
-        BarData data = new BarData(takenDataSet, suggestedDataSet);
-        data.setBarWidth(barWidth);
-        thisMonthBarChart.setData(data);
-        thisMonthBarChart.setVisibleXRangeMaximum(3);
+        // Disable gridlines
+        MonthlyBarChart.getAxisLeft().setDrawGridLines(false);
+        MonthlyBarChart.getAxisRight().setDrawGridLines(false);
+        MonthlyBarChart.getXAxis().setDrawGridLines(false);
 
-        XAxis xAxis = thisMonthBarChart.getXAxis();
-        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-        xAxis.setCenterAxisLabels(true);
-        xAxis.setGranularity(1f);
-        xAxis.setGranularityEnabled(true);
-        xAxis.setAxisMinimum(0);
-        xAxis.setAxisMaximum(0 + thisMonthBarChart.getBarData().getGroupWidth(groupSpace, barSpace) * nutrients.size());
-        xAxis.setValueFormatter(new IndexAxisValueFormatter(nutrientLabels));
-        xAxis.setDrawGridLines(false);
-        xAxis.setTypeface(customFont);
+        // Disable axis lines
+        MonthlyBarChart.getAxisLeft().setDrawAxisLine(false);
+        MonthlyBarChart.getAxisRight().setDrawAxisLine(false);
+        MonthlyBarChart.getXAxis().setDrawAxisLine(false);
 
-        thisMonthBarChart.groupBars(0, groupSpace, barSpace);
+        // Hide X-axis index number
+        MonthlyBarChart.getXAxis().setEnabled(false);
+        // Add chart value selected listener
+        MonthlyBarChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
+            @Override
+            public void onValueSelected(Entry e, Highlight h) {
+                int index = (int) e.getX(); // Get the index of the clicked bar
+                String barName = barNames[index]; // Get the corresponding name from the barNames array
 
-        // Y-Axis customization
-        YAxis leftAxis = thisMonthBarChart.getAxisLeft();
-        leftAxis.setAxisMinimum(0f);
-        leftAxis.setDrawGridLines(false);
-        leftAxis.setTypeface(customFont);
-        thisMonthBarChart.getAxisRight().setEnabled(false);
-        thisMonthBarChart.getLegend().setEnabled(false);
+                // Display the selected bar's name (you can use a Toast, Snackbar, or TextView)
+                Toast.makeText(getContext(), "Selected: " + barName, Toast.LENGTH_SHORT).show();
+            }
 
-        thisMonthBarChart.setDragEnabled(true);
-        thisMonthBarChart.setExtraRightOffset(12f);
-        thisMonthBarChart.setExtraLeftOffset(12f);
-        thisMonthBarChart.setExtraBottomOffset(20f);
-        thisMonthBarChart.getDescription().setEnabled(false);
+            @Override
+            public void onNothingSelected() {
+                // Optional: Action to perform when nothing is selected
+            }
+        });
 
-        RoundedBarChart render = new RoundedBarChart(thisMonthBarChart, thisMonthBarChart.getAnimator(), thisMonthBarChart.getViewPortHandler());
-        render.setmRadius(20);
-        thisMonthBarChart.setRenderer(render);
-        thisMonthBarChart.invalidate();
+        // Customize the Y-axis labels (optional)
+        MonthlyBarChart.getAxisLeft().setDrawLabels(true);
+        MonthlyBarChart.getAxisRight().setEnabled(false); // Hide Y-axis on the right
+        MonthlyBarChart.getXAxis().setGranularity(1f); // For proper spacing between bars
+
+        // Set a more modern and clean appearance (optional)
+        MonthlyBarChart.getLegend().setEnabled(false); // Disable the legend if not needed
+        MonthlyBarChart.setDescription(null);  // Hide description
+
+        // Add animations (optional)
+        MonthlyBarChart.animateY(1000);
+        //show the values above bars
+        dataSet.setDrawValues(true);
+
+        MonthlyBarChart.invalidate(); // Refresh the chart
+        Log.d("ThisMonthFragment", "updateNutritionChart completed successfully.");
+    }
+
+    private void updateMealsHistory(List<String> mealImages) {
+        MealsAdapter adapter = new MealsAdapter(mealImages);
+        rvMonthlyMealsHistory.setAdapter(adapter);
+    }
+
+    private static class MealsAdapter extends RecyclerView.Adapter<MealsAdapter.MealsViewHolder> {
+        private final List<String> mealImages;
+
+        MealsAdapter(List<String> mealImages) {
+            this.mealImages = mealImages;
+        }
+
+        @NonNull
+        @Override
+        public MealsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            View view = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.item_meal_image, parent, false);
+            return new MealsViewHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull MealsViewHolder holder, int position) {
+            String imageUrl = mealImages.get(position);
+            Glide.with(holder.itemView.getContext()).load(imageUrl).into(holder.imageView);
+        }
+
+        @Override
+        public int getItemCount() {
+            return mealImages.size();
+        }
+
+        static class MealsViewHolder extends RecyclerView.ViewHolder {
+            ImageView imageView;
+
+            MealsViewHolder(View itemView) {
+                super(itemView);
+                imageView = itemView.findViewById(R.id.image_view_meal);
+            }
+        }
     }
 }
