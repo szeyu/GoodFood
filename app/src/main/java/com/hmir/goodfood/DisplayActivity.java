@@ -8,9 +8,24 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+/**
+ * Activity for displaying detailed information about a food item.
+ * Shows comprehensive information including food name, image, nutritional content
+ * (fat, calories, protein), description, and ingredients.
+ * Integrates with local database for data retrieval and supports navigation
+ * through the toolbar.
+ *
+ * @see AppCompatActivity
+ * @see DatabaseHelper
+ */
 public class DisplayActivity extends AppCompatActivity {
 
-    private TextView foodNameTextView, fatTextView, caloriesTextView, proteinTextView, descriptionTextView, ingredientsTextView;
+    private TextView foodNameTextView;
+    private TextView fatTextView;
+    private TextView caloriesTextView;
+    private TextView proteinTextView;
+    private TextView descriptionTextView;
+    private TextView ingredientsTextView;
     private ImageView foodImageView;
     private com.hmir.goodfood.DatabaseHelper dbHelper;
 
@@ -75,13 +90,13 @@ public class DisplayActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(android.view.MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                // Handle back button click
-                onBackPressed();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+        if (item.getItemId() == android.R.id.home) {
+            // Handle back button click
+            onBackPressed();
+            return true;
+        } else {
+            return super.onOptionsItemSelected(item);
         }
     }
+
 }

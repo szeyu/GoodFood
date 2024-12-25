@@ -70,12 +70,22 @@ public class FoodScanner extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        if (requestCode == REQUEST_CODE && resultCode == RESULT_OK) {
-            Bitmap photo = (Bitmap) data.getExtras().get("data");
-            cameraView.setImageBitmap(photo);
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == REQUEST_CODE && resultCode == RESULT_OK && data != null) {
+            Bundle extras = data.getExtras();
+            if (extras != null) {
+                Bitmap photo = (Bitmap) extras.get("data");
+                if (photo != null) {
+                    cameraView.setImageBitmap(photo);
+                } else {
+                    Toast.makeText(this, "Failed to capture photo", Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                Toast.makeText(this, "No image data received", Toast.LENGTH_SHORT).show();
+            }
         } else {
             Toast.makeText(this, "Cancelled", Toast.LENGTH_SHORT).show();
-            super.onActivityResult(requestCode, resultCode, data);
         }
     }
 
