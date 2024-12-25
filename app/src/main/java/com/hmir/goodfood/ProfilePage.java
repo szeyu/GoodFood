@@ -1,9 +1,12 @@
 package com.hmir.goodfood;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
+
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -12,6 +15,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
+
 
 /**
  * The ProfilePage class represents an activity where users can view and manage their profile details.
@@ -22,11 +26,12 @@ import com.google.firebase.auth.FirebaseAuth;
 public class ProfilePage extends AppCompatActivity {
 
     private GoogleSignInClient googleSignInClient;
+    private TextView TVName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
+        //EdgeToEdge.enable(this);
         setContentView(R.layout.activity_profile_page);
 
         // Configure Google Sign-In
@@ -35,6 +40,19 @@ public class ProfilePage extends AppCompatActivity {
                 .requestEmail()
                 .build();
         googleSignInClient = GoogleSignIn.getClient(this, gso);
+
+
+        //
+        // Initialize the TextView
+        TVName = findViewById(R.id.TVName);
+
+        // Retrieve username from SharedPreferences
+        SharedPreferences sharedPreferences = getSharedPreferences("UserPreferences", MODE_PRIVATE);
+        String username = sharedPreferences.getString("Username", "Guest");
+
+        // Set the username in the TextView
+        TVName.setText(username);
+        //
 
     }
 
@@ -75,5 +93,22 @@ public class ProfilePage extends AppCompatActivity {
         intent.putExtra("FRAGMENT_TYPE", "PrivacyPolicy");
         startActivity(intent);
     }
+
+
+    public void refreshProfileData() {
+        SharedPreferences sharedPreferences = getSharedPreferences("UserPreferences", MODE_PRIVATE);
+        String username = sharedPreferences.getString("Username", "Guest");
+
+        // Assuming you have a TextView to display the username
+        TextView usernameTextView = findViewById(R.id.TVName); // Or the corresponding ID in ProfilePage
+        usernameTextView.setText(username);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        refreshProfileData(); // Refresh data when the profile page is resumed
+    }
+
 }
 

@@ -2,24 +2,25 @@ package com.hmir.goodfood;
 
 import static android.app.Activity.RESULT_OK;
 
+import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.InputType;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Toast;
-
-import com.hmir.goodfood.R;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -30,6 +31,9 @@ import com.hmir.goodfood.utilities.UserHelper;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import android.content.Intent;
+import android.provider.MediaStore;
 
 /**
  * The EditProfileFragment class provides a user interface for editing the user's profile details.
@@ -55,6 +59,16 @@ public class EditProfileFragment extends Fragment {
 
     private String selectedDietPreference;
 
+
+    //
+    private ImageView IVProfile;
+    private ImageButton BtnChangeProfile;
+    //private SharedPreferences sharedPreferences;
+
+    private static final int PICK_IMAGE_REQUEST = 1;
+    private Uri selectedImageUri;
+
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,6 +86,19 @@ public class EditProfileFragment extends Fragment {
         etHeight = view.findViewById(R.id.ETHeight);
         etWeight = view.findViewById(R.id.ETWeight);
         btnSave = view.findViewById(R.id.IBDone);
+
+        /* pfp
+        // Initialize views
+        IVProfile = view.findViewById(R.id.IVProfileEdit);
+        BtnChangeProfile = view.findViewById(R.id.BtnChangeProfile);
+        sharedPreferences = requireActivity().getSharedPreferences("UserPreferences", requireActivity().MODE_PRIVATE);
+
+        // Set the current profile picture from SharedPreferences
+        loadProfilePicture();
+
+        // Set click listener for the button to open gallery
+        BtnChangeProfile.setOnClickListener(v -> openGalleryForImage());
+        */
 
         // Restrict age to integers only
         InputFilter[] integerFilter = new InputFilter[]{(source, start, end, dest, dstart, dend) -> {
@@ -122,6 +149,7 @@ public class EditProfileFragment extends Fragment {
         btnSave.setOnClickListener(v -> saveChanges());
 
         return view;
+
     }
 
     // Method to Loads original user profile data from SharedPreferences and populates the input fields.
@@ -148,7 +176,8 @@ public class EditProfileFragment extends Fragment {
     private void addTextWatchers() {
         TextWatcher textWatcher = new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -156,7 +185,8 @@ public class EditProfileFragment extends Fragment {
             }
 
             @Override
-            public void afterTextChanged(Editable s) {}
+            public void afterTextChanged(Editable s) {
+            }
         };
 
         etUsername.addTextChangedListener(textWatcher);
@@ -168,26 +198,26 @@ public class EditProfileFragment extends Fragment {
     // Method to set click listeners for dietary preference buttons to update the selected preference.
     private void setDietButtonListeners() {
 
-            View.OnClickListener dietButtonClickListener = v -> {
-                int id = v.getId();
-                if (id == R.id.button_halal) {
-                    selectedDietPreference = "Halal";
-                } else if (id == R.id.button_vegan) {
-                    selectedDietPreference = "Vegan";
-                } else if (id == R.id.button_pescatarian) {
-                    selectedDietPreference = "Pescatarian";
-                } else if (id == R.id.button_custom) {
-                    selectedDietPreference = "Custom";
-                } else if (id == R.id.button_dairy) {
-                    selectedDietPreference = "Dairy-Free";
-                } else if (id == R.id.button_nuts) {
-                    selectedDietPreference = "Nut-Free";
-                } else if (id == R.id.button_seafood) {
-                    selectedDietPreference = "Seafood";
-                } else if (id == R.id.button_others) {
-                    selectedDietPreference = "Others";
-                }
-                detectChanges();
+        View.OnClickListener dietButtonClickListener = v -> {
+            int id = v.getId();
+            if (id == R.id.button_halal) {
+                selectedDietPreference = "Halal";
+            } else if (id == R.id.button_vegan) {
+                selectedDietPreference = "Vegan";
+            } else if (id == R.id.button_pescatarian) {
+                selectedDietPreference = "Pescatarian";
+            } else if (id == R.id.button_custom) {
+                selectedDietPreference = "Custom";
+            } else if (id == R.id.button_dairy) {
+                selectedDietPreference = "Dairy-Free";
+            } else if (id == R.id.button_nuts) {
+                selectedDietPreference = "Nut-Free";
+            } else if (id == R.id.button_seafood) {
+                selectedDietPreference = "Seafood";
+            } else if (id == R.id.button_others) {
+                selectedDietPreference = "Others";
+            }
+            detectChanges();
         };
 
         // Attach the listener to all buttons
@@ -255,6 +285,21 @@ public class EditProfileFragment extends Fragment {
 
         // Reload original data for consistency
         loadOriginalData();
+
+
+        //
+        // Manually notify the HomePage and ProfilePage to refresh data
+        if (getActivity() instanceof HomePage) {
+            ((HomePage) getActivity()).refreshProfileData();
+        }
+        if (getActivity() instanceof ProfilePage) {
+            ((ProfilePage) getActivity()).refreshProfileData();
+        }
+
+        // Optional: Navigate back to the profile page or elsewhere
+        requireActivity().onBackPressed();
+        //
+
     }
 
 
@@ -269,5 +314,46 @@ public class EditProfileFragment extends Fragment {
         }
         return false;
     }
+
+
+    /*
+    private void loadProfilePicture() {
+        String profilePicUri = sharedPreferences.getString("ProfilePicUri", null);
+        if (profilePicUri != null) {
+            try {
+                Uri uri = Uri.parse(profilePicUri);
+                IVProfile.setImageURI(uri); // Set the stored image URI
+            } catch (Exception e) {
+                Log.e("EditProfileFragment", "Error loading profile picture", e);
+            }
+        }
+    }
+
+    private void openGalleryForImage() {
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        intent.setType("image/*");
+        startActivityForResult(intent, PICK_IMAGE_REQUEST);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
+            selectedImageUri = data.getData(); // Get the selected image URI
+
+            if (selectedImageUri != null) {
+                IVProfile.setImageURI(selectedImageUri); // Set the selected image in the ImageView
+
+                // Save the image URI to SharedPreferences
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putString("ProfilePicUri", selectedImageUri.toString());
+                editor.apply();
+            }
+        } else {
+            Log.e("EditProfileFragment", "Error: No image selected or invalid URI");
+        }
+    }
+    */
 
 }

@@ -57,7 +57,7 @@
         app:layout_constraintTop_toBottomOf="@+id/header">
 
         <TextView
-            android:id="@+id/textView3"
+            android:id="@+id/TVNameHomePage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="TextView"
@@ -94,6 +94,15 @@
             android:text="thisMonth"
             app:layout_constraintEnd_toEndOf="@+id/todayDashboardButton"
             app:layout_constraintTop_toBottomOf="@+id/todayDashboardButton" />
+
+        <ImageView
+            android:id="@+id/IVProfile"
+            android:layout_width="123dp"
+            android:layout_height="128dp"
+            android:layout_marginTop="5dp"
+            app:layout_constraintStart_toStartOf="@+id/TVNameHomePage"
+            app:layout_constraintTop_toBottomOf="@+id/TVNameHomePage"
+            app:srcCompat="@drawable/profile_pic_circle" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <FrameLayout

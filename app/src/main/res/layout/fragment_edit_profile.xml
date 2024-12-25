@@ -5,7 +5,19 @@
     android:id="@+id/EditProfileCL"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:backgroundTint="#00FFFFFF"
     tools:context=".EditProfileFragment">
+
+    <ImageButton
+        android:id="@+id/BtnChangeProfile"
+        android:layout_width="74dp"
+        android:layout_height="71dp"
+        android:backgroundTint="#00FFFFFF"
+        android:contentDescription="button"
+        android:tint="#EFA586"
+        app:layout_constraintBottom_toBottomOf="@+id/IVProfileEdit"
+        app:layout_constraintStart_toEndOf="@+id/IVProfileEdit"
+        app:srcCompat="@drawable/baseline_photo_24" />
 
     <TextView
         android:id="@+id/TVWeight"
@@ -39,7 +51,7 @@
         android:text="Username"
         android:textSize="20sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/IVProfile2" />
+        app:layout_constraintTop_toBottomOf="@+id/IVProfileEdit" />
 
     <TextView
         android:id="@+id/TVAge"
@@ -64,7 +76,7 @@
         app:layout_constraintTop_toBottomOf="@+id/TVAge" />
 
     <ImageView
-        android:id="@+id/IVProfile2"
+        android:id="@+id/IVProfileEdit"
         android:layout_width="172dp"
         android:layout_height="172dp"
         android:layout_marginTop="20dp"

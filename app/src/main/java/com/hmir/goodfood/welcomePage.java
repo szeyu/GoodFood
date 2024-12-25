@@ -159,6 +159,12 @@ public class welcomePage extends AppCompatActivity {
             editor.putString("Height", height);
             editor.putString("Weight", weight);
             editor.putString("DietTypes", selectedDietTypes.toString());
+
+            // Initialize ProfilePictureUri if it doesn't exist
+            if (!sharedPreferences.contains("ProfilePictureUri")) {
+                editor.putString("ProfilePictureUri", null); // Use null or set a default profile picture URI
+            }
+
             editor.apply();
 
             // Save data to FireStore
@@ -172,6 +178,11 @@ public class welcomePage extends AppCompatActivity {
             newUserMapping.put("health_labels", health_labels);
             newUserMapping.put("favourite_recipes", null);
             newUserMapping.put("nutritional_records", null);
+
+            //
+            // Add profile picture URI to Firestore
+            String profilePicUri = sharedPreferences.getString("ProfilePictureUri", null);
+            newUserMapping.put("profile_picture_uri", profilePicUri);  // Add the profile picture URI
 
             newUser.addNewUser(newUserMapping);
 
