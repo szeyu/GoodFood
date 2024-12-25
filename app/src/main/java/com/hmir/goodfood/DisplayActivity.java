@@ -10,7 +10,12 @@ import androidx.appcompat.widget.Toolbar;
 
 public class DisplayActivity extends AppCompatActivity {
 
-    private TextView foodNameTextView, fatTextView, caloriesTextView, proteinTextView, descriptionTextView, ingredientsTextView;
+    private TextView foodNameTextView;
+    private TextView fatTextView;
+    private TextView caloriesTextView;
+    private TextView proteinTextView;
+    private TextView descriptionTextView;
+    private TextView ingredientsTextView;
     private ImageView foodImageView;
     private com.hmir.goodfood.DatabaseHelper dbHelper;
 

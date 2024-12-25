@@ -51,7 +51,8 @@ public class ResultAdapter extends RecyclerView.Adapter<ResultAdapter.ResultView
     }
 
     class ResultViewHolder extends RecyclerView.ViewHolder {
-        TextView itemTitle, itemDescription;
+        TextView itemTitle;
+        TextView itemDescription;
         ImageView itemImage;
 
         public ResultViewHolder(View itemView) {
