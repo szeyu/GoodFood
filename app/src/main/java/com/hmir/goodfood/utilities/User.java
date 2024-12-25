@@ -10,7 +10,6 @@ import java.util.List;
 public class User {
     private final static String email = FirebaseAuth.getInstance().getCurrentUser().getEmail();
 //    private final static String email = "test1@gmail.com";
-    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private String username;
     private long age;
     private double height;
