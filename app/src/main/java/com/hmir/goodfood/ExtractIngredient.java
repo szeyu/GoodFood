@@ -5,11 +5,9 @@ import static com.hmir.goodfood.utilities.FileUtil.readBase64FromFile;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Base64;
 import android.util.Log;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -18,24 +16,17 @@ import android.widget.Toast;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.firebase.Timestamp;
 import com.google.gson.Gson;
 import com.hmir.goodfood.callbacks.NutritionCallback;
 import com.hmir.goodfood.models.GeminiApiResponse;
 import com.hmir.goodfood.models.GeminiRequestBody;
 import com.hmir.goodfood.services.GeminiApiService;
-import com.hmir.goodfood.utilities.NetworkUtil;
-import com.hmir.goodfood.utilities.UserHelper;
 
-import org.json.JSONObject;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -213,7 +204,6 @@ public class ExtractIngredient extends AppCompatActivity {
      *
      * @param nutritionData The analyzed nutrition data from image.
      */
-
     private void startCalorieActivity(String nutritionData, String ingredients) {
         Intent intent = new Intent(ExtractIngredient.this, Calories.class);
         intent.putExtra("nutritionData", nutritionData);
@@ -222,6 +212,16 @@ public class ExtractIngredient extends AppCompatActivity {
         startActivity(intent);
     }
 
+    /**
+     * Sets up the button to search for recipes based on the ingredients displayed in the provided TextView.
+     *
+     * This method initializes the ImageButton for searching recipes and attaches an OnClickListener to it.
+     * When clicked, the button retrieves the text from the provided IngredientTextView and attempts
+     * to search for recipes using the extracted ingredients. If no ingredients are available in the
+     * TextView, a toast message is displayed to inform the user.
+     *
+     * @param IngredientTextView The TextView containing the list of ingredients to be used for recipe search.
+     */
     private void setupSearchRecipeBtn(TextView IngredientTextView) {
         // ImageButton for searching recipes
         ImageButton searchRecipeBtn = findViewById(R.id.searchRecipeBtn);
@@ -236,6 +236,7 @@ public class ExtractIngredient extends AppCompatActivity {
             }
         });
     }
+
     /**
      * Searches for recipes based on the ingredients provided.
      *
@@ -323,12 +324,4 @@ public class ExtractIngredient extends AppCompatActivity {
         }
         return recipes;
     }
-
-    /**
-     * Creates a GeminiRequestBody with the specified prompt.
-     *
-     * @param prompt The prompt to be included in the request.
-     * @return A GeminiRequestBody object containing the prompt.
-     */
-
 }
