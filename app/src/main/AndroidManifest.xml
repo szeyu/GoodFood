@@ -25,6 +25,7 @@
         <!-- Other activities -->
         <activity android:name=".HomePage" android:exported="false" />
         <activity android:name=".LoginPage" android:exported="false" />
+        <activity android:name=".RecipeListActivity" />
         <activity android:name=".ProfilePage" android:exported="false" />
         <activity android:name=".DashboardActivity" android:exported="false" />
         <activity android:name=".ExtractIngredient" android:exported="false" />
@@ -34,6 +35,7 @@
         <activity android:name=".FoodScanner" android:exported="false" />
         <activity android:name=".TipsActivity" android:exported="false" />
         <activity android:name=".WelcomePage" android:exported="false"/>
+        <activity android:name=".RecipeDetailActivity" />
 
         <!-- SplashActivity is now the launcher activity -->
         <activity
