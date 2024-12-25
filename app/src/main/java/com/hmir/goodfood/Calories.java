@@ -17,6 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -25,6 +26,7 @@ import com.hmir.goodfood.utilities.NetworkUtil;
 import com.hmir.goodfood.utilities.NutritionalRecord;
 import com.hmir.goodfood.utilities.UserHelper;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -68,46 +70,20 @@ public class Calories extends AppCompatActivity {
             }
         }
 
-        LinearLayout nutritionContainer = findViewById(R.id.nutritionContainer);
+        setupNutritionContainer(nutritionData);
+        setupSaveRecordBtn(filePath, nutritionData, ingredients);
 
-        if (nutritionContainer != null && !nutritionData.isEmpty()) {
-            try {
-                // Parse the JSON into a NutritionalRecord object
-                JSONObject jsonObject = new JSONObject(nutritionData);
-                NutritionalRecord record = new NutritionalRecord(
-                        null,
-                        jsonObject.optDouble("total_calcium", 0),
-                        jsonObject.optDouble("total_calories", 0),
-                        jsonObject.optDouble("total_carbs", 0),
-                        jsonObject.optDouble("total_cholesterol", 0),
-                        null,
-                        jsonObject.optDouble("total_fat", 0),
-                        null,
-                        null,
-                        jsonObject.optDouble("total_iron", 0),
-                        jsonObject.optDouble("total_potassium", 0),
-                        jsonObject.optDouble("total_protein", 0),
-                        jsonObject.optDouble("total_sodium", 0),
-                        jsonObject.optDouble("total_magnesium", 0)
-                );
+    }
 
-                // Add each nutrient to the container
-                addNutrientCard("Calories", record.getCalories(), "kcal", nutritionContainer);
-                addNutrientCard("Protein", record.getProtein(), "g", nutritionContainer);
-                addNutrientCard("Carbohydrates", record.getCarbs(), "g", nutritionContainer);
-                addNutrientCard("Fat", record.getFat(), "g", nutritionContainer);
-                addNutrientCard("Sodium", record.getSodium(), "mg", nutritionContainer);
-                addNutrientCard("Calcium", record.getCalcium(), "mg", nutritionContainer);
-                addNutrientCard("Iron", record.getIron(), "mg", nutritionContainer);
-                addNutrientCard("Cholesterol", record.getCholesterol(), "mg", nutritionContainer);
-                addNutrientCard("Potassium", record.getPotassium(), "mg", nutritionContainer);
-                addNutrientCard("Magnesium", record.getMagnesium(), "mg", nutritionContainer);
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
+    /**
+     * Configures the save record button to allow users to save a nutritional record.
+     * The method extracts data, validates connectivity, and interacts with {@link UserHelper} to save the record.
+     *
+     * @param filePath      The file path of the meal image.
+     * @param nutritionData The JSON string containing nutritional data.
+     * @param ingredients   The ingredients associated with the meal.
+     */
+    private void setupSaveRecordBtn(String filePath, String nutritionData, String ingredients) {
         FloatingActionButton saveRecordBtn = findViewById(R.id.SaveRecordButton);
         saveRecordBtn.setOnClickListener(view -> {
             UserHelper user = new UserHelper();
@@ -147,7 +123,65 @@ public class Calories extends AppCompatActivity {
             }
 
         });
+    }
 
+    /**
+     * Parses and displays nutritional information from a JSON string.
+     * Dynamically creates nutrient cards for each nutrient and adds them to the layout.
+     *
+     * @param nutritionData The JSON string containing nutritional data.
+     */
+    private void setupNutritionContainer(String nutritionData) {
+        LinearLayout nutritionContainer = findViewById(R.id.nutritionContainer);
+        if (nutritionContainer != null && !nutritionData.isEmpty()) {
+            try {
+                // Parse the JSON into a NutritionalRecord object
+                NutritionalRecord record = getNutritionalRecord(nutritionData);
+
+                // Add each nutrient to the container
+                addNutrientCard("Calories", record.getCalories(), "kcal", nutritionContainer);
+                addNutrientCard("Protein", record.getProtein(), "g", nutritionContainer);
+                addNutrientCard("Carbohydrates", record.getCarbs(), "g", nutritionContainer);
+                addNutrientCard("Fat", record.getFat(), "g", nutritionContainer);
+                addNutrientCard("Sodium", record.getSodium(), "mg", nutritionContainer);
+                addNutrientCard("Calcium", record.getCalcium(), "mg", nutritionContainer);
+                addNutrientCard("Iron", record.getIron(), "mg", nutritionContainer);
+                addNutrientCard("Cholesterol", record.getCholesterol(), "mg", nutritionContainer);
+                addNutrientCard("Potassium", record.getPotassium(), "mg", nutritionContainer);
+                addNutrientCard("Magnesium", record.getMagnesium(), "mg", nutritionContainer);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * Parses nutritional data from a JSON string into a {@link NutritionalRecord}.
+     *
+     * @param nutritionData The JSON string containing nutritional data.
+     * @return A {@link NutritionalRecord} object containing the parsed data.
+     * @throws JSONException If the JSON data is invalid or cannot be parsed.
+     */
+    private static @NonNull NutritionalRecord getNutritionalRecord(String nutritionData) throws JSONException {
+        JSONObject jsonObject = new JSONObject(nutritionData);
+        NutritionalRecord record = new NutritionalRecord(
+                null,
+                jsonObject.optDouble("total_calcium", 0),
+                jsonObject.optDouble("total_calories", 0),
+                jsonObject.optDouble("total_carbs", 0),
+                jsonObject.optDouble("total_cholesterol", 0),
+                null,
+                jsonObject.optDouble("total_fat", 0),
+                null,
+                null,
+                jsonObject.optDouble("total_iron", 0),
+                jsonObject.optDouble("total_potassium", 0),
+                jsonObject.optDouble("total_protein", 0),
+                jsonObject.optDouble("total_sodium", 0),
+                jsonObject.optDouble("total_magnesium", 0)
+        );
+        return record;
     }
 
     /**
