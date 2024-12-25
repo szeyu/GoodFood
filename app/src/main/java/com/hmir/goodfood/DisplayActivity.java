@@ -8,6 +8,16 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+/**
+ * Activity for displaying detailed information about a food item.
+ * Shows comprehensive information including food name, image, nutritional content
+ * (fat, calories, protein), description, and ingredients.
+ * Integrates with local database for data retrieval and supports navigation
+ * through the toolbar.
+ *
+ * @see AppCompatActivity
+ * @see DatabaseHelper
+ */
 public class DisplayActivity extends AppCompatActivity {
 
     private TextView foodNameTextView;

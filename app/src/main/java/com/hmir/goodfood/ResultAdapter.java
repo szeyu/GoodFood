@@ -14,6 +14,14 @@ import com.bumptech.glide.Glide;
 
 import java.util.List;
 
+/**
+ * Adapter for displaying food items in a RecyclerView.
+ * Handles the creation and binding of ViewHolders, image loading with Glide,
+ * and proper context management for food item displays.
+ *
+ * @see RecyclerView.Adapter
+ * @see ResultViewHolder
+ */
 public class ResultAdapter extends RecyclerView.Adapter<ResultAdapter.ResultViewHolder> {
     private Context context;
     private List<Item> items;

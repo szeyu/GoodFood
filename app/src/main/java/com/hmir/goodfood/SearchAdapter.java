@@ -10,6 +10,11 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
+/**
+ * ViewHolder pattern implementation for search results in the RecyclerView.
+ * Holds references to the views that display search result items including
+ * the title and image of food items.
+ */
 public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.SearchViewHolder> {
     private List<Item> itemList; // Use a list of Item objects
     private OnItemClickListener listener;

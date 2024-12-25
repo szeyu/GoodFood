@@ -16,6 +16,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Manages favorite recipes in the GoodFood application.
+ * This class handles CRUD operations for favorite recipes in Firebase Firestore,
+ * including storing nutritional information, ingredients, and recipe details.
+ * Implements defensive copying for mutable collections and proper null handling.
+ *
+ * @see FirebaseFirestore
+ */
 public class FavouriteRecipe {
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private String recipe_id;
@@ -58,7 +66,13 @@ public class FavouriteRecipe {
         this.sodium = sodium;
     }
 
-    // Fetch favourite recipe and return a Task of FavouriteRecipe
+    /**
+     * Fetches a favorite recipe from Firestore by its ID.
+     *
+     * @param recipe_id The unique identifier of the recipe to fetch
+     * @return A Task containing the FavouriteRecipe if found
+     * @throws Exception if the recipe is not found or if the fetch operation fails
+     */
     public Task<FavouriteRecipe> fetchFavouriteRecipe(String recipe_id) {
         return db.collection("favourite_recipes")
                 .document(recipe_id)
