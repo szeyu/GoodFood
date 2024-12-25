@@ -1,12 +1,7 @@
 package com.hmir.goodfood;
 
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,30 +13,19 @@ import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
-import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.github.mikephil.charting.charts.BarChart;
-import com.github.mikephil.charting.components.XAxis;
-import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
-import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
-import com.github.mikephil.charting.utils.ColorTemplate;
-import com.hmir.goodfood.R;
-import com.hmir.goodfood.utilities.Nutrient;
 import com.hmir.goodfood.utilities.NutritionalRecord;
-import com.hmir.goodfood.utilities.NutritionalRecordHelper;
-import com.hmir.goodfood.utilities.RoundedBarChart;
 import com.hmir.goodfood.utilities.UserHelper;
 
 import java.text.SimpleDateFormat;
@@ -64,13 +48,12 @@ public class TodayFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_today, container, false);
-        Toast.makeText(getContext(), "TodayFragment onCreateView Called and xml file shown", Toast.LENGTH_SHORT).show();
 
-        tvCalorieIntake = view.findViewById(R.id.tv_calorie_intake);
-        progressCalorieIntake = view.findViewById(R.id.todayProgressBar);
+        tvCalorieIntake = view.findViewById(R.id.HOMEtv_calorie_intake);
+        progressCalorieIntake = view.findViewById(R.id.HOMEtodayProgressBar);
         barChartNutrition = view.findViewById(R.id.todayBarChart);
         rvMealsHistory = view.findViewById(R.id.rv_meals_history);
-        exceedImageView = view.findViewById(R.id.dizzyface);
+        exceedImageView = view.findViewById(R.id.HOMEdizzyface);
 
         rvMealsHistory.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
 
@@ -143,11 +126,6 @@ public class TodayFragment extends Fragment {
 
     private void updateCalorieIntake(double totalCalories) {
         setupProgressBar();
-        // Save the totalCalories in SharedPreferences
-        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("CaloriePrefs", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putFloat("totalCalories", (float) totalCalories);
-        editor.apply();
 
         // Check if totalCalories exceeds 1000 and adjust the progress bar and percentage text accordingly
         int progress;
@@ -169,8 +147,8 @@ public class TodayFragment extends Fragment {
     }
 
     private void setupProgressBar() {
-        progressCalorieIntake = getView().findViewById(R.id.todayProgressBar);
-        caloriePercentageText = getView().findViewById(R.id.percentage_cal);
+        progressCalorieIntake = getView().findViewById(R.id.HOMEtodayProgressBar);
+        caloriePercentageText = getView().findViewById(R.id.HOMEpercentage_cal);
     }
 
     private void updateNutritionChart(float protein, float carbs, float fat, float sodium, float iron, float calcium, float cholesterol, float magnesium, float potassium) {

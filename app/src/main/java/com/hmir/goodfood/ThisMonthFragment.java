@@ -1,51 +1,36 @@
 package com.hmir.goodfood;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
-import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.github.mikephil.charting.charts.BarChart;
-import com.github.mikephil.charting.components.XAxis;
-import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
-import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
-import com.hmir.goodfood.utilities.Meal;
-import com.hmir.goodfood.utilities.Nutrient;
 import com.hmir.goodfood.utilities.NutritionalRecord;
-import com.hmir.goodfood.utilities.RoundedBarChart;
 import com.hmir.goodfood.utilities.UserHelper;
 
 import java.text.SimpleDateFormat;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -66,11 +51,10 @@ public class ThisMonthFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_this_month, container, false);
-        Toast.makeText(getContext(), "ThisMonthFragment onCreateView Called and xml file shown", Toast.LENGTH_SHORT).show();
 
         tvMonthlyCalorieIntake = view.findViewById(R.id.tv_Monthly_calorie_intake);
         MonthlyprogressCalorieIntake = view.findViewById(R.id.thisMonthProgressBar);
-        MonthlyBarChart = view.findViewById(R.id.thisMonthBarChart);
+        MonthlyBarChart = view.findViewById(R.id.HOMEthisMonthBarChart);
         rvMonthlyMealsHistory = view.findViewById(R.id.thisMonth_rv_meals_history);
         MonthlyAvgcalorie = view.findViewById(R.id.thisMonthavg_cal);
         exceedMonthlyCalorieImg = view.findViewById(R.id.exceedMonthCalorie);

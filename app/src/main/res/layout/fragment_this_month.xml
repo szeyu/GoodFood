@@ -140,7 +140,7 @@
             </LinearLayout>
 
             <com.github.mikephil.charting.charts.BarChart
-                android:id="@+id/thisMonthBarChart"
+                android:id="@+id/HOMEthisMonthBarChart"
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
                 android:layout_centerInParent="true"

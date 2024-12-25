@@ -18,7 +18,7 @@
             android:orientation="vertical" >
 
             <TextView
-                android:id="@+id/todayCalorieIntakeText"
+                android:id="@+id/HOMEtodayCalorieIntakeText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
@@ -37,7 +37,7 @@
                 android:layout_height="110dp">
 
                 <ProgressBar
-                    android:id="@+id/todayProgressBar"
+                    android:id="@+id/HOMEtodayProgressBar"
                     style="@android:style/Widget.ProgressBar.Horizontal"
                     android:layout_width="253dp"
                     android:layout_height="52dp"
@@ -51,7 +51,7 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
-                    android:id="@+id/tv_calorie_intake"
+                    android:id="@+id/HOMEtv_calorie_intake"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="28dp"
@@ -62,10 +62,10 @@
                     android:textSize="16sp"
                     android:visibility="visible"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/todayProgressBar" />
+                    app:layout_constraintTop_toBottomOf="@+id/HOMEtodayProgressBar" />
 
                 <TextView
-                    android:id="@+id/percentage_cal"
+                    android:id="@+id/HOMEpercentage_cal"
                     android:layout_width="92dp"
                     android:layout_height="58dp"
                     android:layout_marginTop="16dp"
@@ -77,7 +77,7 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <ImageView
-                    android:id="@+id/dizzyface"
+                    android:id="@+id/HOMEdizzyface"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="24dp"

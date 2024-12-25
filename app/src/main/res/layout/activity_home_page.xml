@@ -62,8 +62,8 @@
         android:id="@+id/imageView5"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="108dp"
-        android:layout_marginEnd="204dp"
+        android:layout_marginTop="104dp"
+        android:layout_marginEnd="192dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/header"
         app:srcCompat="@drawable/goodevening" />
@@ -72,31 +72,167 @@
         android:id="@+id/imageView6"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
+        android:layout_marginStart="28dp"
         android:layout_marginTop="12dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageView5"
         app:srcCompat="@drawable/dashboard" />
 
-    <ImageView
-        android:id="@+id/todayDashboardButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="112dp"
-        android:layout_marginEnd="24dp"
+    <androidx.cardview.widget.CardView
+        android:id="@+id/customCard"
+        android:layout_width="348dp"
+        android:layout_height="153dp"
+        android:clickable="true"
+        android:focusable="true"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="6dp"
+        app:layout_constraintBottom_toTopOf="@+id/customCard2"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/header"
-        app:srcCompat="@drawable/arrow" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageView6">
 
-    <ImageView
-        android:id="@+id/thisMonthDashboardButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="144dp"
-        android:layout_marginEnd="24dp"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="157dp"
+            android:padding="8dp">
+
+            <ProgressBar
+                android:id="@+id/HOMEtodayProgressBar"
+                style="@android:style/Widget.ProgressBar.Horizontal"
+                android:layout_width="226dp"
+                android:layout_height="45dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="48dp"
+                android:max="100"
+                android:progress="0"
+                android:progressDrawable="@drawable/progress_bar_drawable"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/HOMEtv_calorie_intake"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:fontFamily="@font/poppins_semibold_regular"
+                android:text="0/1000 cal"
+                android:textColor="@android:color/black"
+                android:textSize="16sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/HOMEtodayProgressBar" />
+
+            <TextView
+                android:id="@+id/HOMEpercentage_cal"
+                android:layout_width="58dp"
+                android:layout_height="40dp"
+                android:layout_marginTop="52dp"
+                android:layout_marginEnd="20dp"
+                android:fontFamily="@font/poppins_extrabold"
+                android:text="0%"
+                android:textSize="30sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/HOMEdizzyface"
+                android:layout_width="69dp"
+                android:layout_height="64dp"
+                android:layout_marginTop="44dp"
+                android:layout_marginEnd="20dp"
+                android:src="@drawable/dizzyface"
+                android:visibility="visible"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/HOMEtodayCalorieIntakeText"
+                android:layout_width="197dp"
+                android:layout_height="46dp"
+                android:layout_marginStart="8dp"
+                android:fontFamily="@font/poppins_medium_regular"
+                android:padding="8dp"
+                android:text="Calorie Today"
+                android:textColor="@color/black"
+                android:textSize="21sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageButton
+                android:id="@+id/todayDashboardButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="20dp"
+                android:background="@null"
+                android:onClick="toTodayStats"
+                android:text="today"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/arrow" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/customCard2"
+        android:layout_width="348dp"
+        android:layout_height="249dp"
+        android:clickable="true"
+        android:focusable="true"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="6dp"
+        app:layout_constraintBottom_toTopOf="@+id/fragmentContainerView3"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/todayDashboardButton"
-        app:srcCompat="@drawable/arrow" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/customCard">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="249dp"
+            android:padding="8dp">
+
+
+            <ImageButton
+                android:id="@+id/thisMonthDashboardButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="24dp"
+                android:background="@null"
+                android:onClick="toThisMonthStats"
+                android:text="thisMonth"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/arrow" />
+
+            <com.github.mikephil.charting.charts.BarChart
+                android:id="@+id/HOMEthisMonthBarChart"
+                android:layout_width="299dp"
+                android:layout_height="159dp"
+                android:layout_centerInParent="true"
+                android:layout_marginTop="48dp"
+                android:layout_marginEnd="16dp"
+                android:background="@drawable/rounded_border"
+                android:padding="16dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/thisMonthNutrientIntakeText"
+                android:layout_width="231dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="8dp"
+                android:fontFamily="@font/poppins_medium_regular"
+                android:padding="8dp"
+                android:text="Nutrients This Month"
+                android:textColor="@color/black"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

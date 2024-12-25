@@ -6,7 +6,7 @@
     android:layout_height="wrap_content">
 
     <ProgressBar
-        android:id="@+id/todayProgressBar"
+        android:id="@+id/HOMEtodayProgressBar"
         style="@android:style/Widget.ProgressBar.Horizontal"
         android:layout_width="253dp"
         android:layout_height="52dp"
@@ -18,7 +18,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/tv_calorie_intake"
+        android:id="@+id/HOMEtv_calorie_intake"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -28,20 +28,20 @@
         android:textColor="@android:color/black"
         android:textSize="16sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/todayProgressBar" />
+        app:layout_constraintTop_toBottomOf="@+id/HOMEtodayProgressBar" />
 
     <TextView
-        android:id="@+id/percentage_cal"
+        android:id="@+id/HOMEpercentage_cal"
         android:layout_width="92dp"
         android:layout_height="58dp"
         android:fontFamily="@font/poppins_extrabold"
         android:text="0%"
         android:textSize="40sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/todayProgressBar" />
+        app:layout_constraintTop_toTopOf="@+id/HOMEtodayProgressBar" />
 
     <ImageView
-        android:id="@+id/dizzyface"
+        android:id="@+id/HOMEdizzyface"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
