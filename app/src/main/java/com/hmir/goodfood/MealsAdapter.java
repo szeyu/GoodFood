@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.hmir.goodfood.R;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MealsAdapter extends RecyclerView.Adapter<MealsAdapter.MealsViewHolder> {
@@ -18,7 +19,8 @@ public class MealsAdapter extends RecyclerView.Adapter<MealsAdapter.MealsViewHol
 
     // Constructor to initialize the list of meal images
     public MealsAdapter(List<String> mealImages) {
-        this.mealImages = mealImages;
+        // Defensive copy to prevent external modification
+        this.mealImages = new ArrayList<>(mealImages);
     }
 
     @NonNull
