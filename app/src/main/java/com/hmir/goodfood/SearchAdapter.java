@@ -1,6 +1,7 @@
 package com.hmir.goodfood;
 
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +16,7 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
     private OnItemClickListener listener;
 
     public interface OnItemClickListener {
-        void onItemClick(int id); // Pass item ID on click
+        void onItemClick(String recipeRef); // Pass recipeRef as String on click
     }
 
     public void setOnItemClickListener(OnItemClickListener listener) {
@@ -39,39 +40,20 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
         Item item = itemList.get(position);
 
         // Retrieve item details
-        int id = item.getId();
-        String name = item.getName();
-        String imageResourceName = item.getImageResourceName();
-        String fatContent = item.getFatContent();
-        String calories = item.getCalories();
-        String proteinContent = item.getProteinContent();
-        String description = item.getDescription();
-        String ingredients = item.getIngredients();
+        String name = item.getName();  // Only name is required for search results
+        String recipeRef = item.getRecipeId();  // Use recipeRef, which is a String
+        Log.d("SearchAdapter", "Binding recipeRef: " + recipeRef);
 
         // Set item name in the title TextView
         holder.title.setText(name);
 
-        // Get the image resource ID
-        int imageResId = item.getImageResId(holder.itemView.getContext()); // Pass context here
-
-        // Set image to an ImageView (Assuming you have an ImageView in your item_layout)
-        holder.image.setImageResource(imageResId);
-
-        // Set click listener to pass more data via Intent
+        // Set click listener to pass the recipeRef to DisplayActivity
         holder.itemView.setOnClickListener(v -> {
             Intent intent = new Intent(v.getContext(), DisplayActivity.class);
-            intent.putExtra("food_name", name);
-            intent.putExtra("food_id", id);
-            intent.putExtra("food_image", imageResourceName); // You may want to pass the image name or resource ID
-            intent.putExtra("food_fat", fatContent);
-            intent.putExtra("food_calories", calories);
-            intent.putExtra("food_protein", proteinContent);
-            intent.putExtra("food_description", description);
-            intent.putExtra("food_ingredients", ingredients);
+            intent.putExtra("recipe_id", recipeRef);  // Pass only the recipeRef
             v.getContext().startActivity(intent);
         });
     }
-
 
     @Override
     public int getItemCount() {
@@ -80,12 +62,11 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public TextView title;
-        public ImageView image; // Add ImageView to hold the image
 
         public ViewHolder(View itemView) {
             super(itemView);
-            title = itemView.findViewById(R.id.item_title);
-            image = itemView.findViewById(R.id.item_image); // Initialize ImageView
+            title = itemView.findViewById(R.id.item_title); // Initialize TextView
         }
     }
 }
+

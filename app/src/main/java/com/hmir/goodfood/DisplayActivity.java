@@ -2,75 +2,111 @@ package com.hmir.goodfood;
 
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.hmir.goodfood.utilities.FavouriteRecipeHelper;
+
 public class DisplayActivity extends AppCompatActivity {
 
-    private TextView foodNameTextView, fatTextView, caloriesTextView, proteinTextView, descriptionTextView, ingredientsTextView;
-    private ImageView foodImageView;
-    private com.hmir.goodfood.DatabaseHelper dbHelper;
+    private TextView recipeNameTextView, recipeIngredientsTextView, recipeStepsTextView;
+    private FirebaseFirestore db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_display); // Ensure this layout is correct
 
-        // Set up the toolbar
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
         // Initialize the views
-        foodNameTextView = findViewById(R.id.foodNameTextView);
-        foodImageView = findViewById(R.id.foodImageView);
-        fatTextView = findViewById(R.id.fatTextView);
-        caloriesTextView = findViewById(R.id.caloriesTextView);
-        proteinTextView = findViewById(R.id.proteinTextView);
-        descriptionTextView = findViewById(R.id.descriptionTextView);
-        ingredientsTextView = findViewById(R.id.ingredientsTextView);
+        recipeNameTextView = findViewById(R.id.recipeName);
+        recipeIngredientsTextView = findViewById(R.id.recipeIngredients);
+        recipeStepsTextView = findViewById(R.id.recipeSteps);
 
-        // Initialize DatabaseHelper
-        dbHelper = new DatabaseHelper(this);
+        // Initialize Firebase Firestore
+        db = FirebaseFirestore.getInstance();
 
-        // Retrieve the item data from the Intent
-        int foodId = getIntent().getIntExtra("food_id", -1);
-        String foodName = getIntent().getStringExtra("food_name");
-        String foodImage = getIntent().getStringExtra("food_image");
+        // Retrieve the recipe ID from the Intent
+        String recipeId = getIntent().getStringExtra("recipe_id");
+        Log.d("DisplayActivity", "Received recipe_id: " + recipeId);
 
-        Log.d("DisplayActivity", "Received Food ID: " + foodId);
-        Log.d("DisplayActivity", "Received Food Name: " + foodName);
-        Log.d("DisplayActivity", "Received Food Image: " + foodImage);
-
-        if (foodId != -1) {
-            // Fetch the item details from the database by foodId
-            Item item = dbHelper.getItemById(foodId); // Use foodId here directly
-
-            if (item != null) {
-                // Set the data to the views from the Item object
-                foodNameTextView.setText(item.getName());
-
-                // Dynamically load image (with Glide if needed)
-                String imageName = item.getImageResourceName();
-                int imageResourceId = getResources().getIdentifier(imageName, "drawable", getPackageName());
-                if (imageResourceId != 0) {
-                    foodImageView.setImageResource(imageResourceId);
-                } else {
-                    foodImageView.setImageResource(R.drawable.eating_healthy_food_cuate_1); // Default image
-                }
-
-                fatTextView.setText(item.getFatContent());
-                caloriesTextView.setText(item.getCalories());
-                proteinTextView.setText(item.getProteinContent());
-                descriptionTextView.setText(item.getDescription());
-                ingredientsTextView.setText(item.getIngredients());
-            } else {
-                Log.d("DisplayActivity", "Item not found in database");
-            }
+        if (recipeId != null) {
+            // Fetch the recipe details from Firebase
+            fetchRecipeDetails(recipeId);
+        } else {
+            Log.e("DisplayActivity", "No recipe ID provided");
+            Toast.makeText(this, "Error: No recipe ID provided", Toast.LENGTH_SHORT).show();
         }
+
+
+        FloatingActionButton fabDelete = findViewById(R.id.fab_delete);
+        fabDelete.setOnClickListener(v -> {
+            // Get the user's email
+            String userEmail = FirebaseAuth.getInstance().getCurrentUser().getEmail();
+
+            if (userEmail != null) {
+                // Call method to delete the recipe using FavouriteRecipeHelper
+                FavouriteRecipeHelper favouriteRecipeHelper = new FavouriteRecipeHelper();
+                favouriteRecipeHelper.deleteFavouriteRecipe(recipeId, userEmail, new FavouriteRecipeHelper.OnRecipeDeletedCallback() {
+                    @Override
+                    public void onRecipeDeleted() {
+                        Toast.makeText(DisplayActivity.this, "Recipe deleted", Toast.LENGTH_SHORT).show();
+                        finish();  // Close the activity after deletion
+                    }
+
+                    @Override
+                    public void onError(Exception e) {
+                        Toast.makeText(DisplayActivity.this, "Error deleting recipe", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            } else {
+                Toast.makeText(DisplayActivity.this, "User not authenticated", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+        private void fetchRecipeDetails(String recipeId) {
+        // Ensure the recipeId is valid
+        if (recipeId == null || recipeId.isEmpty()) {
+            Log.e("DisplayActivity", "Invalid recipe ID");
+            Toast.makeText(this, "Error: Invalid recipe ID", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Fetch the recipe document from the 'favourite_recipes' collection using the recipeId
+        db.collection("favourite_recipes")
+                .document(recipeId)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        // Get the recipe data from the document
+                        Item item = documentSnapshot.toObject(Item.class);  // Use the correct class (Item)
+
+                        if (item != null) {
+                            // Set the data to the views
+                            recipeNameTextView.setText(item.getName());
+                            recipeIngredientsTextView.setText(String.join("\n", item.getIngredients()));
+                            recipeStepsTextView.setText(String.join("\n", item.getSteps()));
+
+                            // You can set an image here if you have a way to associate images with recipes
+                            // For example, if you store image URLs in Firestore:
+                            // Glide.with(this).load(item.getImageUrl()).into(foodImageView);
+                        }
+                    } else {
+                        Log.d("DisplayActivity", "Recipe not found");
+                        Toast.makeText(this, "Recipe not found", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("DisplayActivity", "Error fetching recipe details", e);
+                    Toast.makeText(this, "Error fetching recipe details", Toast.LENGTH_SHORT).show();
+                });
     }
 
     @Override

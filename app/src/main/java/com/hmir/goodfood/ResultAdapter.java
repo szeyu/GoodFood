@@ -1,15 +1,13 @@
 package com.hmir.goodfood;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.bumptech.glide.Glide;
 
 import java.util.List;
 
@@ -31,19 +29,14 @@ public class ResultAdapter extends RecyclerView.Adapter<ResultAdapter.ResultView
     @Override
     public void onBindViewHolder(ResultViewHolder holder, int position) {
         Item item = items.get(position);
-        holder.itemTitle.setText(item.getName());
-        holder.itemDescription.setText(item.getDescription());
+        holder.itemTitle.setText(item.getName());  // Display only name
 
-        // Use Glide to load images
-        int imageResourceId = context.getResources().getIdentifier(item.getImageResourceName(), "drawable", context.getPackageName());
-        if (imageResourceId != 0) {
-            Glide.with(context).load(imageResourceId).into(holder.itemImage);
-        } else {
-            holder.itemImage.setImageResource(R.drawable.food_image_placeholder);  // Fallback image
-        }
-
+        holder.itemView.setOnClickListener(v -> {
+            Intent intent = new Intent(v.getContext(), DisplayActivity.class);
+            intent.putExtra("recipe_id", item.getRecipeId());  // Pass the recipe reference ID for fetching full details
+            v.getContext().startActivity(intent);
+        });
     }
-
 
     @Override
     public int getItemCount() {
@@ -51,14 +44,11 @@ public class ResultAdapter extends RecyclerView.Adapter<ResultAdapter.ResultView
     }
 
     class ResultViewHolder extends RecyclerView.ViewHolder {
-        TextView itemTitle, itemDescription;
-        ImageView itemImage;
+        TextView itemTitle;
 
         public ResultViewHolder(View itemView) {
             super(itemView);
             itemTitle = itemView.findViewById(R.id.item_title);
-            itemDescription = itemView.findViewById(R.id.item_description);
-            itemImage = itemView.findViewById(R.id.item_image);
         }
     }
 }
