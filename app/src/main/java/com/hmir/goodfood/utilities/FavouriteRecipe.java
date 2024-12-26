@@ -11,15 +11,24 @@ import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Manages favorite recipes in the GoodFood application.
+ * This class handles CRUD operations for favorite recipes in Firebase Firestore,
+ * including storing nutritional information, ingredients, and recipe details.
+ * Implements defensive copying for mutable collections and proper null handling.
+ *
+ * @see FirebaseFirestore
+ */
 public class FavouriteRecipe {
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private String recipe_id;
     private String name;
-    private List<String> diet_labels;
+    private List<String> diet_labels = new ArrayList<>();
     private int servings;
     private double calories;
     private double protein;
@@ -45,7 +54,7 @@ public class FavouriteRecipe {
         this.calories = calories;
         this.carbs = carbs;
         this.cholesterol = cholesterol;
-        this.diet_labels = diet_labels;
+        this.diet_labels = diet_labels != null ? new ArrayList<>(diet_labels) : new ArrayList<>();
         this.fat = fat;
         this.image = image;
         this.iron = iron;
@@ -57,7 +66,13 @@ public class FavouriteRecipe {
         this.sodium = sodium;
     }
 
-    // Fetch favourite recipe and return a Task of FavouriteRecipe
+    /**
+     * Fetches a favorite recipe from Firestore by its ID.
+     *
+     * @param recipe_id The unique identifier of the recipe to fetch
+     * @return A Task containing the FavouriteRecipe if found
+     * @throws Exception if the recipe is not found or if the fetch operation fails
+     */
     public Task<FavouriteRecipe> fetchFavouriteRecipe(String recipe_id) {
         return db.collection("favourite_recipes")
                 .document(recipe_id)
@@ -135,6 +150,10 @@ public class FavouriteRecipe {
     public void updateFavouriteRecipe(double calcium, double calories, double carbs, String name, double cholesterol, double magnesium,
                                       double fat, DocumentReference image, List<String> diet_labels, double iron, long servings,
                                       double potassium, double protein, double sodium) {
+        // Create defensive copy of diet_labels
+        List<String> safeDietLabels = diet_labels != null ?
+                new ArrayList<>(diet_labels) : new ArrayList<>();
+
         Map<String, Object> recipeUpdates = Map.ofEntries(
                 Map.entry("calcium", calcium),
                 Map.entry("calories", calories),
@@ -144,7 +163,7 @@ public class FavouriteRecipe {
                 Map.entry("name", name),
                 Map.entry("fat", fat),
                 Map.entry("image", image),
-                Map.entry("diet_labels", diet_labels),
+                Map.entry("diet_labels", safeDietLabels),
                 Map.entry("servings", servings),
                 Map.entry("iron", iron),
                 Map.entry("potassium", potassium),
@@ -208,11 +227,11 @@ public class FavouriteRecipe {
     }
 
     public List<String> getDiet_labels() {
-        return diet_labels;
+        return new ArrayList<>(diet_labels);
     }
 
     public void setDiet_labels(List<String> diet_labels) {
-        this.diet_labels = diet_labels;
+        this.diet_labels = diet_labels != null ? new ArrayList<>(diet_labels) : new ArrayList<>();
     }
 
     public double getFat() {
@@ -290,6 +309,7 @@ public class FavouriteRecipe {
     @SuppressLint("DefaultLocale")
     @Override
     public String toString() {
+        List<String> safeDietLabels = new ArrayList<>(diet_labels);
         return String.format(
                 "FavouriteRecipe { " +
                         "recipe_id='%s', name='%s', diet_labels='%s', calories=%.2f, " +
@@ -297,7 +317,7 @@ public class FavouriteRecipe {
                         "iron=%.2f, cholesterol=%.2f, potassium=%.2f, magnesium=%.2f, servings=%d, image='%s' }",
                 recipe_id,
                 name,
-                diet_labels,
+                safeDietLabels,
                 calories,
                 protein,
                 carbs,

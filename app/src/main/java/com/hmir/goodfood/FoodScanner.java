@@ -48,6 +48,9 @@ public class FoodScanner extends AppCompatActivity {
     private static final String GEMINI_API_KEY = BuildConfig.GEMINI_API_KEY;
     private static final String GEMINI_API_BASE_URL = "https://generativelanguage.googleapis.com/";
 
+    private static final int MAX_RETRIES = 3;
+    private int retryCount = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,17 +66,26 @@ public class FoodScanner extends AppCompatActivity {
 
         ImageButton ExtractIngredientButton = findViewById(R.id.ExtractIngredientButton);
         ExtractIngredientButton.setOnClickListener(v -> extractIngredient(cameraView));
-
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        if (requestCode == REQUEST_CODE && resultCode == RESULT_OK) {
-            Bitmap photo = (Bitmap) data.getExtras().get("data");
-            cameraView.setImageBitmap(photo);
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == REQUEST_CODE && resultCode == RESULT_OK && data != null) {
+            Bundle extras = data.getExtras();
+            if (extras != null) {
+                Bitmap photo = (Bitmap) extras.get("data");
+                if (photo != null) {
+                    cameraView.setImageBitmap(photo);
+                } else {
+                    Toast.makeText(this, "Failed to capture photo", Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                Toast.makeText(this, "No image data received", Toast.LENGTH_SHORT).show();
+            }
         } else {
             Toast.makeText(this, "Cancelled", Toast.LENGTH_SHORT).show();
-            super.onActivityResult(requestCode, resultCode, data);
         }
     }
 
@@ -120,16 +132,34 @@ public class FoodScanner extends AppCompatActivity {
         call.enqueue(new Callback<GeminiApiResponse>() {
             @Override
             public void onResponse(Call<GeminiApiResponse> call, Response<GeminiApiResponse> response) {
-                if (response.isSuccessful() && response.body() != null && !response.body().getCandidates().isEmpty()) {
-                    String ingredients = response.body().getCandidates().get(0).getContent().getParts().get(0).getText();
-                    Log.d("ExtractIngredient", "Response: " + ingredients);
+                if (response.isSuccessful() && response.body() != null) {
+                    List<GeminiApiResponse.Candidate> candidates = response.body().getCandidates();
+                    if (candidates != null && !candidates.isEmpty()) {
+                        String ingredients = candidates.get(0).getContent().getParts().get(0).getText();
+                        Log.d("ExtractIngredient", "Response: " + ingredients);
 
-                    File imageFile = FileUtil.saveBase64ToFile(FoodScanner.this, encodedImage, "temp_image.txt");
+                        File imageFile = FileUtil.saveBase64ToFile(FoodScanner.this, encodedImage, "temp_image.txt");
 
-                    Intent intent = new Intent(FoodScanner.this, ExtractIngredient.class);
-                    intent.putExtra("file_path", imageFile.getAbsolutePath());
-                    intent.putExtra("ingredients", ingredients);
-                    startActivity(intent);
+                        Intent intent = new Intent(FoodScanner.this, ExtractIngredient.class);
+                        intent.putExtra("file_path", imageFile.getAbsolutePath());
+                        intent.putExtra("ingredients", ingredients);
+                        startActivity(intent);
+                    } else {
+                        // Handle the case when no recipe is found
+                        Log.d("ExtractIngredient", "No recipes found.");
+                        Toast.makeText(FoodScanner.this, "No recipe found for the image.", Toast.LENGTH_SHORT).show();
+
+                        // Retry logic if no results are found
+                        if (retryCount < MAX_RETRIES) {
+                            retryCount++;
+                            Log.d("ExtractIngredient", "Retrying... Attempt " + retryCount);
+                            // Retry after a short delay (e.g., 2 seconds)
+                            new android.os.Handler().postDelayed(() -> extractIngredient(cameraView), 2000);
+                        } else {
+                            Log.d("ExtractIngredient", "Failed after " + MAX_RETRIES + " retries.");
+                            Toast.makeText(FoodScanner.this, "Failed to extract ingredients after retries.", Toast.LENGTH_SHORT).show();
+                        }
+                    }
                 } else {
                     Log.d("ExtractIngredient", "Response unsuccessful: " + response.toString());
                     Toast.makeText(FoodScanner.this, "Failed to extract ingredients", Toast.LENGTH_SHORT).show();
