@@ -72,7 +72,15 @@ public class ThisMonthFragment extends Fragment {
                 String currentMonth = new SimpleDateFormat("yyyy-MM", Locale.getDefault()).format(new Date());
 
                 double totalCalories = 0;
-                float totalProtein = 0, totalCarbs = 0, totalFat = 0, totalSodium = 0, totalCalcium = 0, totalCholesterol = 0, totalMagnesium = 0, totalIron = 0, totalPotassium = 0;
+                float totalProtein = 0;
+                float totalCarbs = 0;
+                float totalFat = 0;
+                float totalSodium = 0;
+                float totalCalcium = 0;
+                float totalCholesterol = 0;
+                float totalMagnesium = 0;
+                float totalIron = 0;
+                float totalPotassium = 0;
                 List<String> mealImages = new ArrayList<>();
                 int daysInMonth = 0;
 
