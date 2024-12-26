@@ -6,6 +6,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.hmir.goodfood.utilities.NutritionalRecord;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -29,23 +31,33 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "protein TEXT, " +
                 "description TEXT, " +
                 "ingredients TEXT" +
+                "carbs TEXT, " +
+                "sodium TEXT, " +
+                "calcium TEXT, " +
+                "iron TEXT, " +
+                "cholesterol TEXT, " +
+                "potassium TEXT, " +
+                "magnesium TEXT" +
                 ")";
         db.execSQL(createTable);
 
         // Insert initial data with drawable resource names as image references
-        db.execSQL("INSERT INTO items (name, image, fat, calories, protein, description, ingredients) " +
-                "VALUES ('Burger', 'burger_image', '20g', '300', '15g', 'A delicious burger', 'Bun, Patty, Lettuce')");
-
-        db.execSQL("INSERT INTO items (name, image, fat, calories, protein, description, ingredients) " +
-                "VALUES ('Hamburger', 'hamburger_image', '18g', '280', '12g', 'Classic hamburger', 'Bun, Patty, Pickles')");
-        db.execSQL("INSERT INTO items (name, image, fat, calories, protein, description, ingredients) " +
-                "VALUES ('Cheese Burger', 'cheese_burger_image', '25g', '400', '20g', 'Cheesy and tasty', 'Bun, Patty, Cheese, Lettuce')");
-        db.execSQL("INSERT INTO items (name, image, fat, calories, protein, description, ingredients) " +
-                "VALUES ('Vegetarian Burger', 'veggie_burger_image', '15g', '250', '10g', 'Healthy vegetarian burger', 'Bun, Veggie Patty, Lettuce')");
-        db.execSQL("INSERT INTO items (name, image, fat, calories, protein, description, ingredients) " +
-                "VALUES ('Pizza', 'pizza_image', '30g', '500', '22g', 'Cheesy pizza', 'Dough, Tomato Sauce, Cheese')");
-        db.execSQL("INSERT INTO items (name, image, fat, calories, protein, description, ingredients) " +
-                "VALUES ('Pasta', 'pasta_image', '10g', '350', '8g', 'Italian pasta', 'Pasta, Sauce, Cheese')");
+        db.execSQL("INSERT INTO items (name, calories, protein, carbs, fat, sodium, calcium, iron, cholesterol, potassium, magnesium) " +
+                "VALUES ('Burger', '300', '15g', '40g', '20g', '500mg', '100mg', '2mg', '50mg', '200mg', '50mg')");
+        // Add more records as needed
+//        db.execSQL("INSERT INTO items (name, image, fat, calories, protein, description, ingredients) " +
+//                "VALUES ('Burger', 'burger_image', '20g', '300', '15g', 'A delicious burger', 'Bun, Patty, Lettuce')");
+//
+//        db.execSQL("INSERT INTO items (name, image, fat, calories, protein, description, ingredients) " +
+//                "VALUES ('Hamburger', 'hamburger_image', '18g', '280', '12g', 'Classic hamburger', 'Bun, Patty, Pickles')");
+//        db.execSQL("INSERT INTO items (name, image, fat, calories, protein, description, ingredients) " +
+//                "VALUES ('Cheese Burger', 'cheese_burger_image', '25g', '400', '20g', 'Cheesy and tasty', 'Bun, Patty, Cheese, Lettuce')");
+//        db.execSQL("INSERT INTO items (name, image, fat, calories, protein, description, ingredients) " +
+//                "VALUES ('Vegetarian Burger', 'veggie_burger_image', '15g', '250', '10g', 'Healthy vegetarian burger', 'Bun, Veggie Patty, Lettuce')");
+//        db.execSQL("INSERT INTO items (name, image, fat, calories, protein, description, ingredients) " +
+//                "VALUES ('Pizza', 'pizza_image', '30g', '500', '22g', 'Cheesy pizza', 'Dough, Tomato Sauce, Cheese')");
+//        db.execSQL("INSERT INTO items (name, image, fat, calories, protein, description, ingredients) " +
+//                "VALUES ('Pasta', 'pasta_image', '10g', '350', '8g', 'Italian pasta', 'Pasta, Sauce, Cheese')");
     }
 
     private String getColumnValue(Cursor cursor, String columnName) {
@@ -196,6 +208,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         return items;
     }
+
+
+
+
 
 
 

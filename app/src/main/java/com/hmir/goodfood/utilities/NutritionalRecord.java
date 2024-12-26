@@ -19,10 +19,10 @@ public class NutritionalRecord {
     private double cholesterol;
     private double potassium;
     private double magnesium;
-    private Uri image;
+    private String image;
 
     public NutritionalRecord(String record_id, double calcium, double calories, double carbs,
-                             double cholesterol, Timestamp date_time, double fat, Uri image,
+                             double cholesterol, Timestamp date_time, double fat, String image,
                              String ingredients, double iron, double potassium, double protein,
                              double sodium, double magnesium) {
         this.record_id = record_id;
@@ -111,11 +111,11 @@ public class NutritionalRecord {
         this.fat = fat;
     }
 
-    public Uri getImage() {
+    public String getImage() {
         return image;
     }
 
-    public void setImage(Uri image) {
+    public void setImage(String image) {
         this.image = image;
     }
 
@@ -180,7 +180,7 @@ public class NutritionalRecord {
                 cholesterol,
                 potassium,
                 magnesium,
-                image != null ? image.getPath() : "null"
+                image != null ? image : "null"
         );
     }
 }
