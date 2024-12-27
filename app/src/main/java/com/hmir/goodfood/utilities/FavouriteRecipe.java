@@ -7,14 +7,25 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+
 import java.util.List;
 
+/**
+ * Manages favorite recipes in the GoodFood application.
+ * This class handles CRUD operations for favorite recipes in Firebase Firestore,
+ * including storing nutritional information, ingredients, and recipe details.
+ * Implements defensive copying for mutable collections and proper null handling.
+ *
+ * @see FirebaseFirestore
+ */
 public class FavouriteRecipe {
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private String recipe_id;
     private String name;
+
     private List<String> ingredients;
     private List<String> steps;
+
 
 
     public FavouriteRecipe() {
@@ -22,13 +33,20 @@ public class FavouriteRecipe {
 
     public FavouriteRecipe(String recipe_id, String name, List<String> ingredients, List<String> steps) {
         this.recipe_id = recipe_id;
+
         this.name = name;
         this.ingredients = ingredients;
         this.steps = steps;
 
     }
 
-    // Fetch favourite recipe and return a Task of FavouriteRecipe
+    /**
+     * Fetches a favorite recipe from Firestore by its ID.
+     *
+     * @param recipe_id The unique identifier of the recipe to fetch
+     * @return A Task containing the FavouriteRecipe if found
+     * @throws Exception if the recipe is not found or if the fetch operation fails
+     */
     public Task<FavouriteRecipe> fetchFavouriteRecipe(String recipe_id) {
         return db.collection("favourite_recipes")
                 .document(recipe_id)
@@ -60,7 +78,9 @@ public class FavouriteRecipe {
     }
 
     // Update Recipe Record
+
     public void updateFavouriteRecipe() {
+
         db.collection("favourite_recipes")
                 .document(recipe_id)
                 .update("name", name, "ingredients", ingredients, "steps", steps)
@@ -85,6 +105,7 @@ public class FavouriteRecipe {
     public void setRecipe_id(String recipe_id) {
         this.recipe_id = recipe_id;
     }
+
 
     public String getName() {
         return name;
@@ -114,13 +135,16 @@ public class FavouriteRecipe {
 
     @Override
     public String toString() {
+        List<String> safeDietLabels = new ArrayList<>(diet_labels);
         return String.format(
                 "FavouriteRecipe { " +
                         "recipe_id='%s', name='%s', ingredients='%s', steps='%s', image='%s' }",
                 recipe_id,
                 name,
+
                 ingredients,
                 steps
+
 
         );
     }
