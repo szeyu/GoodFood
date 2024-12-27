@@ -7,10 +7,15 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.List;
 
+/**
+ * Represents a user in the GoodFood application.
+ * This class manages user profile information including personal details,
+ * health preferences, favorite recipes, and nutritional records.
+ * It integrates with Firebase Authentication for user identification.
+ */
 public class User {
     private final static String email = FirebaseAuth.getInstance().getCurrentUser().getEmail();
 //    private final static String email = "test1@gmail.com";
-    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private String username;
     private long age;
     private double height;
