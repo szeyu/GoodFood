@@ -25,7 +25,7 @@
                 android:layout_marginStart="16dp"
                 android:fontFamily="@font/poppins_medium_regular"
                 android:padding="8dp"
-                android:text="@string/calorieIntakeText"
+                android:text="Average Calorie Intake"
                 android:textColor="@color/black"
                 android:textSize="24sp"
                 android:textStyle="bold" />
@@ -36,23 +36,7 @@
                 android:layout_height="110dp">
 
                 <TextView
-                    android:id="@+id/thisMonthAvgCalLabel"
-                    android:layout_width="72dp"
-                    android:layout_height="46dp"
-                    android:layout_marginStart="68dp"
-                    android:fontFamily="@font/poppins_medium_regular"
-                    android:text="cal"
-                    android:textAlignment="textStart"
-                    android:textColor="@android:color/black"
-                    android:textSize="24sp"
-                    android:textStyle="bold"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/thisMonthProgressBar"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="0.343" />
-
-                <TextView
-                    android:id="@+id/thisMonthAvgCalLabel2"
+                    android:id="@+id/avgtext"
                     android:layout_width="93dp"
                     android:layout_height="32dp"
                     android:layout_marginStart="16dp"
@@ -73,20 +57,17 @@
                     android:layout_height="52dp"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="16dp"
-                    android:layout_weight="1"
-                    android:indeterminateDrawable="@android:drawable/progress_indeterminate_horizontal"
                     android:max="100"
-                    android:padding="5dp"
                     android:progress="0"
-                    android:progressDrawable="@drawable/rounded_grey_container"
-                    android:progressTint="@color/red"
+                    android:progressDrawable="@drawable/progress_bar_drawable"
+                    android:visibility="visible"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
-                    android:id="@+id/thisMonthAvgCalText"
-                    android:layout_width="51dp"
-                    android:layout_height="46dp"
+                    android:id="@+id/thisMonthavg_cal"
+                    android:layout_width="97dp"
+                    android:layout_height="33dp"
                     android:layout_marginStart="12dp"
                     android:fontFamily="@font/poppins_medium_regular"
                     android:text="800"
@@ -97,10 +78,10 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/thisMonthProgressBar"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="0.343" />
+                    app:layout_constraintVertical_bias="0.207" />
 
                 <TextView
-                    android:id="@+id/thisMonthCalorieText"
+                    android:id="@+id/tv_Monthly_calorie_intake"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
@@ -112,6 +93,17 @@
                     android:textSize="16sp"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/thisMonthProgressBar" />
+
+                <ImageView
+                    android:id="@+id/exceedMonthCalorie"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="32dp"
+                    android:layout_marginBottom="12dp"
+                    android:src="@drawable/dizzyface"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:visibility="gone"/>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -128,7 +120,7 @@
                     android:layout_marginStart="16dp"
                     android:fontFamily="@font/poppins_medium_regular"
                     android:padding="8dp"
-                    android:text="@string/nutrientIntakeText"
+                    android:text="Average Nutrient Intake"
                     android:textColor="@color/black"
                     android:textSize="24sp"
                     android:textStyle="bold" />
@@ -148,7 +140,7 @@
             </LinearLayout>
 
             <com.github.mikephil.charting.charts.BarChart
-                android:id="@+id/thisMonthBarChart"
+                android:id="@+id/HOMEthisMonthBarChart"
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
                 android:layout_centerInParent="true"
@@ -165,26 +157,20 @@
                 android:layout_marginStart="16dp"
                 android:fontFamily="@font/poppins_medium_regular"
                 android:padding="8dp"
-                android:text="@string/popularMealsText"
+                android:text="Monthly Meals History"
                 android:textColor="@color/black"
                 android:textSize="24sp"
                 android:textStyle="bold" />
 
-            <LinearLayout
-                android:id="@+id/thisMonthPopularMealsLinearLayout"
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/thisMonth_rv_meals_history"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="24dp"
-                android:layout_marginRight="24dp"
-                android:background="@drawable/rounded_orange_container"
-                android:orientation="vertical">
+                android:orientation="horizontal"
+                android:layout_marginTop="8dp"
+                android:paddingHorizontal="16dp"
+                android:clipToPadding="false" />
 
-                <View
-                    android:id="@+id/thisMonthEmptyViewForSeparation"
-                    android:layout_width="match_parent"
-                    android:layout_height="8dp"/>
-
-            </LinearLayout>
 
         </LinearLayout>
     </ScrollView>
