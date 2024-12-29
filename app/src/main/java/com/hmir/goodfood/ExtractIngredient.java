@@ -8,8 +8,7 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Base64;
 import android.util.Log;
-import android.view.View;
-import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -18,12 +17,15 @@ import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.gson.Gson;
+import com.hmir.goodfood.callbacks.NutritionCallback;
 import com.hmir.goodfood.models.GeminiApiResponse;
 import com.hmir.goodfood.models.GeminiRequestBody;
 import com.hmir.goodfood.services.GeminiApiService;
 
+
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import okhttp3.MediaType;
@@ -69,16 +71,26 @@ public class ExtractIngredient extends AppCompatActivity {
             if (encodedImage != null) {
                 displayImage(encodedImage);
             }
+            setupSearchRecipeBtn(IngredientTextView);
+
         }
 
-        Button calCalorieBtn = findViewById(R.id.CalcCalorieBtn);
-        calCalorieBtn.setOnClickListener(view -> {
-            Log.d("ExtractIngredient", ingredients);
+        analyzeNutrition(ingredients, new NutritionCallback() {
+            @Override
+            public void onSuccess(String nutritionData) {
+                ImageButton CalculateCaloriesButton = findViewById(R.id.CalculateCaloriesButton);
+                CalculateCaloriesButton.setOnClickListener(view -> {
+                    if (ingredients != null && !ingredients.isEmpty()) {
+                        startCalorieActivity(nutritionData, ingredients);
+                    } else {
+                        Toast.makeText(ExtractIngredient.this, "No ingredients to analyze", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
 
-            if (ingredients != null && !ingredients.isEmpty()) {
-                analyzeNutrition(ingredients);
-            } else {
-                Toast.makeText(ExtractIngredient.this, "No ingredients to analyze", Toast.LENGTH_SHORT).show();
+            @Override
+            public void onError(String errorMessage) {
+                Log.e("NutritionError", errorMessage);
             }
         });
     }
@@ -100,7 +112,7 @@ public class ExtractIngredient extends AppCompatActivity {
      *
      * @param ingredients The ingredients to analyze.
      */
-    private void analyzeNutrition(String ingredients) {
+    private void analyzeNutrition(String ingredients, NutritionCallback callback) {
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
         logging.setLevel(HttpLoggingInterceptor.Level.BODY);
 
@@ -157,12 +169,10 @@ public class ExtractIngredient extends AppCompatActivity {
             public void onResponse(Call<GeminiApiResponse> call, Response<GeminiApiResponse> response) {
                 if (response.isSuccessful() && response.body() != null && !response.body().getCandidates().isEmpty()) {
                     String nutritionData = response.body().getCandidates().get(0).getContent().getParts().get(0).getText();
-                    Intent intent = new Intent(ExtractIngredient.this, Calories.class);
-                    intent.putExtra("nutritionData", nutritionData);
-                    intent.putExtra("file_path", getIntent().getStringExtra("file_path"));
-                    startActivity(intent);
+                    callback.onSuccess(nutritionData);
                 } else {
                     Toast.makeText(ExtractIngredient.this, "Failed to analyze nutrition", Toast.LENGTH_SHORT).show();
+                    callback.onError("Failed to analyze nutrition");
                 }
             }
 
@@ -187,5 +197,131 @@ public class ExtractIngredient extends AppCompatActivity {
         contents.add(new GeminiRequestBody.Content(parts));
 
         return new GeminiRequestBody(contents);
+    }
+
+    /**
+     * Calls an Intent and start Calorie activity.
+     *
+     * @param nutritionData The analyzed nutrition data from image.
+     */
+    private void startCalorieActivity(String nutritionData, String ingredients) {
+        Intent intent = new Intent(ExtractIngredient.this, Calories.class);
+        intent.putExtra("nutritionData", nutritionData);
+        intent.putExtra("ingredients", ingredients);
+        intent.putExtra("file_path", getIntent().getStringExtra("file_path"));
+        startActivity(intent);
+    }
+
+    /**
+     * Sets up the button to search for recipes based on the ingredients displayed in the provided TextView.
+     *
+     * This method initializes the ImageButton for searching recipes and attaches an OnClickListener to it.
+     * When clicked, the button retrieves the text from the provided IngredientTextView and attempts
+     * to search for recipes using the extracted ingredients. If no ingredients are available in the
+     * TextView, a toast message is displayed to inform the user.
+     *
+     * @param IngredientTextView The TextView containing the list of ingredients to be used for recipe search.
+     */
+    private void setupSearchRecipeBtn(TextView IngredientTextView) {
+        // ImageButton for searching recipes
+        ImageButton searchRecipeBtn = findViewById(R.id.searchRecipeBtn);
+        searchRecipeBtn.setOnClickListener(view -> {
+            // Get the ingredients from the IngredientTextView
+            String ingredientsFromTextView = IngredientTextView.getText().toString().trim();
+
+            if (!ingredientsFromTextView.isEmpty()) {
+                searchRecipes(ingredientsFromTextView);  // Call the method to search for recipes with the ingredients from the TextView
+            } else {
+                Toast.makeText(ExtractIngredient.this, "No ingredients to search recipes for", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    /**
+     * Searches for recipes based on the ingredients provided.
+     *
+     * @param ingredients The ingredients to search for recipes.
+     */
+    private void searchRecipes(String ingredients) {
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+
+        OkHttpClient client = new OkHttpClient.Builder()
+                .addInterceptor(logging)
+                .build();
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(GEMINI_API_BASE_URL)
+                .client(client)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        GeminiApiService service = retrofit.create(GeminiApiService.class);
+
+        // Improved prompt with ingredients explicitly mentioned
+        String prompt = "Based on the following ingredients: " + ingredients + ", suggest a list of recipes. " +
+                "For each recipe, provide the name, ingredients, and cooking steps in this format:\n" +
+                "- Recipe Name: <recipe_name>\n" +
+                "  Ingredients: <ingredient_1, ingredient_2, ...>\n" +
+                "  Steps: <step_1, step_2, ...>";
+
+        GeminiRequestBody requestBody = createGeminiRequestBody(prompt);
+        String jsonBody = new Gson().toJson(requestBody);
+        RequestBody body = RequestBody.create(MediaType.parse("application/json"), jsonBody);
+
+        Call<GeminiApiResponse> call = service.callGemini(GEMINI_API_KEY, body);
+        call.enqueue(new Callback<GeminiApiResponse>() {
+            @Override
+            public void onResponse(Call<GeminiApiResponse> call, Response<GeminiApiResponse> response) {
+                if (response.isSuccessful() && response.body() != null && !response.body().getCandidates().isEmpty()) {
+                    String recipesText = response.body().getCandidates().get(0).getContent().getParts().get(0).getText();
+                    Log.d("GeminiResponse", "Raw response: " + recipesText);  // Log raw response
+
+                    // Clean up unwanted parts, like "-Recipe Name:" and "**"
+                    recipesText = recipesText.replaceAll("^-Recipe Name: ", "").replaceAll("\\*\\*", "").trim();
+
+                    // Now you can parse the recipe name or use it as is
+                    List<Recipe> recipes = parseRecipes(recipesText);
+
+                    // Pass the cleaned recipe list to the next activity
+                    Intent intent = new Intent(ExtractIngredient.this, RecipeListActivity.class);
+                    intent.putParcelableArrayListExtra("recipes", new ArrayList<>(recipes));
+                    startActivity(intent);
+                } else {
+                    Toast.makeText(ExtractIngredient.this, "Failed to search for recipes", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<GeminiApiResponse> call, Throwable t) {
+                Toast.makeText(ExtractIngredient.this, "Error: " + t.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    /**
+     * Parses a string of recipes text into a list of Recipe objects.
+     *
+     * @param recipesText The text containing recipe information.
+     * @return A list of Recipe objects parsed from the text.
+     */
+    private List<Recipe> parseRecipes(String recipesText) {
+        List<Recipe> recipes = new ArrayList<>();
+        // Example of parsing the text into Recipe objects (you can adjust the parsing logic as needed)
+        String[] recipeStrings = recipesText.split("\n- ");
+        for (String recipeString : recipeStrings) {
+            if (recipeString.trim().isEmpty()) {
+                continue;  // Skip any empty recipe strings
+            }
+
+            String[] parts = recipeString.split("\n  ");
+            if (parts.length >= 3) {  // Ensure there are at least 3 parts (name, ingredients, steps)
+                String name = parts[0].replace("Recipe Name: ", "").replaceAll("\\*\\*", "").trim();  // Remove ** around the name
+                List<String> ingredients = Arrays.asList(parts[1].replace("Ingredients: ", "").split(", "));
+                List<String> steps = Arrays.asList(parts[2].replace("Steps: ", "").split(", "));
+                recipes.add(new Recipe(name, ingredients, steps));
+            }
+        }
+        return recipes;
     }
 }

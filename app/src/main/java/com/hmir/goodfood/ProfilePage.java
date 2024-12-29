@@ -2,36 +2,40 @@ package com.hmir.goodfood;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 
 /**
- * The ProfilePage class represents an activity where users can view and manage their profile details.
- * This includes options for signing out, editing profile information, accessing activity history,
- * adjusting settings, and reviewing the privacy policy. It also integrates with Google Sign-In
- * and Firebase for authentication purposes.
+ * ProfilePage is an activity that allows users to view and manage their profile.
+ * It provides functionalities for:
+ * - Logging out from Google and Firebase
+ * - Navigating to the edit profile, history, settings, and privacy policy sections.
+ *
+ * This activity requires a valid Google Sign-In configuration.
  */
 public class ProfilePage extends AppCompatActivity {
 
     private GoogleSignInClient googleSignInClient;
     private TextView TVName;
+    private ImageView IVProfile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //EdgeToEdge.enable(this);
         setContentView(R.layout.activity_profile_page);
 
         // Configure Google Sign-In
@@ -41,10 +45,9 @@ public class ProfilePage extends AppCompatActivity {
                 .build();
         googleSignInClient = GoogleSignIn.getClient(this, gso);
 
-
-        //
-        // Initialize the TextView
+        // Initialize the TextView and ImageView
         TVName = findViewById(R.id.TVName);
+        IVProfile = findViewById(R.id.IVProfile);
 
         // Retrieve username from SharedPreferences
         SharedPreferences sharedPreferences = getSharedPreferences("UserPreferences", MODE_PRIVATE);
@@ -52,11 +55,23 @@ public class ProfilePage extends AppCompatActivity {
 
         // Set the username in the TextView
         TVName.setText(username);
-        //
+
+        loadGoogleProfileData();
+
 
     }
 
+    /**
+     * Logs the user out of Google, clears user data from SharedPreferences,
+     * signs out from Firebase, and redirects the user to the MainActivity.
+     *
+     * @param view the View that triggers this method (e.g., a Button).
+     */
     public void logoutGoogle(View view) {
+        // Remove SharedPreference user data
+        SharedPreferences sharedPreferences = getSharedPreferences("UserPreferences", MODE_PRIVATE);
+        sharedPreferences.edit().clear().apply();
+
         // Firebase sign out
         FirebaseAuth.getInstance().signOut();
 
@@ -108,6 +123,39 @@ public class ProfilePage extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         refreshProfileData(); // Refresh data when the profile page is resumed
+    }
+
+    /**
+     * Load user profile data, including the name and profile picture, directly from Firebase.
+     */
+    private void loadGoogleProfileData() {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            // Set the display name
+            String displayName = user.getDisplayName();
+            if (displayName != null && !displayName.isEmpty()) {
+                TVName.setText(displayName);
+            } else {
+                TVName.setText("Guest"); // Fallback if no display name is available
+            }
+
+            // Load the profile picture
+            Uri profilePicUri = user.getPhotoUrl();
+            if (profilePicUri != null) {
+                // Use Glide to load the image into IVProfile
+                Glide.with(this)
+                        .load(profilePicUri.toString()) // Convert URI to string
+                        .placeholder(R.drawable.profile_pic) // Default placeholder image
+                        .error(R.drawable.profile_pic) // Error image
+                        .into(IVProfile);
+            } else {
+                IVProfile.setImageResource(R.drawable.profile_pic); // Fallback default image
+            }
+        } else {
+            // Set fallback values if no user is logged in
+            TVName.setText("Guest");
+            IVProfile.setImageResource(R.drawable.profile_pic);
+        }
     }
 
 }

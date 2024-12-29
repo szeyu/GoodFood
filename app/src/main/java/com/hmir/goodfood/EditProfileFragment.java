@@ -22,6 +22,10 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.hmir.goodfood.R;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -34,6 +38,8 @@ import java.util.List;
 
 import android.content.Intent;
 import android.provider.MediaStore;
+
+import com.bumptech.glide.Glide; // Add this import
 
 /**
  * The EditProfileFragment class provides a user interface for editing the user's profile details.
@@ -55,19 +61,20 @@ public class EditProfileFragment extends Fragment {
     private String originalHeight;
     private String originalWeight;
     private String originalDietPreferences;
-    private Button halalButton, veganButton, pescatarianButton, customButton, dairyButton, nutsButton, seafoodButton, othersButton;
+
+    private Button halalButton;
+    private Button veganButton;
+    private Button pescatarianButton;
+    private Button customButton;
+    private Button dairyButton;
+    private Button nutsButton;
+    private Button seafoodButton;
+    private Button othersButton;
 
     private String selectedDietPreference;
 
 
-    //
     private ImageView IVProfile;
-    private ImageButton BtnChangeProfile;
-    //private SharedPreferences sharedPreferences;
-
-    private static final int PICK_IMAGE_REQUEST = 1;
-    private Uri selectedImageUri;
-
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -87,18 +94,8 @@ public class EditProfileFragment extends Fragment {
         etWeight = view.findViewById(R.id.ETWeight);
         btnSave = view.findViewById(R.id.IBDone);
 
-        /* pfp
-        // Initialize views
-        IVProfile = view.findViewById(R.id.IVProfileEdit);
-        BtnChangeProfile = view.findViewById(R.id.BtnChangeProfile);
-        sharedPreferences = requireActivity().getSharedPreferences("UserPreferences", requireActivity().MODE_PRIVATE);
-
-        // Set the current profile picture from SharedPreferences
-        loadProfilePicture();
-
-        // Set click listener for the button to open gallery
-        BtnChangeProfile.setOnClickListener(v -> openGalleryForImage());
-        */
+        // google pfp
+        IVProfile = view.findViewById(R.id.IVProfileEdit); // Initialize your ImageView
 
         // Restrict age to integers only
         InputFilter[] integerFilter = new InputFilter[]{(source, start, end, dest, dstart, dend) -> {
@@ -136,6 +133,11 @@ public class EditProfileFragment extends Fragment {
         seafoodButton = view.findViewById(R.id.button_seafood);
         othersButton = view.findViewById(R.id.button_others);
 
+        // google pfp
+        // Load Google profile picture
+        loadGoogleProfilePicture();
+        //
+
         // Load original data
         loadOriginalData();
 
@@ -149,10 +151,19 @@ public class EditProfileFragment extends Fragment {
         btnSave.setOnClickListener(v -> saveChanges());
 
         return view;
-
     }
 
-    // Method to Loads original user profile data from SharedPreferences and populates the input fields.
+    /**
+     * Loads the user's original profile data from SharedPreferences.
+     * Populates the UI fields with stored values.
+     * Initializes the following fields:
+     * - Username
+     * - Age
+     * - Height
+     * - Weight
+     * - Diet Preferences
+     * Hides the save button initially.
+     */
     private void loadOriginalData() {
         originalUsername = sharedPreferences.getString("Username", "");
         originalAge = sharedPreferences.getString("Age", "");
@@ -172,7 +183,11 @@ public class EditProfileFragment extends Fragment {
         btnSave.setVisibility(View.GONE); // Hide Save button initially
     }
 
-    // Method to add TextWatchers to input fields to detect changes and toggle the Save button visibility.
+    /**
+     * Adds text change listeners to all editable fields.
+     * Monitors real-time changes in username, age, height, and weight fields.
+     * Triggers detectChanges() whenever text is modified in any field.
+     */
     private void addTextWatchers() {
         TextWatcher textWatcher = new TextWatcher() {
             @Override
@@ -195,29 +210,33 @@ public class EditProfileFragment extends Fragment {
         etWeight.addTextChangedListener(textWatcher);
     }
 
-    // Method to set click listeners for dietary preference buttons to update the selected preference.
+    /**
+     * Sets up click listeners for all diet preference buttons.
+     * Updates the selectedDietPreference variable when a button is clicked.
+     * Triggers detectChanges() to update the UI accordingly.
+     */
     private void setDietButtonListeners() {
 
-        View.OnClickListener dietButtonClickListener = v -> {
-            int id = v.getId();
-            if (id == R.id.button_halal) {
-                selectedDietPreference = "Halal";
-            } else if (id == R.id.button_vegan) {
-                selectedDietPreference = "Vegan";
-            } else if (id == R.id.button_pescatarian) {
-                selectedDietPreference = "Pescatarian";
-            } else if (id == R.id.button_custom) {
-                selectedDietPreference = "Custom";
-            } else if (id == R.id.button_dairy) {
-                selectedDietPreference = "Dairy-Free";
-            } else if (id == R.id.button_nuts) {
-                selectedDietPreference = "Nut-Free";
-            } else if (id == R.id.button_seafood) {
-                selectedDietPreference = "Seafood";
-            } else if (id == R.id.button_others) {
-                selectedDietPreference = "Others";
-            }
-            detectChanges();
+            View.OnClickListener dietButtonClickListener = v -> {
+                int id = v.getId();
+                if (id == R.id.button_halal) {
+                    selectedDietPreference = "Halal";
+                } else if (id == R.id.button_vegan) {
+                    selectedDietPreference = "Vegan";
+                } else if (id == R.id.button_pescatarian) {
+                    selectedDietPreference = "Pescatarian";
+                } else if (id == R.id.button_custom) {
+                    selectedDietPreference = "Custom";
+                } else if (id == R.id.button_dairy) {
+                    selectedDietPreference = "Dairy-Free";
+                } else if (id == R.id.button_nuts) {
+                    selectedDietPreference = "Nut-Free";
+                } else if (id == R.id.button_seafood) {
+                    selectedDietPreference = "Seafood";
+                } else if (id == R.id.button_others) {
+                    selectedDietPreference = "Others";
+                }
+                detectChanges();
         };
 
         // Attach the listener to all buttons
@@ -231,7 +250,11 @@ public class EditProfileFragment extends Fragment {
         othersButton.setOnClickListener(dietButtonClickListener);
     }
 
-    // Method to detect changes in the input fields or dietary preference buttons and toggles the Save button visibility.
+    /**
+     * Monitors changes in the profile fields and compares them with original values.
+     * Shows or hides the save button based on whether changes have been made.
+     * Fields monitored: username, age, height, weight, and diet preferences.
+     */
     private void detectChanges() {
         String newUsername = etUsername.getText().toString();
         String newAge = etAge.getText().toString();
@@ -249,8 +272,12 @@ public class EditProfileFragment extends Fragment {
         }
     }
 
-    // Method to save the changes made to the profile either in local storage or firebase
-    // depending on the Internet connectivity
+    /**
+     * Saves the changes made to the user profile.
+     * Updates both local SharedPreferences and Firebase (if internet is available).
+     * Displays appropriate toast messages based on the success of the operation.
+     * Reloads the original data after saving to maintain consistency.
+     */
     private void saveChanges() {
         // Save updated data to SharedPreferences
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -263,7 +290,7 @@ public class EditProfileFragment extends Fragment {
         editor.putString("Age", updatedAge);
         editor.putString("Height", updatedHeight);
         editor.putString("Weight", updatedWeight);
-        editor.putString("DietPreferences", selectedDietPreference);
+        editor.putString("DietTypes", selectedDietPreference);
         editor.apply();
 
         // Firebase sync using UserHelper
@@ -274,9 +301,7 @@ public class EditProfileFragment extends Fragment {
                     List.of(selectedDietPreference), // Assuming single diet preference; adapt as needed
                     Long.parseLong(updatedAge),
                     Double.parseDouble(updatedHeight),
-                    Double.parseDouble(updatedWeight),
-                    new ArrayList<>(), // Placeholder for favourite_recipes
-                    new ArrayList<>()  // Placeholder for nutritional_records
+                    Double.parseDouble(updatedWeight)
             );
             Toast.makeText(requireContext(), "Changes saved and synced to Firebase.", Toast.LENGTH_SHORT).show();
         } else {
@@ -286,8 +311,6 @@ public class EditProfileFragment extends Fragment {
         // Reload original data for consistency
         loadOriginalData();
 
-
-        //
         // Manually notify the HomePage and ProfilePage to refresh data
         if (getActivity() instanceof HomePage) {
             ((HomePage) getActivity()).refreshProfileData();
@@ -298,15 +321,16 @@ public class EditProfileFragment extends Fragment {
 
         // Optional: Navigate back to the profile page or elsewhere
         requireActivity().onBackPressed();
-        //
 
     }
 
 
-    // Method to check whether the emulator / device is connected to the Internet
-    // different message will be displayed after the user make changes on his / her profile based on the Internet Connectivity
+    /**
+     * Checks if an internet connection is available.
+     *
+     * @return true if the device has an active internet connection, false otherwise
+     */
     private boolean isInternetAvailable() {
-
         ConnectivityManager connectivityManager = (ConnectivityManager) requireContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         if (connectivityManager != null) {
             NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
@@ -315,45 +339,26 @@ public class EditProfileFragment extends Fragment {
         return false;
     }
 
+    private void loadGoogleProfilePicture() {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            Uri profilePicUri = user.getPhotoUrl(); // Get the profile picture URL from Firebase
 
-    /*
-    private void loadProfilePicture() {
-        String profilePicUri = sharedPreferences.getString("ProfilePicUri", null);
-        if (profilePicUri != null) {
-            try {
-                Uri uri = Uri.parse(profilePicUri);
-                IVProfile.setImageURI(uri); // Set the stored image URI
-            } catch (Exception e) {
-                Log.e("EditProfileFragment", "Error loading profile picture", e);
-            }
-        }
-    }
-
-    private void openGalleryForImage() {
-        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        intent.setType("image/*");
-        startActivityForResult(intent, PICK_IMAGE_REQUEST);
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
-            selectedImageUri = data.getData(); // Get the selected image URI
-
-            if (selectedImageUri != null) {
-                IVProfile.setImageURI(selectedImageUri); // Set the selected image in the ImageView
-
-                // Save the image URI to SharedPreferences
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putString("ProfilePicUri", selectedImageUri.toString());
-                editor.apply();
+            if (profilePicUri != null) {
+                // Use Glide to load the image into IVProfile
+                Glide.with(this)
+                        .load(profilePicUri.toString()) // Convert URI to string
+                        .placeholder(R.drawable.profile_pic) // Default placeholder image
+                        .error(R.drawable.profile_pic) // Error image
+                        .into(IVProfile);
+            } else {
+                IVProfile.setImageResource(R.drawable.profile_pic); // Set default image if no URL is found
             }
         } else {
-            Log.e("EditProfileFragment", "Error: No image selected or invalid URI");
+            IVProfile.setImageResource(R.drawable.profile_pic); // Set default image if no user is signed in
         }
     }
-    */
+
+
 
 }

@@ -1,5 +1,10 @@
 package com.hmir.goodfood.utilities;
 
+import static android.content.Context.MODE_PRIVATE;
+
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.net.Uri;
 import android.util.Log;
 
 import com.google.android.gms.tasks.Task;
@@ -9,18 +14,33 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 
+/**
+ * Helper class for managing user-related operations in the application.
+ * This class handles user data management, nutritional records, and favorite recipes.
+ * It provides methods for CRUD operations on user data and related entities.
+ *
+ * The class is organized into four main sections:
+ * 1. User Specifics - Basic user operations (fetch, add, update, delete)
+ * 2. User Nutritional Records - Managing user's nutritional data
+ * 3. User Favourite Recipes - Managing user's favorite recipes
+ * 4. Callbacks - Interfaces for handling asynchronous operations
+ */
 public class UserHelper {
     /*
       In this class, there will be multiple sections of methods relating to a user:
       Section 1 : User Specifics
                     - fetchUser()
+                    - isUserExist()
                     - addNewUser()
                     - updateUserInfo()
                     - deleteUser()
@@ -73,7 +93,7 @@ public class UserHelper {
     private final NutritionalRecordHelper nutritionalRecordHelper = new NutritionalRecordHelper();
     private final FavouriteRecipeHelper favouriteRecipeHelper = new FavouriteRecipeHelper();
     private final Queue<Runnable> pendingOperations = new LinkedList<>();
-    protected User currentUser;
+    public User currentUser;
     //    private final static String email = "test1@gmail.com";
     private boolean isUserLoaded = false;
 
@@ -104,7 +124,7 @@ public class UserHelper {
         });
     }
 
-    // Add an operation to the queue
+    // Add an operation to the queue for execution
     private void enqueueOrExecute(Runnable operation) {
         if (isUserLoaded) {
             operation.run();
@@ -143,13 +163,89 @@ public class UserHelper {
         });
     }
 
+    // Fetch user and check if it exists
+    public Task<Boolean> isUserExist() {
+        if (email == null || email.isEmpty()) {
+            return Tasks.forException(new Exception("Email is null or empty"));
+        }
+
+        // Check if document exists
+        return db.collection("user").document(email).get().continueWith(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot documentSnapshot = task.getResult();
+                return documentSnapshot.exists();
+            } else {
+                throw task.getException() != null ? task.getException() : new Exception("Failed to check user existence");
+            }
+        });
+    }
+
+    // For MainActivity, saving user data to SharedPreferences when user exists in Firestore
+    public void saveUserDataFromFirestoreToSharedPreferences(Context context) {
+        enqueueOrExecute(() -> {
+            // Save data in Shared Preferences
+            SharedPreferences sharedPreferences = context.getSharedPreferences("UserPreferences", MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+
+            String email = FirebaseAuth.getInstance().getCurrentUser().getEmail();
+            String username = currentUser.getUsername();
+            String age = Long.toString(currentUser.getAge());
+            String height = Double.toString(currentUser.getHeight());
+            String weight = Double.toString(currentUser.getWeight());
+            String dietTypes = currentUser.getHealth_labels().toString();
+
+            // google pfp
+            // Fetch the Google profile picture URL
+            String profilePicUri = currentUser.getPhotoUrl();  // Get the profile picture URL directly from the user object
+
+            // If the profile picture URI is null, use the default placeholder
+            if (profilePicUri == null) {
+                profilePicUri = "android.resource://com.hmir.goodfood/drawable/profile_pic"; // Default URI
+            }
+            //
+
+
+            /*
+            // Check if ProfilePicUri already exists in SharedPreferences
+            String existingProfilePicUri = sharedPreferences.getString("ProfilePicUri", null);
+
+            // Use existing value, or initialize with a default placeholder
+            String profilePicUri = (existingProfilePicUri != null)
+                    ? existingProfilePicUri
+                    : "android.resource://com.hmir.goodfood/drawable/profile_pic";
+            */
+
+
+            editor.putString("Email", email);
+            editor.putString("Username", username);
+            editor.putString("Age", age);
+            editor.putString("Height", height);
+            editor.putString("Weight", weight);
+            editor.putString("DietTypes", dietTypes);
+            //
+            editor.putString("ProfilePicUri", profilePicUri); // Save profile picture URI
+            //
+            editor.apply();
+
+            Log.d("UserHelper","SharedPreferences saved");
+        });
+    }
+
+    //
     // Update User document
-    public void updateUserInfo(String username, List<String> health_labels, long age, double height, double weight,
-                               List<String> favourite_recipes, List<String> nutritional_records) {
+    public void updateUserInfo(String username, List<String> health_labels, long age, double height, double weight) {
         enqueueOrExecute(() -> {
             if (email == null || email.isEmpty()) {
                 throw new IllegalArgumentException("Email is null or empty");
             }
+
+            //google pfp
+            // Fetch the current profile picture URL
+            String profilePicUri = FirebaseAuth.getInstance().getCurrentUser().getPhotoUrl() != null
+                    ? FirebaseAuth.getInstance().getCurrentUser().getPhotoUrl().toString()
+                    : "android.resource://com.hmir.goodfood/drawable/profile_pic";  // Default URI if null
+            //
+
 
             Map<String, Object> userUpdates = Map.of(
                     "username", username,
@@ -157,29 +253,51 @@ public class UserHelper {
                     "age", age,
                     "height", height,
                     "weight", weight,
-                    "favourite_recipes", favourite_recipes,
-                    "nutritional_records", nutritional_records
+                    //google pfp
+                    "profilePicUri", profilePicUri
+                    //
             );
 
             db.collection("user").document(email).get().addOnSuccessListener(documentSnapshot -> {
                 if (documentSnapshot.exists()) {
                     db.collection("user").document(email).update(userUpdates)
-                            .addOnSuccessListener(aVoid ->
-                                    Log.d("UserHelper", "User info updated"))
-                            .addOnFailureListener(e ->
-                                    Log.e("UserHelper", "Error updating user info", e));
+                            .addOnSuccessListener(aVoid -> {
+                                Log.d("UserHelper", "User info updated");
+
+                                // Update SharedPreferences for ProfilePicUri
+                                Context context = FirebaseAuth.getInstance().getApp().getApplicationContext();
+                                SharedPreferences sharedPreferences = context.getSharedPreferences("UserPreferences", MODE_PRIVATE);
+                                SharedPreferences.Editor editor = sharedPreferences.edit();
+
+                                // Preserve the existing ProfilePicUri if it already exists
+                                String existingProfilePicUri = sharedPreferences.getString("ProfilePicUri", null);
+                                if (existingProfilePicUri == null) {
+                                    editor.putString("ProfilePicUri", "android.resource://com.hmir.goodfood/drawable/profile_pic"); // Default URI
+                                }
+                                editor.apply();
+                            })
+                            .addOnFailureListener(e -> Log.e("UserHelper", "Error updating user info", e));
                 } else {
                     Log.e("UserHelper", "User document not found for email: " + email);
                 }
             });
         });
     }
+    //
+
 
     // Add new user
     public void addNewUser(Map<String, Object> user) {
         if (email == null || email.isEmpty()) {
             throw new IllegalArgumentException("Email is null or empty");
         }
+
+        //google pfp
+        // Get the Google profile picture URL
+        String profilePicUri = FirebaseAuth.getInstance().getCurrentUser().getPhotoUrl() != null
+                ? FirebaseAuth.getInstance().getCurrentUser().getPhotoUrl().toString()
+                : "android.resource://com.hmir.goodfood/drawable/profile_pic";  // Default URI if null
+        //
 
         Map<String, Object> defaultUser = new HashMap<>();
         defaultUser.put("username", null);
@@ -189,6 +307,9 @@ public class UserHelper {
         defaultUser.put("health_labels", null);
         defaultUser.put("favourite_recipes", null);
         defaultUser.put("nutritional_records", null);
+        // google pfp
+        defaultUser.put("profilePicUri", profilePicUri);
+        //
         defaultUser.putAll(user);
 
         db.collection("user")
@@ -271,73 +392,110 @@ public class UserHelper {
     }
 
     // Add new nutritional record
-    public void addUserNutritionalRecord(Map<String, Object> record) {
-        enqueueOrExecute(() -> {
-            if (email == null || email.isEmpty()) {
-                throw new IllegalArgumentException("Email is null or empty");
-            }
+    public void addUserNutritionalRecord(Map<String, Object> record, Uri imageUri) {
+        if (email == null || email.isEmpty()) {
+            throw new IllegalArgumentException("Email is null or empty");
+        }
+        // Upload photo first, then proceed to add record
+        uploadPhotoToStorage(imageUri, email)
+                .addOnSuccessListener(uri -> {
+                    // Once the image upload is complete, get the download URL
+                    String imageDownloadUrl = uri.toString();
 
-            nutritionalRecordHelper.addNutritionalRecord(record, new NutritionalRecordHelper.OnRecordAddedCallback() {
-                @Override
-                public void onRecordAdded(String recordId) {
-                    currentUser.getNutritional_records().add(recordId);
+                    // Add the image URL to the nutritional record map
+                    record.put("image", imageDownloadUrl);
 
-                    db.collection("user")
-                            .document(email)
-                            .update("nutritional_records", FieldValue.arrayUnion(recordId))
-                            .addOnSuccessListener(aVoid -> {
-                                Log.d("UserHelper", "Nutritional record added to user successfully." + recordId);
-                            })
-                            .addOnFailureListener(e -> {
-                                Log.e("UserHelper", "Error adding nutritional record to user", e);
-                            });
-                }
+                    // Proceed with adding the nutritional record
+                    enqueueOrExecute(() -> {
+                        nutritionalRecordHelper.addNutritionalRecord(record, new NutritionalRecordHelper.OnRecordAddedCallback() {
+                            @Override
+                            public void onRecordAdded(String recordId) {
+                                if(currentUser.getNutritional_records() != null){
+                                    currentUser.getNutritional_records().add(recordId);
+                                } else {
+                                    List<String> nutritional_records = new ArrayList<>();
+                                    nutritional_records.add(recordId);
+                                    currentUser.setNutritional_records(nutritional_records);
+                                }
 
-                @Override
-                public void onError(Exception e) {
-                    Log.e("UserHelper", "Error adding nutritional record: " + e.getMessage());
-                }
-            });
-        });
+                                db.collection("user")
+                                        .document(email)
+                                        .update("nutritional_records", FieldValue.arrayUnion(recordId))
+                                        .addOnSuccessListener(aVoid -> {
+                                            Log.d("UserHelper", "Nutritional record added to user successfully." + recordId);
+                                        })
+                                        .addOnFailureListener(e -> {
+                                            Log.e("UserHelper", "Error adding nutritional record to user", e);
+                                        });
+                            }
+
+                            @Override
+                            public void onError(Exception e) {
+                                Log.e("UserHelper", "Error adding nutritional record: " + e.getMessage());
+                            }
+                        });
+                    });
+
+                }).addOnFailureListener(e -> {
+                    Log.e("Firebase", "Image upload failed", e);
+                });
     }
 
     // Update nutritional record
-    public void updateUserNutritionalRecord(String record_id, Map<String, Object> record) {
-        enqueueOrExecute(() -> {
-            if (email == null || email.isEmpty()) {
-                throw new IllegalArgumentException("Email is null or empty");
-            }
+    public void updateUserNutritionalRecord(String record_id, Map<String, Object> record, Uri imageUri) {
+        if (email == null || email.isEmpty()) {
+            throw new IllegalArgumentException("Email is null or empty");
+        }
+        // Upload photo first, then proceed to update record
+        uploadPhotoToStorage(imageUri, email)
+                .addOnSuccessListener(uri -> {
+                    // Once the image upload is complete, get the download URL
+                    String imageDownloadUrl = uri.toString();
 
-            nutritionalRecordHelper.addNutritionalRecord(record, new NutritionalRecordHelper.OnRecordAddedCallback() {
-                @Override
-                public void onRecordAdded(String newRecordId) {
-                    if (currentUser.getNutritional_records() != null) {
-                        currentUser.getNutritional_records().add(newRecordId);
-                        currentUser.getNutritional_records().remove(record_id);
-                    }
+                    // Add the image URL to the nutritional record map if necessary
+                    record.put("image", imageDownloadUrl);
 
-                    db.collection("user")
-                            .document(email)
-                            .update("nutritional_records", FieldValue.arrayRemove(record_id))
-                            .addOnSuccessListener(aVoid -> {
+                    // Proceed with updating the nutritional record
+                    enqueueOrExecute(() -> {
+                        nutritionalRecordHelper.addNutritionalRecord(record, new NutritionalRecordHelper.OnRecordAddedCallback() {
+                            @Override
+                            public void onRecordAdded(String newRecordId) {
+                                if (currentUser.getNutritional_records() != null) {
+                                    currentUser.getNutritional_records().add(newRecordId);
+                                    currentUser.getNutritional_records().remove(record_id);
+                                } else {
+                                    List<String> nutritional_records = new ArrayList<>();
+                                    nutritional_records.add(newRecordId);
+                                    currentUser.setNutritional_records(nutritional_records);
+                                }
+
                                 db.collection("user")
                                         .document(email)
-                                        .update("nutritional_records", FieldValue.arrayUnion(newRecordId))
-                                        .addOnSuccessListener(aVoid2 ->
-                                                Log.d("UserHelper", "Nutritional record updated successfully."))
-                                        .addOnFailureListener(e ->
-                                                Log.e("UserHelper", "Error updating nutritional record", e));
-                            })
-                            .addOnFailureListener(e ->
-                                    Log.e("UserHelper", "Error removing old nutritional record", e));
-                }
+                                        .update("nutritional_records", FieldValue.arrayRemove(record_id))
+                                        .addOnSuccessListener(aVoid -> {
+                                            db.collection("user")
+                                                    .document(email)
+                                                    .update("nutritional_records", FieldValue.arrayUnion(newRecordId))
+                                                    .addOnSuccessListener(aVoid2 ->
+                                                            Log.d("UserHelper", "Nutritional record updated successfully."))
+                                                    .addOnFailureListener(e ->
+                                                            Log.e("UserHelper", "Error updating nutritional record", e));
+                                        })
+                                        .addOnFailureListener(e -> {
+                                            Log.e("UserHelper", "Error removing old nutritional record", e);
+                                        });
+                            }
 
-                @Override
-                public void onError(Exception e) {
-                    Log.e("UserHelper", "Error updating nutritional record: " + e.getMessage());
-                }
-            });
-        });
+                            @Override
+                            public void onError(Exception e) {
+                                Log.e("UserHelper", "Error updating nutritional record: " + e.getMessage());
+                            }
+                        });
+                    });
+
+                }).addOnFailureListener(e -> {
+                    Log.e("Firebase", "Image upload failed", e);
+                });
     }
 
     // Delete nutritional record
@@ -350,6 +508,9 @@ public class UserHelper {
             if (record_id == null || record_id.isEmpty()) {
                 throw new IllegalArgumentException("record_id is null or empty");
             }
+
+            if(currentUser.getNutritional_records() == null)
+                return;
 
             if (currentUser.getNutritional_records().contains(record_id)) {
                 currentUser.getNutritional_records().remove(record_id);
@@ -439,74 +600,112 @@ public class UserHelper {
     }
 
     // Add new favourite recipe
-    public void addUserFavouriteRecipe(Map<String, Object> recipe) {
-        enqueueOrExecute(() -> {
-            if (email == null || email.isEmpty()) {
-                throw new IllegalArgumentException("Email is null or empty");
-            }
+    public void addUserFavouriteRecipe(Map<String, Object> recipe, Uri imageUri) {
+        if (email == null || email.isEmpty()) {
+            throw new IllegalArgumentException("Email is null or empty");
+        }
+        // Upload photo first, then proceed to add the recipe
+        uploadPhotoToStorage(imageUri, email)
+                .addOnSuccessListener(uri -> {
+                    // Once the image upload is complete, get the download URL
+                    String imageDownloadUrl = uri.toString();
 
-            favouriteRecipeHelper.addFavouriteRecipe(recipe, new FavouriteRecipeHelper.OnRecipeAddedCallback() {
-                @Override
-                public void onRecipeAdded(String recipeId) {
-                    currentUser.getFavourite_recipes().add(recipeId);
+                    // Add the image URL to the recipe map if necessary
+                    recipe.put("image", imageDownloadUrl);
 
-                    db.collection("user")
-                            .document(email)
-                            .update("favourite_recipes", FieldValue.arrayUnion(recipeId))
-                            .addOnSuccessListener(aVoid -> {
-                                Log.d("UserHelper", "New favourite recipe added to user successfully.");
-                            })
-                            .addOnFailureListener(e -> {
-                                Log.e("UserHelper", "Error adding new favourite recipe to user", e);
-                            });
-                }
+                    // Proceed with adding the favourite recipe
+                    enqueueOrExecute(() -> {
+                        favouriteRecipeHelper.addFavouriteRecipe(recipe, new FavouriteRecipeHelper.OnRecipeAddedCallback() {
+                            @Override
+                            public void onRecipeAdded(String recipeId) {
+                                if(currentUser.getFavourite_recipes() != null){
+                                    currentUser.getFavourite_recipes().add(recipeId);
+                                } else {
+                                    List<String> favourite_recipes = new ArrayList<>();
+                                    favourite_recipes.add(recipeId);
+                                    currentUser.setFavourite_recipes(favourite_recipes);
+                                }
 
-                @Override
-                public void onError(Exception e) {
-                    Log.e("UserHelper", "Error adding favourite recipe: " + e.getMessage());
-                }
-            });
-        });
+                                db.collection("user")
+                                        .document(email)
+                                        .update("favourite_recipes", FieldValue.arrayUnion(recipeId))
+                                        .addOnSuccessListener(aVoid -> {
+                                            Log.d("UserHelper", "New favourite recipe added to user successfully.");
+                                        })
+                                        .addOnFailureListener(e -> {
+                                            Log.e("UserHelper", "Error adding new favourite recipe to user", e);
+                                        });
+                            }
+
+                            @Override
+                            public void onError(Exception e) {
+                                Log.e("UserHelper", "Error adding favourite recipe: " + e.getMessage());
+                            }
+                        });
+                    });
+
+                }).addOnFailureListener(e -> {
+                    Log.e("Firebase", "Image upload failed", e);
+                });
     }
 
     // Update favourite recipe
-    public void updateUserFavouriteRecipe(String recipe_id, Map<String, Object> recipe) {
-        enqueueOrExecute(() -> {
-            if (email == null || email.isEmpty()) {
-                throw new IllegalArgumentException("Email is null or empty");
-            }
+    public void updateUserFavouriteRecipe(String recipe_id, Map<String, Object> recipe, Uri imageUri, String userEmail) {
+        if (email == null || email.isEmpty()) {
+            throw new IllegalArgumentException("Email is null or empty");
+        }
+        // Upload photo first, then proceed to update the recipe
+        uploadPhotoToStorage(imageUri, userEmail)
+                .addOnSuccessListener(uri -> {
+                    // Once the image upload is complete, get the download URL
+                    String imageDownloadUrl = uri.toString();
 
-            favouriteRecipeHelper.addFavouriteRecipe(recipe, new FavouriteRecipeHelper.OnRecipeAddedCallback() {
-                @Override
-                public void onRecipeAdded(String newRecipeId) {
-                    if (currentUser.getNutritional_records() != null) {
-                        currentUser.getNutritional_records().add(newRecipeId);
-                        currentUser.getNutritional_records().remove(recipe_id);
-                    }
+                    // Add the image URL to the recipe map if necessary
+                    recipe.put("image_url", imageDownloadUrl);
 
-                    db.collection("user")
-                            .document(email)
-                            .update("favourite_recipes", FieldValue.arrayRemove(recipe_id))
-                            .addOnSuccessListener(aVoid -> {
+                    // Proceed with updating the favourite recipe
+                    enqueueOrExecute(() -> {
+                        favouriteRecipeHelper.addFavouriteRecipe(recipe, new FavouriteRecipeHelper.OnRecipeAddedCallback() {
+                            @Override
+                            public void onRecipeAdded(String newRecipeId) {
+                                if (currentUser.getFavourite_recipes() != null) {
+                                    currentUser.getFavourite_recipes().add(newRecipeId);
+                                    currentUser.getFavourite_recipes().remove(recipe_id);
+                                } else {
+                                    List<String> favourite_recipes = new ArrayList<>();
+                                    favourite_recipes.add(newRecipeId);
+                                    currentUser.setFavourite_recipes(favourite_recipes);
+                                }
+
                                 db.collection("user")
                                         .document(email)
-                                        .update("favourite_recipes", FieldValue.arrayUnion(newRecipeId))
-                                        .addOnSuccessListener(aVoid2 ->
-                                                Log.d("UserHelper", "Favourite recipe updated successfully."))
-                                        .addOnFailureListener(e ->
-                                                Log.e("UserHelper", "Error adding new favourite recipe", e));
-                            })
-                            .addOnFailureListener(e ->
-                                    Log.e("UserHelper", "Error removing old favourite recipe", e));
-                }
+                                        .update("favourite_recipes", FieldValue.arrayRemove(recipe_id))
+                                        .addOnSuccessListener(aVoid -> {
+                                            db.collection("user")
+                                                    .document(email)
+                                                    .update("favourite_recipes", FieldValue.arrayUnion(newRecipeId))
+                                                    .addOnSuccessListener(aVoid2 ->
+                                                            Log.d("UserHelper", "Favourite recipe updated successfully."))
+                                                    .addOnFailureListener(e ->
+                                                            Log.e("UserHelper", "Error adding new favourite recipe", e));
+                                        })
+                                        .addOnFailureListener(e -> {
+                                            Log.e("UserHelper", "Error removing old favourite recipe", e);
+                                        });
+                            }
 
-                @Override
-                public void onError(Exception e) {
-                    Log.e("UserHelper", "Error updating favourite recipe: " + e.getMessage());
-                }
-            });
-        });
+                            @Override
+                            public void onError(Exception e) {
+                                Log.e("UserHelper", "Error updating favourite recipe: " + e.getMessage());
+                            }
+                        });
+                    });
+
+                }).addOnFailureListener(e -> {
+                    Log.e("Firebase", "Image upload failed", e);
+                });
     }
+
 
     // Delete favourite recipe
     public void deleteUserFavouriteRecipe(String recipe_id) {
@@ -518,6 +717,9 @@ public class UserHelper {
             if (recipe_id == null || recipe_id.isEmpty()) {
                 throw new IllegalArgumentException("recipe_id is null or empty");
             }
+
+            if(currentUser.getFavourite_recipes() == null)
+                return;
 
             if (currentUser.getFavourite_recipes().contains(recipe_id)) {
                 currentUser.getFavourite_recipes().remove(recipe_id);
@@ -567,4 +769,39 @@ public class UserHelper {
 
         void onError(Exception e);
     }
+
+    /**
+     * Uploads a photo to Firebase Storage and returns a Task containing the download URL.
+     *
+     * @param imageUri The URI of the image to be uploaded
+     * @param userEmail The email of the user uploading the image, used to create a unique file name
+     * @return Task<Uri> A task that resolves to the download URL of the uploaded image
+     * @throws IllegalArgumentException if imageUri is null
+     */
+    public Task<Uri> uploadPhotoToStorage(Uri imageUri, String userEmail) {
+        if (imageUri == null) {
+            Log.e("Firebase", "Image URI is null");
+            return Tasks.forException(new IllegalArgumentException("Image URI cannot be null"));
+        }
+
+        // 1. Get a reference to Firebase Storage
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        StorageReference storageRef = storage.getReference();
+
+        // Create a unique path for the image
+        String fileName = "images/" + userEmail + "_" + System.currentTimeMillis() + ".jpg";
+        StorageReference imageRef = storageRef.child(fileName);
+
+        // 2. Upload the image to Storage
+        return imageRef.putFile(imageUri)
+                .continueWithTask(task -> {
+                    if (!task.isSuccessful()) {
+                        throw task.getException();
+                    }
+
+                    // 3. Get the download URL of the uploaded image
+                    return imageRef.getDownloadUrl();
+                });
+    }
+
 }

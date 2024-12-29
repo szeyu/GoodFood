@@ -8,17 +8,6 @@
     android:backgroundTint="#00FFFFFF"
     tools:context=".EditProfileFragment">
 
-    <ImageButton
-        android:id="@+id/BtnChangeProfile"
-        android:layout_width="74dp"
-        android:layout_height="71dp"
-        android:backgroundTint="#00FFFFFF"
-        android:contentDescription="button"
-        android:tint="#EFA586"
-        app:layout_constraintBottom_toBottomOf="@+id/IVProfileEdit"
-        app:layout_constraintStart_toEndOf="@+id/IVProfileEdit"
-        app:srcCompat="@drawable/baseline_photo_24" />
-
     <TextView
         android:id="@+id/TVWeight"
         android:layout_width="wrap_content"

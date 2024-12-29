@@ -10,7 +10,12 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
-public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder> {
+/**
+ * ViewHolder pattern implementation for search results in the RecyclerView.
+ * Holds references to the views that display search result items including
+ * the title and image of food items.
+ */
+public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.SearchViewHolder> {
     private List<Item> itemList; // Use a list of Item objects
     private OnItemClickListener listener;
 
@@ -28,14 +33,14 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
 
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public SearchViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_layout, parent, false);
-        return new ViewHolder(view);
+        return new SearchViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(SearchViewHolder holder, int position) {
         Item item = itemList.get(position);
 
         // Retrieve item details
@@ -78,14 +83,28 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
         return itemList.size();
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    /**
+     * ViewHolder pattern implementation for search results in the RecyclerView.
+     * Holds references to the views that display search result items.
+     */
+    public static class SearchViewHolder extends RecyclerView.ViewHolder {
+        /** TextView that displays the title of the search result item */
         public TextView title;
-        public ImageView image; // Add ImageView to hold the image
 
-        public ViewHolder(View itemView) {
+        /** ImageView that displays the image of the search result item */
+        public ImageView image;
+
+        /**
+         * Constructs a new SearchViewHolder.
+         * Initializes the view references for the search result item layout.
+         *
+         * @param itemView The View object containing the layout for a single search result item
+         *                 Must contain a TextView with id 'item_title' and an ImageView with id 'item_image'
+         */
+        public SearchViewHolder(View itemView) {
             super(itemView);
             title = itemView.findViewById(R.id.item_title);
-            image = itemView.findViewById(R.id.item_image); // Initialize ImageView
+            image = itemView.findViewById(R.id.item_image);
         }
     }
 }

@@ -49,76 +49,201 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/header">
-
-        <TextView
-            android:id="@+id/TVNameHomePage"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="TextView"
-            app:layout_constraintStart_toStartOf="@+id/textView2"
-            app:layout_constraintTop_toBottomOf="@+id/textView2" />
-
-        <TextView
-            android:id="@+id/textView2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="64dp"
-            android:layout_marginTop="36dp"
-            android:text="Good Evening!"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <Button
-            android:id="@+id/todayDashboardButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="200dp"
-            android:layout_marginEnd="68dp"
-            android:onClick="toTodayStats"
-            android:text="today"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <Button
-            android:id="@+id/thisMonthDashboardButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="160dp"
-            android:onClick="toThisMonthStats"
-            android:text="thisMonth"
-            app:layout_constraintEnd_toEndOf="@+id/todayDashboardButton"
-            app:layout_constraintTop_toBottomOf="@+id/todayDashboardButton" />
-
-        <ImageView
-            android:id="@+id/IVProfile"
-            android:layout_width="123dp"
-            android:layout_height="128dp"
-            android:layout_marginTop="5dp"
-            app:layout_constraintStart_toStartOf="@+id/TVNameHomePage"
-            app:layout_constraintTop_toBottomOf="@+id/TVNameHomePage"
-            app:srcCompat="@drawable/profile_pic_circle" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:foregroundGravity="bottom"
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/fragmentContainerView3"
+        android:name="com.hmir.goodfood.BottomNavigationFragment"
+        android:layout_width="410dp"
+        android:layout_height="93dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toStartOf="parent" />
 
-        <androidx.fragment.app.FragmentContainerView
-            android:id="@+id/fragmentContainerView"
-            android:name="com.hmir.goodfood.BottomNavigationFragment"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+    <ImageView
+        android:id="@+id/imageView5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="104dp"
+        android:layout_marginEnd="192dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/header"
+        app:srcCompat="@drawable/goodevening" />
 
-    </FrameLayout>
+    <ImageView
+        android:id="@+id/imageView6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="28dp"
+        android:layout_marginTop="12dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageView5"
+        app:srcCompat="@drawable/dashboard" />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/customCard"
+        android:layout_width="348dp"
+        android:layout_height="153dp"
+        android:clickable="true"
+        android:focusable="true"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="6dp"
+        app:layout_constraintBottom_toTopOf="@+id/customCard2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageView6">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="157dp"
+            android:padding="8dp">
+
+            <ProgressBar
+                android:id="@+id/HOMEtodayProgressBar"
+                style="@android:style/Widget.ProgressBar.Horizontal"
+                android:layout_width="226dp"
+                android:layout_height="45dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="48dp"
+                android:max="100"
+                android:progress="0"
+                android:progressDrawable="@drawable/progress_bar_drawable"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/HOMEtv_calorie_intake"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:fontFamily="@font/poppins_semibold_regular"
+                android:text="0/1000 cal"
+                android:textColor="@android:color/black"
+                android:textSize="16sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/HOMEtodayProgressBar" />
+
+            <TextView
+                android:id="@+id/HOMEpercentage_cal"
+                android:layout_width="58dp"
+                android:layout_height="40dp"
+                android:layout_marginTop="52dp"
+                android:layout_marginEnd="20dp"
+                android:fontFamily="@font/poppins_extrabold"
+                android:text="0%"
+                android:textSize="30sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/HOMEdizzyface"
+                android:layout_width="69dp"
+                android:layout_height="64dp"
+                android:layout_marginTop="44dp"
+                android:layout_marginEnd="20dp"
+                android:src="@drawable/dizzyface"
+                android:visibility="visible"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/HOMEtodayCalorieIntakeText"
+                android:layout_width="197dp"
+                android:layout_height="46dp"
+                android:layout_marginStart="8dp"
+                android:fontFamily="@font/poppins_medium_regular"
+                android:padding="8dp"
+                android:text="Calorie Today"
+                android:textColor="@color/black"
+                android:textSize="21sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageButton
+                android:id="@+id/todayDashboardButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="20dp"
+                android:background="@null"
+                android:onClick="toTodayStats"
+                android:text="today"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/arrow" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/customCard2"
+        android:layout_width="348dp"
+        android:layout_height="249dp"
+        android:clickable="true"
+        android:focusable="true"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="6dp"
+        app:layout_constraintBottom_toTopOf="@+id/fragmentContainerView3"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/customCard">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="249dp"
+            android:padding="8dp">
+
+
+            <ImageButton
+                android:id="@+id/thisMonthDashboardButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="24dp"
+                android:background="@null"
+                android:onClick="toThisMonthStats"
+                android:text="thisMonth"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/arrow" />
+
+            <com.github.mikephil.charting.charts.BarChart
+                android:id="@+id/HOMEthisMonthBarChart"
+                android:layout_width="299dp"
+                android:layout_height="159dp"
+                android:layout_centerInParent="true"
+                android:layout_marginTop="48dp"
+                android:layout_marginEnd="16dp"
+                android:background="@drawable/rounded_border"
+                android:padding="16dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/thisMonthNutrientIntakeText"
+                android:layout_width="231dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="8dp"
+                android:fontFamily="@font/poppins_medium_regular"
+                android:padding="8dp"
+                android:text="Nutrients This Month"
+                android:textColor="@color/black"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
+
+    <TextView
+        android:id="@+id/TVNameHomePage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:text="Guest"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toEndOf="@+id/imageView5"
+        app:layout_constraintTop_toTopOf="@+id/imageView5" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

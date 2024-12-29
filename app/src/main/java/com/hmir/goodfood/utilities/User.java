@@ -3,12 +3,18 @@ package com.hmir.goodfood.utilities;
 import android.annotation.SuppressLint;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.List;
 
 public class User {
-    private final static String email = FirebaseAuth.getInstance().getCurrentUser().getEmail();
+    //private final static String email = FirebaseAuth.getInstance().getCurrentUser().getEmail();
+    //google pfp
+    private final static FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+    private final static String email = currentUser != null ? currentUser.getEmail() : null;
+    private final static String photoUrl = currentUser != null ? currentUser.getPhotoUrl().toString() : null; // Get the Google profile picture URL
+    //
 //    private final static String email = "test1@gmail.com";
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private String username;
@@ -18,6 +24,7 @@ public class User {
     private List<String> health_labels;
     private List<String> favourite_recipes;
     private List<String> nutritional_records;
+
 
     public User() {}
 
@@ -82,11 +89,16 @@ public class User {
         this.nutritional_records = nutritional_records;
     }
 
+    // google pfp
+    public String getPhotoUrl() {
+        return photoUrl; // Add this getter for the profile picture URL
+    }
+
     @SuppressLint("DefaultLocale")
     @Override
     public String toString() {
-        return String.format("User(%s, %s, %d, %.2f, %.2f, %s, %s, %s)",
+        return String.format("User(%s, %s, %d, %.2f, %.2f, %s, %s, %s,%s)",
                 username, email, age, height, weight,
-                health_labels, favourite_recipes, nutritional_records);
+                health_labels, favourite_recipes, nutritional_records,photoUrl);//
     }
 }
