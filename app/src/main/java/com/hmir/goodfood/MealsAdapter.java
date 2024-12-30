@@ -14,9 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MealsAdapter extends RecyclerView.Adapter<MealsAdapter.MealsViewHolder> {
-
     private final List<String> mealImages; // List of meal image URLs or URIs
-
     // Constructor to initialize the list of meal images
     public MealsAdapter(List<String> mealImages) {
         // Defensive copy to prevent external modification

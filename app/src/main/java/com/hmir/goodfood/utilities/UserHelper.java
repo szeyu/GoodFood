@@ -192,7 +192,10 @@ public class UserHelper {
             String age = Long.toString(currentUser.getAge());
             String height = Double.toString(currentUser.getHeight());
             String weight = Double.toString(currentUser.getWeight());
-            String dietTypes = currentUser.getHealth_labels().toString();
+            // Check if getHealth_labels() is null before calling toString()
+            String dietTypes = currentUser.getHealth_labels() != null
+                    ? currentUser.getHealth_labels().toString()
+                    : "No health labels available";
 
             editor.putString("Email", email);
             editor.putString("Username", username);
