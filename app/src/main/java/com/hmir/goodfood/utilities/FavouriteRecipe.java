@@ -26,15 +26,25 @@ public class FavouriteRecipe {
     private List<String> ingredients;
     private List<String> steps;
 
+    /**
+     * Default constructor required for Firebase Firestore deserialization.
+     */
     public FavouriteRecipe() {
     }
 
+    /**
+     * Creates a new FavouriteRecipe with the specified details.
+     *
+     * @param recipe_id   The unique identifier for the recipe
+     * @param name        The name of the recipe
+     * @param ingredients List of ingredients required for the recipe
+     * @param steps       List of preparation steps for the recipe
+     */
     public FavouriteRecipe(String recipe_id, String name, List<String> ingredients, List<String> steps) {
         this.recipe_id = recipe_id;
         this.name = name;
         this.ingredients = new ArrayList<>(ingredients);
         this.steps = new ArrayList<>(steps);
-
     }
 
     /**
@@ -75,9 +85,7 @@ public class FavouriteRecipe {
     }
 
     // Update Recipe Record
-
     public void updateFavouriteRecipe() {
-
         db.collection("favourite_recipes")
                 .document(recipe_id)
                 .update("name", name, "ingredients", ingredients, "steps", steps)
@@ -94,36 +102,74 @@ public class FavouriteRecipe {
                 .addOnFailureListener(e -> Log.e("Firestore", "Error deleting favourite recipe", e));
     }
 
-    // Getters and Setters
+    /**
+     * Gets the recipe's unique identifier.
+     *
+     * @return The recipe ID
+     */
     public String getRecipe_id() {
         return recipe_id;
     }
 
+    /**
+     * Sets the recipe's unique identifier.
+     *
+     * @param recipe_id The new recipe ID
+     */
     public void setRecipe_id(String recipe_id) {
         this.recipe_id = recipe_id;
     }
 
-
+    /**
+     * Gets the recipe's name.
+     *
+     * @return The name of the recipe
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Sets the recipe's name.
+     *
+     * @param name The new name for the recipe
+     */
     public void setName(String name) {
         this.name = name;
     }
 
+    /**
+     * Gets the list of ingredients.
+     *
+     * @return A defensive copy of the ingredients list
+     */
     public List<String> getIngredients() {
         return new ArrayList<>(ingredients);
     }
 
+    /**
+     * Sets the list of ingredients.
+     *
+     * @param ingredients The new list of ingredients
+     */
     public void setIngredients(List<String> ingredients) {
         this.ingredients = ingredients;
     }
 
+    /**
+     * Gets the list of preparation steps.
+     *
+     * @return A defensive copy of the steps list
+     */
     public List<String> getSteps() {
         return new ArrayList<>(steps);
     }
 
+    /**
+     * Sets the list of preparation steps.
+     *
+     * @param steps The new list of preparation steps
+     */
     public void setSteps(List<String> steps) {
         this.steps = new ArrayList<>(steps);
     }
