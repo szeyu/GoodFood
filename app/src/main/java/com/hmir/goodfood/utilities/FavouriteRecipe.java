@@ -130,7 +130,6 @@ public class FavouriteRecipe {
 
     @Override
     public String toString() {
-        List<String> safeDietLabels = new ArrayList<>(diet_labels);
         return String.format(
                 "FavouriteRecipe { " +
                         "recipe_id='%s', name='%s', ingredients='%s', steps='%s', image='%s' }",
