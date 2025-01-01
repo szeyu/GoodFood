@@ -10,6 +10,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Exclude;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -174,7 +175,7 @@ public class User {
      */
     @NonNull
     public List<String> getFavourite_recipes() {
-        return favourite_recipes != null ? favourite_recipes : new ArrayList<>();
+        return Collections.unmodifiableList(favourite_recipes);
     }
 
     /**
@@ -191,15 +192,18 @@ public class User {
      */
     @NonNull
     public List<String> getHealth_labels() {
-        return health_labels != null ? health_labels : new ArrayList<>();
+        return Collections.unmodifiableList(health_labels);
     }
 
     /**
      * Sets the user's health labels.
-     * @param health_labels The list of health labels
+     * @param labels The list of health labels
      */
-    public void setHealth_labels(@Nullable List<String> health_labels) {
-        this.health_labels = health_labels != null ? health_labels : new ArrayList<>();
+    public void setHealth_labels(@Nullable List<String> labels) {
+        health_labels.clear();
+        if (labels != null) {
+            health_labels.addAll(labels);
+        }
     }
 
     /**
@@ -208,15 +212,18 @@ public class User {
      */
     @NonNull
     public List<String> getNutritional_records() {
-        return nutritional_records != null ? nutritional_records : new ArrayList<>();
+        return Collections.unmodifiableList(nutritional_records);
     }
 
     /**
      * Sets the user's nutritional records.
-     * @param nutritional_records The list of nutritional record IDs
+     * @param records The list of nutritional record IDs
      */
-    public void setNutritional_records(@Nullable List<String> nutritional_records) {
-        this.nutritional_records = nutritional_records != null ? nutritional_records : new ArrayList<>();
+    public void setNutritional_records(@Nullable List<String> records) {
+        nutritional_records.clear();
+        if (records != null) {
+            nutritional_records.addAll(records);
+        }
     }
 
     /**
