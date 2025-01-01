@@ -7,10 +7,8 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-
 import java.util.ArrayList;
 import java.util.HashMap;
-
 import java.util.List;
 
 /**
@@ -25,22 +23,17 @@ public class FavouriteRecipe {
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private String recipe_id;
     private String name;
-
     private List<String> ingredients;
     private List<String> steps;
-
-    
-
 
     public FavouriteRecipe() {
     }
 
     public FavouriteRecipe(String recipe_id, String name, List<String> ingredients, List<String> steps) {
         this.recipe_id = recipe_id;
-
         this.name = name;
-        this.ingredients = ingredients;
-        this.steps = steps;
+        this.ingredients = new ArrayList<>(ingredients);
+        this.steps = new ArrayList<>(steps);
 
     }
 
@@ -120,7 +113,7 @@ public class FavouriteRecipe {
     }
 
     public List<String> getIngredients() {
-        return ingredients;
+        return new ArrayList<>(ingredients);
     }
 
     public void setIngredients(List<String> ingredients) {
@@ -128,14 +121,12 @@ public class FavouriteRecipe {
     }
 
     public List<String> getSteps() {
-        return steps;
+        return new ArrayList<>(steps);
     }
 
     public void setSteps(List<String> steps) {
-        this.steps = steps;
+        this.steps = new ArrayList<>(steps);
     }
-
-
 
     @Override
     public String toString() {
@@ -145,7 +136,6 @@ public class FavouriteRecipe {
                         "recipe_id='%s', name='%s', ingredients='%s', steps='%s', image='%s' }",
                 recipe_id,
                 name,
-
                 ingredients,
                 steps
 
