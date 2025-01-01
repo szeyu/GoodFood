@@ -19,7 +19,7 @@
         android:theme="@style/Theme.GoodFood"
         tools:targetApi="31">
         <activity
-            android:name=".Mealhistory"
+            android:name=".MealHistory"
             android:exported="false" />
         <activity
             android:name=".ProfilePageFunctions"

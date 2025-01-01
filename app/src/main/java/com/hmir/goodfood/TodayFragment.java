@@ -19,7 +19,6 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import com.hmir.goodfood.MealsAdapter;
 
 import com.bumptech.glide.Glide;
 import com.github.mikephil.charting.charts.BarChart;
@@ -269,7 +268,7 @@ public class TodayFragment extends Fragment {
                         NutritionalRecord selectedRecord = getNutritionalRecordForImage(imageUrl);
                         if (selectedRecord != null) {
                             // Now you have the selected record, pass it along with the image URL
-                            Intent intent = new Intent(getContext(), Mealhistory.class);
+                            Intent intent = new Intent(getContext(), MealHistory.class);
                             intent.putExtra("imageUrl", imageUrl);
                             intent.putExtra("calories", selectedRecord.getCalories());
                             intent.putExtra("protein", selectedRecord.getProtein());
