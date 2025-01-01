@@ -253,6 +253,11 @@ public class FavouriteRecipeHelper {
         return splitSteps;
     }
 
+    /**
+     * Fetches all favorite recipes for the currently authenticated user.
+     *
+     * @param callback Callback to handle the fetched recipes or errors
+     */
     public void fetchUserFavoriteRecipes(RecipeFetchCallback callback) {
         // Get the current user's email
         String userEmail = FirebaseAuth.getInstance().getCurrentUser() != null ? FirebaseAuth.getInstance().getCurrentUser().getEmail() : null;
@@ -282,6 +287,12 @@ public class FavouriteRecipeHelper {
                 .addOnFailureListener(callback::onError);
     }
 
+    /**
+     * Fetches recipe details for a list of recipe IDs.
+     *
+     * @param recipeIds List of recipe IDs to fetch
+     * @param callback Callback to handle the fetched recipes or errors
+     */
     public void fetchRecipesFromReferences(List<String> recipeIds, RecipeFetchCallback callback) {
         CollectionReference favRecipesRef = db.collection("favourite_recipes");
 
@@ -334,9 +345,17 @@ public class FavouriteRecipeHelper {
     }
 
     // Function 4 : Delete
-
-    // Delete favourite recipe
-    public void deleteFavouriteRecipe(String recipeId, String userEmail, OnRecipeDeletedCallback callback) {
+    /**
+     * Deletes a user's favorite recipe from both user's collection and main recipes collection.
+     *
+     * @param recipeId ID of the recipe to delete
+     * @param userEmail Email of the user
+     * @param callback Callback to handle success or failure of deletion
+     */
+    public void deleteFavouriteRecipe(
+            String recipeId,
+            String userEmail,
+            OnRecipeDeletedCallback callback) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         // Reference to the recipe in the 'favourite_recipes' collection

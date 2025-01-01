@@ -47,6 +47,10 @@ public class DisplayActivity extends AppCompatActivity {
         setupDeleteButton();
     }
 
+    /**
+     * Initializes view references from layout.
+     * Finds and assigns all necessary view components.
+     */
     private void initializeViews() {
         recipeNameTextView = findViewById(R.id.recipeName);
         recipeIngredientsTextView = findViewById(R.id.recipeIngredients);
@@ -54,6 +58,10 @@ public class DisplayActivity extends AppCompatActivity {
         fabDelete = findViewById(R.id.fab_delete);
     }
 
+    /**
+     * Sets up the toolbar with proper configuration.
+     * Enables the back button and sets the title.
+     */
     private void setupToolbar() {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -63,11 +71,19 @@ public class DisplayActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Initializes Firebase components.
+     * Sets up Firestore and FavouriteRecipeHelper instances.
+     */
     private void initializeFirebase() {
         db = FirebaseFirestore.getInstance();
         favouriteRecipeHelper = new FavouriteRecipeHelper();
     }
 
+    /**
+     * Handles the recipe ID received from the intent.
+     * Fetches recipe details if ID is present, shows error otherwise.
+     */
     private void handleRecipeId() {
         recipeId = getIntent().getStringExtra("recipe_id");
         if (recipeId != null) {
@@ -78,6 +94,10 @@ public class DisplayActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Sets up the delete button with click listener.
+     * Initializes the floating action button for recipe deletion.
+     */
     private void setupDeleteButton() {
         fabDelete.setOnClickListener(v -> deleteRecipe());
     }
@@ -155,10 +175,20 @@ public class DisplayActivity extends AppCompatActivity {
                 });
     }
 
+    /**
+     * Displays an error message to the user.
+     *
+     * @param message The error message to display
+     */
     private void showError(String message) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 
+    /**
+     * Displays a success message to the user.
+     *
+     * @param message The success message to display
+     */
     private void showSuccess(String message) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
