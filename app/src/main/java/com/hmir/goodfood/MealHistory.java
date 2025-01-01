@@ -12,6 +12,18 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
 
+/**
+ * Activity that displays detailed information about a specific meal.
+ * Shows the meal image and its complete nutritional breakdown.
+ *
+ * <p>This activity receives meal data through intent extras and displays:
+ * <ul>
+ *     <li>Meal image</li>
+ *     <li>Caloric content</li>
+ *     <li>Macro and micronutrients</li>
+ *     <li>Detailed nutritional information</li>
+ * </ul>
+ */
 public class MealHistory extends AppCompatActivity {
 
     @Override
@@ -76,7 +88,21 @@ public class MealHistory extends AppCompatActivity {
         }
     }
 
+    /**
+     * Adds a card view displaying nutritional information to the container.
+     *
+     * @param label The name of the nutrient to display
+     * @param value The numerical value of the nutrient
+     * @param unit The unit of measurement (e.g., "g", "mg", "kcal")
+     * @param container The LinearLayout container to add the card to
+     * @throws IllegalArgumentException if any parameter is null
+     * @throws IllegalStateException if the layout inflation fails
+     */
     private void addNutrientCard(String label, double value, String unit, LinearLayout container) {
+        if (label == null || unit == null || container == null) {
+            throw new IllegalArgumentException("Parameters cannot be null");
+        }
+
         LayoutInflater inflater = LayoutInflater.from(this);
         View card = inflater.inflate(R.layout.fragment_nutritional_detail, container, false);
 
