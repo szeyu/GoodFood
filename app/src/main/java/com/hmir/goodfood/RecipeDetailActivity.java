@@ -13,10 +13,22 @@ import com.hmir.goodfood.utilities.FavouriteRecipeHelper;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Activity for displaying detailed information about a recipe.
+ * This activity shows the recipe's name, ingredients, and steps,
+ * and allows users to save the recipe to their favorites.
+ */
 public class RecipeDetailActivity extends AppCompatActivity {
 
     private FavouriteRecipeHelper favouriteRecipeHelper;
 
+    /**
+     * Initializes the activity, sets up the UI, and populates recipe details.
+     *
+     * @param savedInstanceState If the activity is being re-initialized after previously
+     *                          being shut down, this contains the data it most recently
+     *                          supplied in onSaveInstanceState(Bundle)
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,7 +75,12 @@ public class RecipeDetailActivity extends AppCompatActivity {
         }
     }
 
-    // Save the recipe to the user's own favourite_recipes collection
+    /**
+     * Saves the current recipe to the user's favorites collection in Firebase.
+     * Requires user to be authenticated.
+     *
+     * @param recipe The Recipe object to be saved to favorites
+     */
     private void saveRecipeToFavorites(Recipe recipe) {
         // Get the current user's UID (ensure the user is logged in)
         String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
