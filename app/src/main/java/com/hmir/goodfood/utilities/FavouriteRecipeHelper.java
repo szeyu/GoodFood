@@ -14,20 +14,31 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.hmir.goodfood.Item;
 
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Helper class for managing favorite recipes in Firebase Firestore.
+ * This class provides functionality for CRUD operations (Create, Read, Update, Delete)
+ * on favorite recipes, including searching and managing user-specific favorite recipes.
+ */
 public class FavouriteRecipeHelper {
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
+    /**
+     * Default constructor for FavouriteRecipeHelper.
+     */
     public FavouriteRecipeHelper() {}
 
     // Function 1 : Fetch and Search
-
-    // Fetch specific favourite recipe and return a Task of it
+    /**
+     * Fetches a specific favorite recipe by its ID.
+     *
+     * @param recipe_id The unique identifier of the recipe
+     * @return Task containing the FavouriteRecipe object
+     */
     public Task<FavouriteRecipe> fetchFavouriteRecipe(@NonNull String recipe_id) {
         return db.collection("favourite_recipes")
                 .document(recipe_id)
@@ -38,6 +49,7 @@ public class FavouriteRecipeHelper {
                         if (documentSnapshot.exists()) {
                             FavouriteRecipe recipe = documentSnapshot.toObject(FavouriteRecipe.class);
                             if (recipe != null) {
+                                // Set the recipe_id field to the document ID
                                 recipe.setRecipe_id(documentSnapshot.getId());
                             }
                             return recipe;
@@ -51,8 +63,12 @@ public class FavouriteRecipeHelper {
                 });
     }
 
-
-    // Fetch selected favourite recipes and return a Task of a List of them
+    /**
+     * Fetches multiple favorite recipes based on provided recipe IDs.
+     *
+     * @param recipe_id List of recipe IDs to fetch
+     * @return Task containing a List of FavouriteRecipe objects
+     */
     public Task<List<FavouriteRecipe>> fetchSomeFavouriteRecipes(List<String> recipe_id) {
         if (recipe_id == null || recipe_id.isEmpty()) {
             return Tasks.forException(new Exception("recipe_id(s) list is null or empty"));
@@ -134,11 +150,13 @@ public class FavouriteRecipeHelper {
                 });
     }
 
-
     // Function 2 : Add
-
-    // Add new favourite recipe for a specific user
-    // Add new favourite recipe for the currently authenticated user
+    /**
+     * Adds a new favorite recipe for the currently authenticated user.
+     *
+     * @param recipe Recipe data as a Map
+     * @param callback Callback to handle success or failure of the operation
+     */
     public void addFavouriteRecipe(Map<String, Object> recipe, OnRecipeAddedCallback callback) {
         // Get the current user's email from Firebase Authentication
         String userEmail = FirebaseAuth.getInstance().getCurrentUser() != null ? FirebaseAuth.getInstance().getCurrentUser().getEmail() : null;
@@ -289,9 +307,17 @@ public class FavouriteRecipeHelper {
                     .addOnFailureListener(e -> callback.onError(e));
         }
     }
-   // Function 3 : Update
 
-    // Update favourite recipe
+    // Function 3 : Update
+    /**
+     * Updates an existing favorite recipe.
+     *
+     * @param name New name for the recipe
+     * @param ingredients New list of ingredients
+     * @param steps New list of steps
+     * @param recipe_id ID of the recipe to update
+     * @throws IllegalArgumentException if recipe_id is null or empty
+     */
     public void updateFavouriteRecipe(String name, List<String> ingredients, List<String> steps, String recipe_id) {
         if (recipe_id == null || recipe_id.isEmpty()) {
             throw new IllegalArgumentException("recipe_id is null or empty");
@@ -361,18 +387,41 @@ public class FavouriteRecipeHelper {
                 });
     }
 
-
-    // Callback interface for delete success or failure
+    /**
+     * Callback interface for handling recipe deletion operations.
+     * This interface provides methods to handle both successful deletion
+     * and error scenarios when deleting a favorite recipe.
+     */
     public interface OnRecipeDeletedCallback {
+
+        /**
+         * Called when a recipe is successfully deleted from the database.
+         * This method is invoked after the deletion operation completes without errors.
+         */
         void onRecipeDeleted();
+
+        /**
+         * Called when a recipe is successfully deleted from the database.
+         * This method is invoked after the deletion operation completes without errors.
+         */
         void onError(Exception e);
     }
 
-
-
-
+    /**
+     * Callback interface for recipe addition operations.
+     */
     public interface OnRecipeAddedCallback {
+
+        /**
+         * Called when a recipe is successfully added.
+         * @param recipeId ID of the newly added recipe
+         */
         void onRecipeAdded(String recipeId);
+
+        /**
+         * Called when an error occurs during recipe addition.
+         * @param e The exception that occurred
+         */
         void onError(Exception e);
     }
 }
