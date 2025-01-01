@@ -1,34 +1,35 @@
 package com.hmir.goodfood;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
-
+import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Adapter for displaying food items in a RecyclerView.
- * Handles the creation and binding of ViewHolders, image loading with Glide,
- * and proper context management for food item displays.
- *
- * @see RecyclerView.Adapter
- * @see ResultViewHolder
+ * Adapter for displaying recipe results in a RecyclerView.
+ * Handles the display and click events of recipe items in the results list.
  */
 public class ResultAdapter extends RecyclerView.Adapter<ResultAdapter.ResultViewHolder> {
     private Context context;
     private List<Item> items;
 
+    /**
+     * Constructs a new ResultAdapter.
+     *
+     * @param context The context in which the adapter is being used
+     * @param items   The list of items to display
+     */
     public ResultAdapter(Context context, List<Item> items) {
         this.context = context;
-        this.items = items;
+        this.items = new ArrayList<>(items); // Defensive copy
     }
 
     @Override
@@ -38,9 +39,15 @@ public class ResultAdapter extends RecyclerView.Adapter<ResultAdapter.ResultView
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ResultViewHolder holder, int position) {
+    public void onBindViewHolder(ResultViewHolder holder, int position) {
         Item item = items.get(position);
-        holder.bind(item, context);
+        holder.itemTitle.setText(item.getName());  // Display only name
+
+        holder.itemView.setOnClickListener(v -> {
+            Intent intent = new Intent(v.getContext(), DisplayActivity.class);
+            intent.putExtra("recipe_id", item.getRecipeId());  // Pass the recipe reference ID for fetching full details
+            v.getContext().startActivity(intent);
+        });
     }
 
     @Override
@@ -48,38 +55,31 @@ public class ResultAdapter extends RecyclerView.Adapter<ResultAdapter.ResultView
         return items.size();
     }
 
-    // Made static and added binding logic inside ViewHolder
-    static class ResultViewHolder extends RecyclerView.ViewHolder {
+    /**
+     * Static ViewHolder class for result items.
+     * Holds and manages the views for individual result entries.
+     */
+    public static class ResultViewHolder extends RecyclerView.ViewHolder {
         private final TextView itemTitle;
-        private final TextView itemDescription;
-        private final ImageView itemImage;
 
+        /**
+         * Constructs a new ResultViewHolder.
+         *
+         * @param itemView The view containing the layout for a single result item
+         */
         public ResultViewHolder(@NonNull View itemView) {
             super(itemView);
             itemTitle = itemView.findViewById(R.id.item_title);
-            itemDescription = itemView.findViewById(R.id.item_description);
-            itemImage = itemView.findViewById(R.id.item_image);
         }
 
-        // Added bind method to handle item binding
-        public void bind(Item item, Context context) {
-            itemTitle.setText(item.getName());
-            itemDescription.setText(item.getDescription());
-
-            // Use Glide to load images
-            int imageResourceId = context.getResources().getIdentifier(
-                    item.getImageResourceName(),
-                    "drawable",
-                    context.getPackageName()
-            );
-
-            if (imageResourceId != 0) {
-                Glide.with(context)
-                        .load(imageResourceId)
-                        .into(itemImage);
-            } else {
-                itemImage.setImageResource(R.drawable.food_image_placeholder);
-            }
+        /**
+         * Gets the title TextView of this ViewHolder.
+         *
+         * @return The TextView displaying the item title
+         */
+        @NonNull
+        public TextView getItemTitle() {
+            return itemTitle;
         }
     }
 }
