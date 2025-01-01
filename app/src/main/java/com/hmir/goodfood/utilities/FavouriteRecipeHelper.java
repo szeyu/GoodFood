@@ -6,48 +6,42 @@ import androidx.annotation.NonNull;
 
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FieldPath;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.hmir.goodfood.Item;
+import com.hmir.goodfood.callbacks.OnRecipeAddedCallback;
+import com.hmir.goodfood.callbacks.OnRecipeDeletedCallback;
+import com.hmir.goodfood.callbacks.RecipeFetchCallback;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 
+/**
+ * Helper class for managing favorite recipes in Firebase Firestore.
+ * This class provides functionality for CRUD operations (Create, Read, Update, Delete)
+ * on favorite recipes, including searching and managing user-specific favorite recipes.
+ */
 public class FavouriteRecipeHelper {
-    /*
-      In this class, there will be multiple methods relating to favourite recipe(s):
-
-      * Note :  The following Functions 1 - 4 are mostly covered in UserHelper, so these usually are not being used / called directly from
-                FavouriteRecipeHelper.
-
-      Function 1 : Fetch and Search
-                    - fetchFavouriteRecipe()
-                    - fetchSomeFavouriteRecipes()
-                    - fetchAllFavouriteRecipes()
-                    - searchFavouriteRecipesByName()
-
-      Function 2 : Add
-                    - addFavouriteRecipe()
-
-      Function 3 : Update
-                    - updateFavouriteRecipe()
-
-       Function 4 : Delete
-                    - deleteFavouriteRecipe()
-     */
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
+    /**
+     * Default constructor for FavouriteRecipeHelper.
+     */
     public FavouriteRecipeHelper() {}
 
     // Function 1 : Fetch and Search
-
-    // Fetch specific favourite recipe and return a Task of it
+    /**
+     * Fetches a specific favorite recipe by its ID.
+     *
+     * @param recipe_id The unique identifier of the recipe
+     * @return Task containing the FavouriteRecipe object
+     */
     public Task<FavouriteRecipe> fetchFavouriteRecipe(@NonNull String recipe_id) {
         return db.collection("favourite_recipes")
                 .document(recipe_id)
@@ -72,7 +66,12 @@ public class FavouriteRecipeHelper {
                 });
     }
 
-    // Fetch selected favourite recipes and return a Task of a List of them
+    /**
+     * Fetches multiple favorite recipes based on provided recipe IDs.
+     *
+     * @param recipe_id List of recipe IDs to fetch
+     * @return Task containing a List of FavouriteRecipe objects
+     */
     public Task<List<FavouriteRecipe>> fetchSomeFavouriteRecipes(List<String> recipe_id) {
         if (recipe_id == null || recipe_id.isEmpty()) {
             return Tasks.forException(new Exception("recipe_id(s) list is null or empty"));
@@ -132,9 +131,7 @@ public class FavouriteRecipeHelper {
 
         return db.collection("favourite_recipes")
                 .whereGreaterThanOrEqualTo("name", name.toLowerCase())
-                // Start of the range for lexicographical order
                 .whereLessThanOrEqualTo("name", name.toLowerCase() + "\uf8ff")
-                // End of the range (wide range character)
                 .get()
                 .continueWith(task -> {
                     if (task.isSuccessful()) {
@@ -157,63 +154,188 @@ public class FavouriteRecipeHelper {
     }
 
     // Function 2 : Add
-
-    // Add new favourite recipe
+    /**
+     * Adds a new favorite recipe for the currently authenticated user.
+     *
+     * @param recipe Recipe data as a Map
+     * @param callback Callback to handle success or failure of the operation
+     */
     public void addFavouriteRecipe(Map<String, Object> recipe, OnRecipeAddedCallback callback) {
-        Map<String, Object> defaultRecipe = new HashMap<>();
-        defaultRecipe.put("calcium", 0);
-        defaultRecipe.put("calories", 0);
-        defaultRecipe.put("carbs", 0);
-        defaultRecipe.put("magnesium", 0);
-        defaultRecipe.put("cholesterol", 0);
-        defaultRecipe.put("diet_labels", null);
-        defaultRecipe.put("fat", 0);
-        defaultRecipe.put("image", null);
-        defaultRecipe.put("name", null);
-        defaultRecipe.put("iron", 0);
-        defaultRecipe.put("potassium", 0);
-        defaultRecipe.put("protein", 0);
-        defaultRecipe.put("sodium", 0);
-        defaultRecipe.put("servings", 0);
-        defaultRecipe.putAll(recipe);
+        // Get the current user's email from Firebase Authentication
+        String userEmail = FirebaseAuth.getInstance().getCurrentUser() != null ? FirebaseAuth.getInstance().getCurrentUser().getEmail() : null;
 
-        db.collection("favourite_recipes")
-                .add(defaultRecipe)
+        if (userEmail == null) {
+            callback.onError(new Exception("User is not authenticated"));
+            return;
+        }
+
+        // Prepare the recipe data
+        Map<String, Object> defaultRecipe = new HashMap<>(); // Use a mutable map here
+        defaultRecipe.put("name", recipe.get("name"));  // Add name from the passed data
+        defaultRecipe.put("ingredients", recipe.get("ingredients"));  // Add ingredients from the passed data
+
+        // Get the steps from the recipe
+        Object stepsObj = recipe.get("steps");
+        List<String> splitSteps = new ArrayList<>();
+
+        if (stepsObj instanceof String) {
+            // If steps are a String, split them into individual steps
+            String steps = (String) stepsObj;
+            splitSteps = splitSteps(steps);  // Split the steps into a list of strings
+        } else if (stepsObj instanceof List) {
+            // If steps are already a List, just cast it
+            splitSteps = (List<String>) stepsObj;
+        }
+
+        // Add the list of steps to the recipe data
+        defaultRecipe.put("steps", splitSteps);
+
+        // Get Firestore instance
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        // Reference to the user's document using email as the document ID
+        DocumentReference userDocRef = db.collection("user").document(userEmail);
+
+        // Reference to the `favourite_recipes` collection to store the recipe data
+        CollectionReference favRecipesRef = db.collection("favourite_recipes");
+
+        // Add the recipe to the `favourite_recipes` collection and get the recipe ID
+        favRecipesRef.add(defaultRecipe)
                 .addOnSuccessListener(documentReference -> {
-                    String newRecipeId = documentReference.getId();
-                    callback.onRecipeAdded(newRecipeId);
+                    String newRecipeId = documentReference.getId();  // Get the new recipe ID
+
+                    // Now, update the user's document to store the recipe ID in the `favourite_recipes` field
+                    userDocRef.update("favourite_recipes", FieldValue.arrayUnion(newRecipeId))
+                            .addOnSuccessListener(aVoid -> {
+                                callback.onRecipeAdded(newRecipeId);  // Call the callback with the new recipe ID
+                            })
+                            .addOnFailureListener(e -> {
+                                callback.onError(new Exception("Error updating user's favourite recipes", e));  // Handle error
+                            });
                 })
                 .addOnFailureListener(e -> {
-                    callback.onError(new Exception("Error adding favourite recipe", e));
+                    callback.onError(new Exception("Error adding favourite recipe", e));  // Handle error
                 });
     }
 
-    // Function 3 : Update
+    // Helper method to split the steps string into individual steps
+    public List<String> splitSteps(String steps) {
+        List<String> splitSteps = new ArrayList<>();
+        if (steps != null && !steps.isEmpty()) {
+            // Split by period followed by a space or newline
+            String[] parts = steps.split("(?<=\\.)\\s*");
 
-    // Update favourite recipe
-    public void updateFavouriteRecipe(double calcium, double calories, double carbs, double cholesterol,
-                                        double magnesium, List<String> diet_labels, double fat, int servings,
-                                        DocumentReference image, String name, double iron,
-                                        double potassium, double protein, double sodium, String recipe_id) {
+            // Variable to track whether to split or not (skip every other period)
+            boolean shouldSplit = false;
+
+            StringBuilder currentStep = new StringBuilder();
+
+            for (String part : parts) {
+                currentStep.append(part.trim()); // Append the current part
+
+                // If the current part ends with a period, decide whether to split or not
+                if (currentStep.toString().endsWith(".")) {
+                    if (shouldSplit) {
+                        splitSteps.add(currentStep.toString().trim()); // Add the current step
+                        currentStep.setLength(0); // Reset for the next step
+                    }
+                    shouldSplit = !shouldSplit; // Toggle the split flag
+                } else {
+                    currentStep.append(" "); // Add space between steps if not splitting
+                }
+            }
+
+            // Add any remaining text as a final step
+            if (currentStep.length() > 0) {
+                splitSteps.add(currentStep.toString().trim());
+            }
+        }
+        return splitSteps;
+    }
+
+    /**
+     * Fetches all favorite recipes for the currently authenticated user.
+     *
+     * @param callback Callback to handle the fetched recipes or errors
+     */
+    public void fetchUserFavoriteRecipes(RecipeFetchCallback callback) {
+        // Get the current user's email
+        String userEmail = FirebaseAuth.getInstance().getCurrentUser() != null ? FirebaseAuth.getInstance().getCurrentUser().getEmail() : null;
+
+        if (userEmail == null) {
+            callback.onError(new Exception("User is not authenticated"));
+            return;
+        }
+
+        // Reference to the user's document
+        DocumentReference userDocRef = db.collection("user").document(userEmail);
+
+        // Fetch the user's favourite recipe IDs
+        userDocRef.get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists() && documentSnapshot.contains("favourite_recipes")) {
+                        List<String> recipeRefs = (List<String>) documentSnapshot.get("favourite_recipes");
+                        if (recipeRefs != null && !recipeRefs.isEmpty()) {
+                            fetchRecipesFromReferences(recipeRefs, callback);
+                        } else {
+                            callback.onRecipesFetched(new ArrayList<>()); // Return empty list if no recipes
+                        }
+                    } else {
+                        callback.onRecipesFetched(new ArrayList<>()); // Return empty list if no data
+                    }
+                })
+                .addOnFailureListener(callback::onError);
+    }
+
+    /**
+     * Fetches recipe details for a list of recipe IDs.
+     *
+     * @param recipeIds List of recipe IDs to fetch
+     * @param callback Callback to handle the fetched recipes or errors
+     */
+    public void fetchRecipesFromReferences(List<String> recipeIds, RecipeFetchCallback callback) {
+        CollectionReference favRecipesRef = db.collection("favourite_recipes");
+
+        List<Item> items = new ArrayList<>();
+        for (String recipeId : recipeIds) {
+            favRecipesRef.document(recipeId).get()
+                    .addOnSuccessListener(documentSnapshot -> {
+                        if (documentSnapshot.exists()) {
+                            // Create Item object from the recipe data
+                            Item item = documentSnapshot.toObject(Item.class);
+                            if (item != null) {
+                                item.setRecipeId(recipeId);  // Set the recipe ID manually
+                                items.add(item);
+                            }
+                        }
+                        // Once all recipes are fetched, invoke the callback
+                        if (items.size() == recipeIds.size()) {
+                            callback.onRecipesFetched(items);
+                        }
+                    })
+                    .addOnFailureListener(e -> callback.onError(e));
+        }
+    }
+
+    // Function 3 : Update
+    /**
+     * Updates an existing favorite recipe.
+     *
+     * @param name New name for the recipe
+     * @param ingredients New list of ingredients
+     * @param steps New list of steps
+     * @param recipe_id ID of the recipe to update
+     * @throws IllegalArgumentException if recipe_id is null or empty
+     */
+    public void updateFavouriteRecipe(String name, List<String> ingredients, List<String> steps, String recipe_id) {
         if (recipe_id == null || recipe_id.isEmpty()) {
             throw new IllegalArgumentException("recipe_id is null or empty");
         }
 
         Map<String, Object> recipeUpdates = Map.ofEntries(
-                Map.entry("calcium", calcium),
-                Map.entry("calories", calories),
-                Map.entry("carbs", carbs),
-                Map.entry("cholesterol", cholesterol),
-                Map.entry("magnesium", magnesium),
-                Map.entry("diet_labels", diet_labels),
-                Map.entry("fat", fat),
-                Map.entry("image", image),
                 Map.entry("name", name),
-                Map.entry("iron", iron),
-                Map.entry("potassium", potassium),
-                Map.entry("protein", protein),
-                Map.entry("sodium", sodium),
-                Map.entry("servings", servings)
+                Map.entry("ingredients", ingredients),
+                Map.entry("steps", steps)
         );
         db.collection("favourite_recipes")
                 .document(recipe_id)
@@ -223,22 +345,62 @@ public class FavouriteRecipeHelper {
     }
 
     // Function 4 : Delete
+    /**
+     * Deletes a user's favorite recipe from both user's collection and main recipes collection.
+     *
+     * @param recipeId ID of the recipe to delete
+     * @param userEmail Email of the user
+     * @param callback Callback to handle success or failure of deletion
+     */
+    public void deleteFavouriteRecipe(
+            String recipeId,
+            String userEmail,
+            OnRecipeDeletedCallback callback) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-    // Delete favourite recipe
-    public void deleteFavouriteRecipe(String recipe_id) {
-        if (recipe_id == null || recipe_id.isEmpty()) {
-            throw new IllegalArgumentException("recipe_id is null or empty");
-        }
+        // Reference to the recipe in the 'favourite_recipes' collection
+        DocumentReference recipeRef = db.collection("favourite_recipes").document(recipeId);
 
-        db.collection("favourite_recipes")
-                .document(recipe_id)
-                .delete()
-                .addOnSuccessListener(aVoid -> Log.d("FavouriteRecipeHelper", "favourite recipe deleted"))
-                .addOnFailureListener(e -> Log.e("FavouriteRecipeHelper", "Error deleting favourite recipe", e));
+        // Reference to the user's document
+        DocumentReference userDocRef = db.collection("user").document(userEmail);
+
+        // Delete the recipe from the 'favourite_recipes' collection
+        recipeRef.delete()
+                .addOnSuccessListener(aVoid -> {
+                    // Remove the recipe reference from the user's 'favourite_recipes' subcollection
+                    userDocRef.update("favourite_recipes", FieldValue.arrayRemove(recipeId))
+                            .addOnSuccessListener(aVoid1 -> {
+                                callback.onRecipeDeleted();  // Notify that the recipe was deleted
+                            })
+                            .addOnFailureListener(e -> {
+                                callback.onError(e);  // Handle error in removing from user's subcollection
+                            });
+                })
+                .addOnFailureListener(e -> {
+                    callback.onError(e);  // Handle error in deleting from 'favourite_recipes'
+                });
     }
 
-    public interface OnRecipeAddedCallback {
-        void onRecipeAdded(String recipeId);
-        void onError(Exception e);
+    private void deleteUserFavouriteRecipe(DocumentReference userFavRecipeRef, String recipeId, String userEmail, OnRecipeDeletedCallback callback) {
+        // Delete the recipe from the user's "favourite_recipes" subcollection
+        userFavRecipeRef.delete()
+                .addOnSuccessListener(aVoid -> {
+                    // After deleting from the user's subcollection, also delete from the main 'favourite_recipes' collection
+                    FirebaseFirestore db = FirebaseFirestore.getInstance();
+                    DocumentReference recipeRef = db.collection("favourite_recipes").document(recipeId);
+
+                    // Delete the recipe from the 'favourite_recipes' collection
+                    recipeRef.delete()
+                            .addOnSuccessListener(aVoid1 -> {
+                                // Notify the caller that the recipe was deleted from both locations
+                                callback.onRecipeDeleted();
+                            })
+                            .addOnFailureListener(e -> {
+                                callback.onError(new Exception("Error deleting recipe from favourite_recipes", e));
+                            });
+                })
+                .addOnFailureListener(e -> {
+                    callback.onError(new Exception("Error deleting recipe from user's favourite_recipes", e));
+                });
     }
 }

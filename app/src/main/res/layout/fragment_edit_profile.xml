@@ -5,6 +5,7 @@
     android:id="@+id/EditProfileCL"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:backgroundTint="#00FFFFFF"
     tools:context=".EditProfileFragment">
 
     <TextView
@@ -39,7 +40,7 @@
         android:text="Username"
         android:textSize="20sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/IVProfile2" />
+        app:layout_constraintTop_toBottomOf="@+id/IVProfileEdit" />
 
     <TextView
         android:id="@+id/TVAge"
@@ -64,7 +65,7 @@
         app:layout_constraintTop_toBottomOf="@+id/TVAge" />
 
     <ImageView
-        android:id="@+id/IVProfile2"
+        android:id="@+id/IVProfileEdit"
         android:layout_width="172dp"
         android:layout_height="172dp"
         android:layout_marginTop="20dp"

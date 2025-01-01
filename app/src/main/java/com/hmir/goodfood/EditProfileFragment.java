@@ -2,23 +2,28 @@ package com.hmir.goodfood;
 
 import static android.app.Activity.RESULT_OK;
 
+import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.InputType;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.hmir.goodfood.R;
 
 import androidx.annotation.NonNull;
@@ -30,6 +35,11 @@ import com.hmir.goodfood.utilities.UserHelper;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import android.content.Intent;
+import android.provider.MediaStore;
+
+import com.bumptech.glide.Glide; // Add this import
 
 /**
  * The EditProfileFragment class provides a user interface for editing the user's profile details.
@@ -63,6 +73,9 @@ public class EditProfileFragment extends Fragment {
 
     private String selectedDietPreference;
 
+
+    private ImageView IVProfile;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -80,6 +93,9 @@ public class EditProfileFragment extends Fragment {
         etHeight = view.findViewById(R.id.ETHeight);
         etWeight = view.findViewById(R.id.ETWeight);
         btnSave = view.findViewById(R.id.IBDone);
+
+        // google pfp
+        IVProfile = view.findViewById(R.id.IVProfileEdit); // Initialize your ImageView
 
         // Restrict age to integers only
         InputFilter[] integerFilter = new InputFilter[]{(source, start, end, dest, dstart, dend) -> {
@@ -116,6 +132,11 @@ public class EditProfileFragment extends Fragment {
         nutsButton = view.findViewById(R.id.button_nuts);
         seafoodButton = view.findViewById(R.id.button_seafood);
         othersButton = view.findViewById(R.id.button_others);
+
+        // google pfp
+        // Load Google profile picture
+        loadGoogleProfilePicture();
+        //
 
         // Load original data
         loadOriginalData();
@@ -170,7 +191,8 @@ public class EditProfileFragment extends Fragment {
     private void addTextWatchers() {
         TextWatcher textWatcher = new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -178,7 +200,8 @@ public class EditProfileFragment extends Fragment {
             }
 
             @Override
-            public void afterTextChanged(Editable s) {}
+            public void afterTextChanged(Editable s) {
+            }
         };
 
         etUsername.addTextChangedListener(textWatcher);
@@ -214,7 +237,6 @@ public class EditProfileFragment extends Fragment {
                     selectedDietPreference = "Others";
                 }
                 detectChanges();
-
         };
 
         // Attach the listener to all buttons
@@ -288,6 +310,18 @@ public class EditProfileFragment extends Fragment {
 
         // Reload original data for consistency
         loadOriginalData();
+
+        // Manually notify the HomePage and ProfilePage to refresh data
+        if (getActivity() instanceof HomePage) {
+            ((HomePage) getActivity()).refreshProfileData();
+        }
+        if (getActivity() instanceof ProfilePage) {
+            ((ProfilePage) getActivity()).refreshProfileData();
+        }
+
+        // Optional: Navigate back to the profile page or elsewhere
+        requireActivity().onBackPressed();
+
     }
 
 
@@ -304,5 +338,31 @@ public class EditProfileFragment extends Fragment {
         }
         return false;
     }
+
+    /**
+     * Loads and displays the user's Google profile picture.
+     * Falls back to default picture if no Google profile picture is available.
+     */
+    private void loadGoogleProfilePicture() {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            Uri profilePicUri = user.getPhotoUrl(); // Get the profile picture URL from Firebase
+
+            if (profilePicUri != null) {
+                // Use Glide to load the image into IVProfile
+                Glide.with(this)
+                        .load(profilePicUri.toString()) // Convert URI to string
+                        .placeholder(R.drawable.profile_pic) // Default placeholder image
+                        .error(R.drawable.profile_pic) // Error image
+                        .into(IVProfile);
+            } else {
+                IVProfile.setImageResource(R.drawable.profile_pic); // Set default image if no URL is found
+            }
+        } else {
+            IVProfile.setImageResource(R.drawable.profile_pic); // Set default image if no user is signed in
+        }
+    }
+
+
 
 }
