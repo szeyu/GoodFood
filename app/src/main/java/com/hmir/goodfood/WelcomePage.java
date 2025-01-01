@@ -117,6 +117,10 @@ public class WelcomePage extends AppCompatActivity {
         editor.putString("Height", height);
         editor.putString("Weight", weight);
         editor.putString("DietTypes", selectedDietTypes.toString());
+        //pfp
+        editor.putString("ProfilePicUri",null);
+        //
+
         editor.apply();
 
         // Save data to FireStore
@@ -130,7 +134,9 @@ public class WelcomePage extends AppCompatActivity {
         newUserMapping.put("health_labels", health_labels);
         newUserMapping.put("favourite_recipes", null);
         newUserMapping.put("nutritional_records", null);
-
+        //pfp
+        newUserMapping.put("ProfilePicUri",null);
+        //
         newUser.addNewUser(newUserMapping);
 
         // Show confirmation

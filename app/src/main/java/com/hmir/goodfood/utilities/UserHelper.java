@@ -195,18 +195,44 @@ public class UserHelper {
             String weight = Double.toString(currentUser.getWeight());
             String dietTypes = currentUser.getHealth_labels().toString();
 
+            // google pfp
+            // Fetch the Google profile picture URL
+            String profilePicUri = currentUser.getPhotoUrl();  // Get the profile picture URL directly from the user object
+
+            // If the profile picture URI is null, use the default placeholder
+            if (profilePicUri == null) {
+                profilePicUri = "android.resource://com.hmir.goodfood/drawable/profile_pic"; // Default URI
+            }
+            //
+
+
+            /*
+            // Check if ProfilePicUri already exists in SharedPreferences
+            String existingProfilePicUri = sharedPreferences.getString("ProfilePicUri", null);
+
+            // Use existing value, or initialize with a default placeholder
+            String profilePicUri = (existingProfilePicUri != null)
+                    ? existingProfilePicUri
+                    : "android.resource://com.hmir.goodfood/drawable/profile_pic";
+            */
+
+
             editor.putString("Email", email);
             editor.putString("Username", username);
             editor.putString("Age", age);
             editor.putString("Height", height);
             editor.putString("Weight", weight);
             editor.putString("DietTypes", dietTypes);
+            //
+            editor.putString("ProfilePicUri", profilePicUri); // Save profile picture URI
+            //
             editor.apply();
 
             Log.d("UserHelper","SharedPreferences saved");
         });
     }
 
+    //
     // Update User document
     public void updateUserInfo(String username, List<String> health_labels, long age, double height, double weight) {
         enqueueOrExecute(() -> {
@@ -214,33 +240,65 @@ public class UserHelper {
                 throw new IllegalArgumentException("Email is null or empty");
             }
 
+            //google pfp
+            // Fetch the current profile picture URL
+            String profilePicUri = FirebaseAuth.getInstance().getCurrentUser().getPhotoUrl() != null
+                    ? FirebaseAuth.getInstance().getCurrentUser().getPhotoUrl().toString()
+                    : "android.resource://com.hmir.goodfood/drawable/profile_pic";  // Default URI if null
+            //
+
+
             Map<String, Object> userUpdates = Map.of(
                     "username", username,
                     "health_labels", health_labels,
                     "age", age,
                     "height", height,
-                    "weight", weight
+                    "weight", weight,
+                    //google pfp
+                    "profilePicUri", profilePicUri
+                    //
             );
 
             db.collection("user").document(email).get().addOnSuccessListener(documentSnapshot -> {
                 if (documentSnapshot.exists()) {
                     db.collection("user").document(email).update(userUpdates)
-                            .addOnSuccessListener(aVoid ->
-                                    Log.d("UserHelper", "User info updated"))
-                            .addOnFailureListener(e ->
-                                    Log.e("UserHelper", "Error updating user info", e));
+                            .addOnSuccessListener(aVoid -> {
+                                Log.d("UserHelper", "User info updated");
+
+                                // Update SharedPreferences for ProfilePicUri
+                                Context context = FirebaseAuth.getInstance().getApp().getApplicationContext();
+                                SharedPreferences sharedPreferences = context.getSharedPreferences("UserPreferences", MODE_PRIVATE);
+                                SharedPreferences.Editor editor = sharedPreferences.edit();
+
+                                // Preserve the existing ProfilePicUri if it already exists
+                                String existingProfilePicUri = sharedPreferences.getString("ProfilePicUri", null);
+                                if (existingProfilePicUri == null) {
+                                    editor.putString("ProfilePicUri", "android.resource://com.hmir.goodfood/drawable/profile_pic"); // Default URI
+                                }
+                                editor.apply();
+                            })
+                            .addOnFailureListener(e -> Log.e("UserHelper", "Error updating user info", e));
                 } else {
                     Log.e("UserHelper", "User document not found for email: " + email);
                 }
             });
         });
     }
+    //
+
 
     // Add new user
     public void addNewUser(Map<String, Object> user) {
         if (email == null || email.isEmpty()) {
             throw new IllegalArgumentException("Email is null or empty");
         }
+
+        //google pfp
+        // Get the Google profile picture URL
+        String profilePicUri = FirebaseAuth.getInstance().getCurrentUser().getPhotoUrl() != null
+                ? FirebaseAuth.getInstance().getCurrentUser().getPhotoUrl().toString()
+                : "android.resource://com.hmir.goodfood/drawable/profile_pic";  // Default URI if null
+        //
 
         Map<String, Object> defaultUser = new HashMap<>();
         defaultUser.put("username", null);
@@ -250,6 +308,9 @@ public class UserHelper {
         defaultUser.put("health_labels", null);
         defaultUser.put("favourite_recipes", null);
         defaultUser.put("nutritional_records", null);
+        // google pfp
+        defaultUser.put("profilePicUri", profilePicUri);
+        //
         defaultUser.putAll(user);
 
         db.collection("user")
