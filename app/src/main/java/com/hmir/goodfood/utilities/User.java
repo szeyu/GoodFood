@@ -32,10 +32,6 @@ public class User {
             ? currentUser.getPhotoUrl().toString()
             : null;
 
-    // Database instance
-    @Exclude
-    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
-
     // User personal information
     private final String email;
     private String username;
