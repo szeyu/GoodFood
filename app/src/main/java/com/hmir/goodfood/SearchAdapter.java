@@ -5,13 +5,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
 import java.util.List;
 
-public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder> {
+public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.SearchItemViewHolder> {
     private List<Item> itemList; // Use a list of Item objects
     private OnItemClickListener listener;
 
@@ -29,14 +30,14 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
 
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public SearchItemViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_layout, parent, false);
-        return new ViewHolder(view);
+        return new SearchItemViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(SearchItemViewHolder holder, int position) {
         Item item = itemList.get(position);
 
         // Retrieve item details
@@ -60,10 +61,10 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
         return itemList.size();
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public static class SearchItemViewHolder extends RecyclerView.ViewHolder {
         public TextView title;
 
-        public ViewHolder(View itemView) {
+        public SearchItemViewHolder(View itemView) {
             super(itemView);
             title = itemView.findViewById(R.id.item_title); // Initialize TextView
         }
