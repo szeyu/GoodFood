@@ -16,7 +16,9 @@ import com.hmir.goodfood.utilities.FavouriteRecipeHelper;
 
 public class DisplayActivity extends AppCompatActivity {
 
-    private TextView recipeNameTextView, recipeIngredientsTextView, recipeStepsTextView;
+    private TextView recipeNameTextView;
+    private TextView recipeIngredientsTextView;
+    private TextView recipeStepsTextView;
     private FirebaseFirestore db;
 
     @Override
