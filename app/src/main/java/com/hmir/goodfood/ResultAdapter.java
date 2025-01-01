@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
@@ -55,20 +56,30 @@ public class ResultAdapter extends RecyclerView.Adapter<ResultAdapter.ResultView
     }
 
     /**
-     * ViewHolder class for result items.
+     * Static ViewHolder class for result items.
      * Holds and manages the views for individual result entries.
      */
-    class ResultViewHolder extends RecyclerView.ViewHolder {
-        TextView itemTitle;
+    public static class ResultViewHolder extends RecyclerView.ViewHolder {
+        private final TextView itemTitle;
 
         /**
          * Constructs a new ResultViewHolder.
          *
          * @param itemView The view containing the layout for a single result item
          */
-        public ResultViewHolder(View itemView) {
+        public ResultViewHolder(@NonNull View itemView) {
             super(itemView);
             itemTitle = itemView.findViewById(R.id.item_title);
+        }
+
+        /**
+         * Gets the title TextView of this ViewHolder.
+         *
+         * @return The TextView displaying the item title
+         */
+        @NonNull
+        public TextView getItemTitle() {
+            return itemTitle;
         }
     }
 }
