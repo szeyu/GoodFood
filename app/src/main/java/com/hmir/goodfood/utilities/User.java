@@ -27,7 +27,6 @@ public class User {
     private final static FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
 
     // User identification
-    private final static String email = currentUser != null ? currentUser.getEmail() : null;
     private final static String photoUrl = currentUser != null && currentUser.getPhotoUrl() != null
             ? currentUser.getPhotoUrl().toString()
             : null;
@@ -37,6 +36,7 @@ public class User {
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     // User personal information
+    private final String email;
     private String username;
     private long age;
     private double height;  // in centimeters
@@ -51,6 +51,9 @@ public class User {
      * Default constructor required for Firestore serialization.
      */
     public User() {
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        this.email = currentUser != null ? currentUser.getEmail() : null;
+
         // Initialize lists to prevent null pointer exceptions
         this.health_labels = new ArrayList<>();
         this.favourite_recipes = new ArrayList<>();
@@ -259,7 +262,7 @@ public class User {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return email != null && email.equals(user.email);
+        return getEmail() != null && email.equals(user.getEmail());
     }
 
     /**
@@ -268,6 +271,6 @@ public class User {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(email);
+        return Objects.hash(getEmail());
     }
 }
