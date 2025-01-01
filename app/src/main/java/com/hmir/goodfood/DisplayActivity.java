@@ -15,6 +15,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.hmir.goodfood.callbacks.OnRecipeDeletedCallback;
 import com.hmir.goodfood.utilities.FavouriteRecipeHelper;
 
 /**
@@ -139,7 +140,7 @@ public class DisplayActivity extends AppCompatActivity {
         }
 
         favouriteRecipeHelper.deleteFavouriteRecipe(recipeId, currentUser.getEmail(),
-                new FavouriteRecipeHelper.OnRecipeDeletedCallback() {
+                new OnRecipeDeletedCallback() {
                     @Override
                     public void onRecipeDeleted() {
                         showSuccess(getString(R.string.success_recipe_deleted));

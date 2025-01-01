@@ -12,14 +12,31 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
+/**
+ * Adapter for displaying search results in a RecyclerView.
+ * Handles the display and click events of recipe items in the search interface.
+ */
 public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.SearchItemViewHolder> {
     private List<Item> itemList; // Use a list of Item objects
     private OnItemClickListener listener;
 
+    /**
+     * Interface for handling item click events in the search results.
+     */
     public interface OnItemClickListener {
-        void onItemClick(String recipeRef); // Pass recipeRef as String on click
+        /**
+         * Called when a search result item is clicked.
+         *
+         * @param recipeRef The reference ID of the clicked recipe
+         */
+        void onItemClick(String recipeRef);
     }
 
+    /**
+     * Sets the click listener for recipe items.
+     *
+     * @param listener The listener to handle item clicks
+     */
     public void setOnItemClickListener(OnItemClickListener listener) {
         this.listener = listener;
     }
@@ -61,9 +78,18 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.SearchItem
         return itemList.size();
     }
 
+    /**
+     * ViewHolder class for search result items.
+     * Holds and manages the views for individual search result entries.
+     */
     public static class SearchItemViewHolder extends RecyclerView.ViewHolder {
         public TextView title;
 
+        /**
+         * Constructs a new SearchItemViewHolder.
+         *
+         * @param itemView The view containing the layout for a single search result item
+         */
         public SearchItemViewHolder(View itemView) {
             super(itemView);
             title = itemView.findViewById(R.id.item_title); // Initialize TextView

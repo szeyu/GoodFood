@@ -13,6 +13,9 @@ import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.hmir.goodfood.Item;
+import com.hmir.goodfood.callbacks.OnRecipeAddedCallback;
+import com.hmir.goodfood.callbacks.OnRecipeDeletedCallback;
+import com.hmir.goodfood.callbacks.RecipeFetchCallback;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -250,11 +253,6 @@ public class FavouriteRecipeHelper {
         return splitSteps;
     }
 
-    public interface RecipeFetchCallback {
-        void onRecipesFetched(List<Item> items);
-        void onError(Exception e);
-    }
-
     public void fetchUserFavoriteRecipes(RecipeFetchCallback callback) {
         // Get the current user's email
         String userEmail = FirebaseAuth.getInstance().getCurrentUser() != null ? FirebaseAuth.getInstance().getCurrentUser().getEmail() : null;
@@ -385,43 +383,5 @@ public class FavouriteRecipeHelper {
                 .addOnFailureListener(e -> {
                     callback.onError(new Exception("Error deleting recipe from user's favourite_recipes", e));
                 });
-    }
-
-    /**
-     * Callback interface for handling recipe deletion operations.
-     * This interface provides methods to handle both successful deletion
-     * and error scenarios when deleting a favorite recipe.
-     */
-    public interface OnRecipeDeletedCallback {
-
-        /**
-         * Called when a recipe is successfully deleted from the database.
-         * This method is invoked after the deletion operation completes without errors.
-         */
-        void onRecipeDeleted();
-
-        /**
-         * Called when a recipe is successfully deleted from the database.
-         * This method is invoked after the deletion operation completes without errors.
-         */
-        void onError(Exception e);
-    }
-
-    /**
-     * Callback interface for recipe addition operations.
-     */
-    public interface OnRecipeAddedCallback {
-
-        /**
-         * Called when a recipe is successfully added.
-         * @param recipeId ID of the newly added recipe
-         */
-        void onRecipeAdded(String recipeId);
-
-        /**
-         * Called when an error occurs during recipe addition.
-         * @param e The exception that occurred
-         */
-        void onError(Exception e);
     }
 }

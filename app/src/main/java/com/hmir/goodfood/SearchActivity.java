@@ -18,11 +18,17 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.hmir.goodfood.callbacks.RecipeFetchCallback;
 import com.hmir.goodfood.utilities.FavouriteRecipeHelper;
 
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Activity for searching and displaying recipe search results.
+ * Provides real-time search functionality and displays results in a RecyclerView.
+ * Integrates with Firebase Firestore for recipe data retrieval.
+ */
 public class SearchActivity extends AppCompatActivity {
 
     private EditText searchText;
@@ -92,12 +98,15 @@ public class SearchActivity extends AppCompatActivity {
             Log.d("SearchActivity", "Passing recipe_id: " + recipeRef);
 
         });
-
     }
 
+    /**
+     * Fetches favorite recipes from Firebase Firestore.
+     * Updates the adapter with the fetched results.
+     */
     private void fetchFavoriteRecipes() {
         FavouriteRecipeHelper favouriteRecipeHelper = new FavouriteRecipeHelper();
-        favouriteRecipeHelper.fetchUserFavoriteRecipes(new FavouriteRecipeHelper.RecipeFetchCallback() {
+        favouriteRecipeHelper.fetchUserFavoriteRecipes(new RecipeFetchCallback() {
             @Override
             public void onRecipesFetched(List<Item> items) {
                 itemList.clear();
@@ -112,8 +121,12 @@ public class SearchActivity extends AppCompatActivity {
         });
     }
 
-
-
+    /**
+     * Filters the recipe list based on search text.
+     * Updates the UI to show/hide results accordingly.
+     *
+     * @param text The search text to filter by
+     */
     private void filter(String text) {
         if (filteredList == null) {
             filteredList = new ArrayList<>();

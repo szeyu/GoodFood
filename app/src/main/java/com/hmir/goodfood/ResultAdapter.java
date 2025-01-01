@@ -9,15 +9,26 @@ import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Adapter for displaying recipe results in a RecyclerView.
+ * Handles the display and click events of recipe items in the results list.
+ */
 public class ResultAdapter extends RecyclerView.Adapter<ResultAdapter.ResultViewHolder> {
     private Context context;
     private List<Item> items;
 
+    /**
+     * Constructs a new ResultAdapter.
+     *
+     * @param context The context in which the adapter is being used
+     * @param items   The list of items to display
+     */
     public ResultAdapter(Context context, List<Item> items) {
         this.context = context;
-        this.items = items;
+        this.items = new ArrayList<>(items); // Defensive copy
     }
 
     @Override
@@ -43,9 +54,18 @@ public class ResultAdapter extends RecyclerView.Adapter<ResultAdapter.ResultView
         return items.size();
     }
 
+    /**
+     * ViewHolder class for result items.
+     * Holds and manages the views for individual result entries.
+     */
     class ResultViewHolder extends RecyclerView.ViewHolder {
         TextView itemTitle;
 
+        /**
+         * Constructs a new ResultViewHolder.
+         *
+         * @param itemView The view containing the layout for a single result item
+         */
         public ResultViewHolder(View itemView) {
             super(itemView);
             itemTitle = itemView.findViewById(R.id.item_title);

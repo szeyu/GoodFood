@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageButton;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.hmir.goodfood.callbacks.OnRecipeAddedCallback;
 import com.hmir.goodfood.utilities.FavouriteRecipeHelper;
 
 import java.util.List;
@@ -95,7 +96,7 @@ public class RecipeDetailActivity extends AppCompatActivity {
         );
 
         // Add the recipe to the user's favourite_recipes subcollection
-        favouriteRecipeHelper.addFavouriteRecipe(recipeData, new FavouriteRecipeHelper.OnRecipeAddedCallback() {
+        favouriteRecipeHelper.addFavouriteRecipe(recipeData, new OnRecipeAddedCallback() {
             @Override
             public void onRecipeAdded(String recipeId) {
                 // Handle success (e.g., show a message or update UI)
