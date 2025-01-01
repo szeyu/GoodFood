@@ -339,6 +339,10 @@ public class EditProfileFragment extends Fragment {
         return false;
     }
 
+    /**
+     * Loads and displays the user's Google profile picture.
+     * Falls back to default picture if no Google profile picture is available.
+     */
     private void loadGoogleProfilePicture() {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {

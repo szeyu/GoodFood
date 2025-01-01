@@ -144,10 +144,20 @@ public class HomePage extends AppCompatActivity {
         updateCalorieDisplay(totalCalories, progress);
     }
 
+    /**
+     * Calculates the progress percentage based on total calories.
+     * @param totalCalories The total calories consumed
+     * @return The calculated progress percentage (0-100)
+     */
     private int calculateProgress(double totalCalories) {
         return Math.min((int) ((totalCalories / MAX_DAILY_CALORIES) * 100), 100);
     }
 
+    /**
+     * Updates the calorie display UI components.
+     * @param totalCalories The total calories to display
+     * @param progress The progress percentage (0-100)
+     */
     private void updateCalorieDisplay(double totalCalories, int progress) {
         tvCalorieIntake.setText(String.format(Locale.getDefault(),
                 "Calories: %.0f/%d", totalCalories, MAX_DAILY_CALORIES));
@@ -212,6 +222,12 @@ public class HomePage extends AppCompatActivity {
         int daysInMonth;
     }
 
+    /**
+     * Calculates monthly nutrient totals from nutritional records.
+     * @param records List of nutritional records
+     * @param currentMonth The current month in yyyy-MM format
+     * @return MonthlyNutrients object containing the calculated totals
+     */
     private MonthlyNutrients calculateMonthlyNutrients(List<NutritionalRecord> records,
                                                        String currentMonth) {
         MonthlyNutrients nutrients = new MonthlyNutrients();
@@ -251,6 +267,11 @@ public class HomePage extends AppCompatActivity {
         setupBarChart(entries);
     }
 
+    /**
+     * Creates bar entries from the monthly nutrients data.
+     * @param nutrients The monthly nutrients data
+     * @return ArrayList of BarEntry objects representing the nutrient values
+     */
     private ArrayList<BarEntry> createBarEntries(MonthlyNutrients nutrients) {
         ArrayList<BarEntry> entries = new ArrayList<>();
         float[] values = {
@@ -272,6 +293,11 @@ public class HomePage extends AppCompatActivity {
         return entries;
     }
 
+    /**
+     * Sets up the bar chart with the provided entries.
+     * Configures the dataset, appearance, and listeners.
+     * @param entries The bar entries to display in the chart
+     */
     private void setupBarChart(ArrayList<BarEntry> entries) {
         BarDataSet dataSet = new BarDataSet(entries, "Nutrients");
         dataSet.setColor(getResources().getColor(R.color.yellow));
@@ -283,6 +309,10 @@ public class HomePage extends AppCompatActivity {
         setupBarChartListener();
     }
 
+    /**
+     * Configures the visual appearance of the bar chart.
+     * Sets up grid lines, axes, labels, and animation properties.
+     */
     private void configureBarChartAppearance() {
         monthlyBarChart.getAxisLeft().setDrawGridLines(false);
         monthlyBarChart.getAxisRight().setDrawGridLines(false);
@@ -299,6 +329,10 @@ public class HomePage extends AppCompatActivity {
         monthlyBarChart.animateY(1000);
     }
 
+    /**
+     * Sets up the bar chart listener for handling user interactions.
+     * Displays a toast message when a bar is selected.
+     */
     private void setupBarChartListener() {
         monthlyBarChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
             @Override
@@ -335,10 +369,19 @@ public class HomePage extends AppCompatActivity {
         startActivity(intent);
     }
 
+    /**
+     * Refreshes the user profile data from SharedPreferences.
+     * Updates the UI with the latest user information.
+     */
     public void refreshProfileData() {
         setupUserProfile();
     }
 
+    /**
+     * Handles error conditions and displays appropriate messages.
+     * @param e The exception that occurred
+     * @param message The base error message to display
+     */
     private void handleError(Exception e, String message) {
         String errorMessage = e != null ? e.getMessage() : "Unknown error occurred";
         Log.e(TAG, message + ": " + errorMessage, e);
