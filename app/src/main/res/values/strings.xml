@@ -12,4 +12,15 @@
     <string name="name">Name</string>
     <string name="calories">Calories</string>
     <string name="default_web_client_id">1</string>
+    <string name="recipe_details">Recipe Details</string>
+    <string name="error_no_recipe_id">No recipe ID provided</string>
+    <string name="error_invalid_recipe_id">Invalid recipe ID</string>
+    <string name="error_invalid_data">Invalid recipe data</string>
+    <string name="error_recipe_not_found">Recipe not found</string>
+    <string name="error_fetching_details">Error fetching recipe details</string>
+    <string name="error_not_authenticated">User not authenticated</string>
+    <string name="error_deleting_recipe">Error deleting recipe</string>
+    <string name="success_recipe_deleted">Recipe deleted successfully</string>
+    <string name="ingredients_format">Ingredients:\n%1$s</string>
+    <string name="steps_format">Steps:\n%1$s</string>
 </resources>

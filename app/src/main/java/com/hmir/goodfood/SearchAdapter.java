@@ -1,28 +1,42 @@
 package com.hmir.goodfood;
 
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
 import java.util.List;
 
 /**
- * ViewHolder pattern implementation for search results in the RecyclerView.
- * Holds references to the views that display search result items including
- * the title and image of food items.
+ * Adapter for displaying search results in a RecyclerView.
+ * Handles the display and click events of recipe items in the search interface.
  */
-public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.SearchViewHolder> {
+public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.SearchItemViewHolder> {
     private List<Item> itemList; // Use a list of Item objects
     private OnItemClickListener listener;
 
+    /**
+     * Interface for handling item click events in the search results.
+     */
     public interface OnItemClickListener {
-        void onItemClick(int id); // Pass item ID on click
+        /**
+         * Called when a search result item is clicked.
+         *
+         * @param recipeRef The reference ID of the clicked recipe
+         */
+        void onItemClick(String recipeRef);
     }
 
+    /**
+     * Sets the click listener for recipe items.
+     *
+     * @param listener The listener to handle item clicks
+     */
     public void setOnItemClickListener(OnItemClickListener listener) {
         this.listener = listener;
     }
@@ -33,50 +47,31 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.SearchView
 
     @NonNull
     @Override
-    public SearchViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public SearchItemViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_layout, parent, false);
-        return new SearchViewHolder(view);
+        return new SearchItemViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(SearchViewHolder holder, int position) {
+    public void onBindViewHolder(SearchItemViewHolder holder, int position) {
         Item item = itemList.get(position);
 
         // Retrieve item details
-        int id = item.getId();
-        String name = item.getName();
-        String imageResourceName = item.getImageResourceName();
-        String fatContent = item.getFatContent();
-        String calories = item.getCalories();
-        String proteinContent = item.getProteinContent();
-        String description = item.getDescription();
-        String ingredients = item.getIngredients();
+        String name = item.getName();  // Only name is required for search results
+        String recipeRef = item.getRecipeId();  // Use recipeRef, which is a String
+        Log.d("SearchAdapter", "Binding recipeRef: " + recipeRef);
 
         // Set item name in the title TextView
         holder.title.setText(name);
 
-        // Get the image resource ID
-        int imageResId = item.getImageResId(holder.itemView.getContext()); // Pass context here
-
-        // Set image to an ImageView (Assuming you have an ImageView in your item_layout)
-        holder.image.setImageResource(imageResId);
-
-        // Set click listener to pass more data via Intent
+        // Set click listener to pass the recipeRef to DisplayActivity
         holder.itemView.setOnClickListener(v -> {
             Intent intent = new Intent(v.getContext(), DisplayActivity.class);
-            intent.putExtra("food_name", name);
-            intent.putExtra("food_id", id);
-            intent.putExtra("food_image", imageResourceName); // You may want to pass the image name or resource ID
-            intent.putExtra("food_fat", fatContent);
-            intent.putExtra("food_calories", calories);
-            intent.putExtra("food_protein", proteinContent);
-            intent.putExtra("food_description", description);
-            intent.putExtra("food_ingredients", ingredients);
+            intent.putExtra("recipe_id", recipeRef);  // Pass only the recipeRef
             v.getContext().startActivity(intent);
         });
     }
-
 
     @Override
     public int getItemCount() {
@@ -84,27 +79,21 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.SearchView
     }
 
     /**
-     * ViewHolder pattern implementation for search results in the RecyclerView.
-     * Holds references to the views that display search result items.
+     * ViewHolder class for search result items.
+     * Holds and manages the views for individual search result entries.
      */
-    public static class SearchViewHolder extends RecyclerView.ViewHolder {
-        /** TextView that displays the title of the search result item */
+    public static class SearchItemViewHolder extends RecyclerView.ViewHolder {
         public TextView title;
 
-        /** ImageView that displays the image of the search result item */
-        public ImageView image;
-
         /**
-         * Constructs a new SearchViewHolder.
-         * Initializes the view references for the search result item layout.
+         * Constructs a new SearchItemViewHolder.
          *
-         * @param itemView The View object containing the layout for a single search result item
-         *                 Must contain a TextView with id 'item_title' and an ImageView with id 'item_image'
+         * @param itemView The view containing the layout for a single search result item
          */
-        public SearchViewHolder(View itemView) {
+        public SearchItemViewHolder(View itemView) {
             super(itemView);
-            title = itemView.findViewById(R.id.item_title);
-            image = itemView.findViewById(R.id.item_image);
+            title = itemView.findViewById(R.id.item_title); // Initialize TextView
         }
     }
 }
+

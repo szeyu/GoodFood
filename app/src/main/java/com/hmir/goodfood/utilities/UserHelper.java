@@ -16,6 +16,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.hmir.goodfood.callbacks.OnRecipeAddedCallback;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -554,7 +555,7 @@ public class UserHelper {
 
                     // Proceed with adding the favourite recipe
                     enqueueOrExecute(() -> {
-                        favouriteRecipeHelper.addFavouriteRecipe(recipe, new FavouriteRecipeHelper.OnRecipeAddedCallback() {
+                        favouriteRecipeHelper.addFavouriteRecipe(recipe, new OnRecipeAddedCallback() {
                             @Override
                             public void onRecipeAdded(String recipeId) {
                                 if(currentUser.getFavourite_recipes() != null){
@@ -604,7 +605,7 @@ public class UserHelper {
 
                     // Proceed with updating the favourite recipe
                     enqueueOrExecute(() -> {
-                        favouriteRecipeHelper.addFavouriteRecipe(recipe, new FavouriteRecipeHelper.OnRecipeAddedCallback() {
+                        favouriteRecipeHelper.addFavouriteRecipe(recipe, new OnRecipeAddedCallback() {
                             @Override
                             public void onRecipeAdded(String newRecipeId) {
                                 if (currentUser.getFavourite_recipes() != null) {
