@@ -150,6 +150,7 @@ public class FavouriteRecipeHelper {
     }
 
     // Function 2 : Add
+
     /**
      * Adds a new favorite recipe for the currently authenticated user.
      *
@@ -248,7 +249,6 @@ public class FavouriteRecipeHelper {
         }
         return splitSteps;
     }
-
 
     // Function 3 : Update
     /**

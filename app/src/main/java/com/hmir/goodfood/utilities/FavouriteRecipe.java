@@ -3,13 +3,18 @@ package com.hmir.goodfood.utilities;
 import android.net.Uri;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Manages favorite recipes in the GoodFood application.
@@ -20,16 +25,23 @@ import java.util.List;
  * @see FirebaseFirestore
  */
 public class FavouriteRecipe {
-    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private static final String COLLECTION_NAME = "favourite_recipes";
+    private static final String TAG = "FavouriteRecipe";
+
+    private final FirebaseFirestore db;
     private String recipe_id;
     private String name;
-    private List<String> ingredients;
-    private List<String> steps;
+    private final List<String> ingredients;
+    private final List<String> steps;
 
     /**
      * Default constructor required for Firebase Firestore deserialization.
+     * Initializes empty lists for ingredients and steps.
      */
     public FavouriteRecipe() {
+        this.db = FirebaseFirestore.getInstance();
+        this.ingredients = new ArrayList<>();
+        this.steps = new ArrayList<>();
     }
 
     /**
@@ -39,12 +51,24 @@ public class FavouriteRecipe {
      * @param name        The name of the recipe
      * @param ingredients List of ingredients required for the recipe
      * @param steps       List of preparation steps for the recipe
+     * @throws IllegalArgumentException if recipe_id or name is null or empty
      */
-    public FavouriteRecipe(String recipe_id, String name, List<String> ingredients, List<String> steps) {
+    public FavouriteRecipe(@NonNull String recipe_id, @NonNull String name,
+                           @Nullable List<String> ingredients, @Nullable List<String> steps) {
+        if (recipe_id.trim().isEmpty()) {
+            throw new IllegalArgumentException("Recipe ID cannot be empty");
+        }
+        if (name.trim().isEmpty()) {
+            throw new IllegalArgumentException("Recipe name cannot be empty");
+        }
+
+        this.db = FirebaseFirestore.getInstance();
         this.recipe_id = recipe_id;
         this.name = name;
-        this.ingredients = new ArrayList<>(ingredients);
-        this.steps = new ArrayList<>(steps);
+        this.ingredients = ingredients != null ?
+                new ArrayList<>(ingredients) : new ArrayList<>();
+        this.steps = steps != null ?
+                new ArrayList<>(steps) : new ArrayList<>();
     }
 
     /**
@@ -52,54 +76,85 @@ public class FavouriteRecipe {
      *
      * @param recipe_id The unique identifier of the recipe to fetch
      * @return A Task containing the FavouriteRecipe if found
-     * @throws Exception if the recipe is not found or if the fetch operation fails
+     * @throws IllegalArgumentException if recipe_id is null or empty
      */
-    public Task<FavouriteRecipe> fetchFavouriteRecipe(String recipe_id) {
-        return db.collection("favourite_recipes")
+    public Task<FavouriteRecipe> fetchFavouriteRecipe(@NonNull String recipe_id) {
+        if (recipe_id.trim().isEmpty()) {
+            return Tasks.forException(new IllegalArgumentException("Recipe ID cannot be empty"));
+        }
+
+        return db.collection(COLLECTION_NAME)
                 .document(recipe_id)
                 .get()
                 .continueWith(task -> {
                     if (task.isSuccessful()) {
-                        DocumentSnapshot documentSnapshot = task.getResult();
-                        if (documentSnapshot.exists()) {
-                            return documentSnapshot.toObject(FavouriteRecipe.class);
-                        } else {
-                            throw new Exception("Favourite recipe not found");
+                        DocumentSnapshot document = task.getResult();
+                        if (document != null && document.exists()) {
+                            return document.toObject(FavouriteRecipe.class);
                         }
-                    } else {
-                        throw task.getException() != null ? task.getException() :
-                                new Exception("Failed to fetch favourite recipe");
+                        throw new Exception("Recipe not found");
                     }
+                    throw task.getException() != null ? task.getException() :
+                            new Exception("Failed to fetch recipe");
                 });
     }
 
-    // Add new favourite recipe
-    public void addFavouriteRecipe() {
-        db.collection("favourite_recipes")
+    /**
+     * Adds the current recipe to Firestore.
+     *
+     * @return A Task representing the async operation
+     * @throws IllegalStateException if recipe_id is null or empty
+     */
+    public Task<Void> addFavouriteRecipe() {
+        if (recipe_id == null || recipe_id.trim().isEmpty()) {
+            return Tasks.forException(new IllegalStateException("Recipe ID cannot be null or empty"));
+        }
+
+        return db.collection(COLLECTION_NAME)
                 .document(recipe_id)
                 .set(this)
-                .addOnSuccessListener(aVoid ->
-                        Log.d("Firestore", "Favourite recipe added"))
-                .addOnFailureListener(e ->
-                        Log.e("Firestore", "Error adding favourite recipe", e));
+                .addOnSuccessListener(aVoid -> Log.d(TAG, "Recipe added successfully"))
+                .addOnFailureListener(e -> Log.e(TAG, "Error adding recipe", e));
     }
 
-    // Update Recipe Record
-    public void updateFavouriteRecipe() {
-        db.collection("favourite_recipes")
+    /**
+     * Updates the current recipe in Firestore.
+     *
+     * @return A Task representing the async operation
+     * @throws IllegalStateException if recipe_id is null or empty
+     */
+    public Task<Void> updateFavouriteRecipe() {
+        if (recipe_id == null || recipe_id.trim().isEmpty()) {
+            return Tasks.forException(new IllegalStateException("Recipe ID cannot be null or empty"));
+        }
+
+        return db.collection(COLLECTION_NAME)
                 .document(recipe_id)
-                .update("name", name, "ingredients", ingredients, "steps", steps)
-                .addOnSuccessListener(aVoid -> Log.d("Firestore", "Recipe info updated"))
-                .addOnFailureListener(e -> Log.e("Firestore", "Error updating recipe info", e));
+                .update(
+                        "name", name,
+                        "ingredients", new ArrayList<>(ingredients),
+                        "steps", new ArrayList<>(steps)
+                )
+                .addOnSuccessListener(aVoid -> Log.d(TAG, "Recipe updated successfully"))
+                .addOnFailureListener(e -> Log.e(TAG, "Error updating recipe", e));
     }
 
-    // Delete Favourite Recipe by Document ID
-    public void deleteFavouriteRecipe() {
-        db.collection("favourite_recipes")
+    /**
+     * Deletes the current recipe from Firestore.
+     *
+     * @return A Task representing the async operation
+     * @throws IllegalStateException if recipe_id is null or empty
+     */
+    public Task<Void> deleteFavouriteRecipe() {
+        if (recipe_id == null || recipe_id.trim().isEmpty()) {
+            return Tasks.forException(new IllegalStateException("Recipe ID cannot be null or empty"));
+        }
+
+        return db.collection(COLLECTION_NAME)
                 .document(recipe_id)
                 .delete()
-                .addOnSuccessListener(aVoid -> Log.d("Firestore", "Favourite recipe deleted"))
-                .addOnFailureListener(e -> Log.e("Firestore", "Error deleting favourite recipe", e));
+                .addOnSuccessListener(aVoid -> Log.d(TAG, "Recipe deleted successfully"))
+                .addOnFailureListener(e -> Log.e(TAG, "Error deleting recipe", e));
     }
 
     /**
@@ -115,8 +170,12 @@ public class FavouriteRecipe {
      * Sets the recipe's unique identifier.
      *
      * @param recipe_id The new recipe ID
+     * @throws IllegalArgumentException if recipe_id is empty
      */
-    public void setRecipe_id(String recipe_id) {
+    public void setRecipe_id(@NonNull String recipe_id) {
+        if (recipe_id.trim().isEmpty()) {
+            throw new IllegalArgumentException("Recipe ID cannot be empty");
+        }
         this.recipe_id = recipe_id;
     }
 
@@ -133,18 +192,23 @@ public class FavouriteRecipe {
      * Sets the recipe's name.
      *
      * @param name The new name for the recipe
+     * @throws IllegalArgumentException if name is empty
      */
-    public void setName(String name) {
+    public void setName(@NonNull String name) {
+        if (name.trim().isEmpty()) {
+            throw new IllegalArgumentException("Recipe name cannot be empty");
+        }
         this.name = name;
     }
 
     /**
      * Gets the list of ingredients.
      *
-     * @return A defensive copy of the ingredients list
+     * @return An unmodifiable view of the ingredients list
      */
+    @NonNull
     public List<String> getIngredients() {
-        return new ArrayList<>(ingredients);
+        return Collections.unmodifiableList(ingredients);
     }
 
     /**
@@ -152,17 +216,21 @@ public class FavouriteRecipe {
      *
      * @param ingredients The new list of ingredients
      */
-    public void setIngredients(List<String> ingredients) {
-        this.ingredients = new ArrayList<>(ingredients);
+    public void setIngredients(@Nullable List<String> ingredients) {
+        this.ingredients.clear();
+        if (ingredients != null) {
+            this.ingredients.addAll(ingredients);
+        }
     }
 
     /**
      * Gets the list of preparation steps.
      *
-     * @return A defensive copy of the steps list
+     * @return An unmodifiable view of the steps list
      */
+    @NonNull
     public List<String> getSteps() {
-        return new ArrayList<>(steps);
+        return Collections.unmodifiableList(steps);
     }
 
     /**
@@ -170,21 +238,33 @@ public class FavouriteRecipe {
      *
      * @param steps The new list of preparation steps
      */
-    public void setSteps(List<String> steps) {
-        this.steps = new ArrayList<>(steps);
+    public void setSteps(@Nullable List<String> steps) {
+        this.steps.clear();
+        if (steps != null) {
+            this.steps.addAll(steps);
+        }
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        FavouriteRecipe that = (FavouriteRecipe) o;
+        return Objects.equals(recipe_id, that.recipe_id) &&
+                Objects.equals(name, that.name) &&
+                Objects.equals(ingredients, that.ingredients) &&
+                Objects.equals(steps, that.steps);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(recipe_id, name, ingredients, steps);
+    }
+
+    @Override
+    @NonNull
     public String toString() {
-        return String.format(
-                "FavouriteRecipe { " +
-                        "recipe_id='%s', name='%s', ingredients='%s', steps='%s', image='%s' }",
-                recipe_id,
-                name,
-                ingredients,
-                steps
-
-
-        );
+        return String.format("FavouriteRecipe{recipe_id='%s', name='%s', ingredients=%s, steps=%s}",
+                recipe_id, name, ingredients, steps);
     }
 }
