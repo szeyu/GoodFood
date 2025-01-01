@@ -109,7 +109,17 @@ public class ProfilePage extends AppCompatActivity {
         startActivity(intent);
     }
 
-
+    /**
+     * Refreshes the user profile data displayed in the UI.
+     * Retrieves the username from SharedPreferences and updates the corresponding TextView.
+     * If no username is found, defaults to "Guest".
+     *
+     * <p>This method should be called whenever the user profile data needs to be updated,
+     * such as after profile edits or when returning to the profile page.</p>
+     *
+     * @see SharedPreferences
+     * @see TextView
+     */
     public void refreshProfileData() {
         SharedPreferences sharedPreferences = getSharedPreferences("UserPreferences", MODE_PRIVATE);
         String username = sharedPreferences.getString("Username", "Guest");
