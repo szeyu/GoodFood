@@ -180,10 +180,13 @@ public class User {
 
     /**
      * Sets the user's favorite recipes.
-     * @param favourite_recipes The list of favorite recipe IDs
+     * @param recipes The list of favorite recipe IDs
      */
-    public void setFavourite_recipes(@Nullable List<String> favourite_recipes) {
-        this.favourite_recipes = favourite_recipes != null ? favourite_recipes : new ArrayList<>();
+    public void setFavourite_recipes(@Nullable List<String> recipes) {
+        favourite_recipes.clear();
+        if (recipes != null) {
+            favourite_recipes.addAll(recipes);
+        }
     }
 
     /**
