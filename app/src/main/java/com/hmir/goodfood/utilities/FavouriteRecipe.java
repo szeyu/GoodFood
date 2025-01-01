@@ -153,7 +153,7 @@ public class FavouriteRecipe {
      * @param ingredients The new list of ingredients
      */
     public void setIngredients(List<String> ingredients) {
-        this.ingredients = ingredients;
+        this.ingredients = new ArrayList<>(ingredients);
     }
 
     /**
