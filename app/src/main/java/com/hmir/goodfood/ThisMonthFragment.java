@@ -1,5 +1,6 @@
 package com.hmir.goodfood;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -9,7 +10,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -36,6 +39,18 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * Fragment that displays the user's nutritional information for the current month.
+ * Provides monthly averages and trends of nutritional data.
+ *
+ * <p>Features:
+ * <ul>
+ *     <li>Monthly calorie tracking with averages</li>
+ *     <li>Nutritional trends visualization</li>
+ *     <li>Monthly meal history gallery</li>
+ *     <li>Statistical analysis of nutritional intake</li>
+ * </ul>
+ */
 public class ThisMonthFragment extends Fragment {
 
     private BarChart MonthlyBarChart;
@@ -47,6 +62,7 @@ public class ThisMonthFragment extends Fragment {
     private ImageView exceedMonthlyCalorieImg;
     private TextView avgtextview;
     private UserHelper userHelper = new UserHelper();
+    private List<NutritionalRecord> records = new ArrayList<>(); // Store fetched records
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -65,10 +81,23 @@ public class ThisMonthFragment extends Fragment {
         return view;
     }
 
+    /**
+     * Fetches and processes nutritional records for the current month.
+     * Calculates monthly averages and updates the UI accordingly.
+     *
+     * <p>This method:
+     * <ul>
+     *     <li>Retrieves all nutritional records</li>
+     *     <li>Filters for current month's records</li>
+     *     <li>Calculates monthly totals and averages</li>
+     *     <li>Updates UI components with the processed data</li>
+     * </ul>
+     */
     private void fetchThisMonthData() {
         userHelper.fetchAllUserNutritionalRecords(new UserHelper.OnRecordListFetchedCallback() {
             @Override
             public void onRecordListFetched(List<NutritionalRecord> records) {
+                ThisMonthFragment.this.records = records;
                 String currentMonth = new SimpleDateFormat("yyyy-MM", Locale.getDefault()).format(new Date());
 
                 double totalCalories = 0;
@@ -164,6 +193,19 @@ public class ThisMonthFragment extends Fragment {
         MonthlyAvgcalorie = getView().findViewById(R.id.thisMonthavg_cal);
     }
 
+    /**
+     * Updates the nutrition chart with current data.
+     *
+     * @param protein Protein content in grams
+     * @param carbs Carbohydrate content in grams
+     * @param fat Fat content in grams
+     * @param sodium Sodium content in milligrams
+     * @param iron Iron content in milligrams
+     * @param calcium Calcium content in milligrams
+     * @param cholesterol Cholesterol content in milligrams
+     * @param magnesium Magnesium content in milligrams
+     * @param potassium Potassium content in milligrams
+     */
     private void updateNutritionChart(float protein, float carbs, float fat, float sodium, float iron, float calcium, float cholesterol, float magnesium, float potassium, int daysInMonth) {
         Log.d("ThisMonthFragment", "updateNutritionChart called with values: protein=" + protein + ", carbs=" + carbs + ", fat=" + fat);
 
@@ -253,9 +295,84 @@ public class ThisMonthFragment extends Fragment {
         Log.d("ThisMonthFragment", "updateNutritionChart completed successfully.");
     }
 
+    /**
+     * Updates the meals history display with the provided meal images.
+     * Sets up click listeners for meal detail viewing and handles navigation
+     * to the meal history detail screen.
+     *
+     * @param mealImages List of meal image URLs to display
+     * @throws IllegalStateException if the RecyclerView is not properly initialized
+     */
     private void updateMealsHistory(List<String> mealImages) {
         MealsAdapter adapter = new MealsAdapter(mealImages);
         rvMonthlyMealsHistory.setAdapter(adapter);
+        // Attach click listener to the RecyclerView
+        rvMonthlyMealsHistory.addOnItemTouchListener(new RecyclerView.SimpleOnItemTouchListener() {
+            GestureDetector gestureDetector = new GestureDetector(getContext(),
+                    new GestureDetector.SimpleOnGestureListener() {
+                        @Override
+                        public boolean onSingleTapUp(MotionEvent e) {
+                            return true;
+                        }
+                    });
+
+            @Override
+            public boolean onInterceptTouchEvent(@NonNull RecyclerView rv, @NonNull MotionEvent e) {
+                View childView = rv.findChildViewUnder(e.getX(), e.getY());
+                if (childView != null && gestureDetector.onTouchEvent(e)) {
+                    int position = rv.getChildAdapterPosition(childView);
+                    if (position != RecyclerView.NO_POSITION) {
+                        String imageUrl = mealImages.get(position);
+
+                        // Navigate to MealHistoryActivity
+                        // You need to get the nutritional details for this image, e.g.:
+                        NutritionalRecord selectedRecord = getNutritionalRecordForImage(imageUrl);
+                        if (selectedRecord != null) {
+                            // Now you have the selected record, pass it along with the image URL
+                            Intent intent = new Intent(getContext(), MealHistory.class);
+                            intent.putExtra("imageUrl", imageUrl);
+                            intent.putExtra("calories", selectedRecord.getCalories());
+                            intent.putExtra("protein", selectedRecord.getProtein());
+                            intent.putExtra("carbs", selectedRecord.getCarbs());
+                            intent.putExtra("fat", selectedRecord.getFat());
+                            intent.putExtra("sodium", selectedRecord.getSodium());
+                            intent.putExtra("iron", selectedRecord.getIron());
+                            intent.putExtra("calcium", selectedRecord.getCalcium());
+                            intent.putExtra("cholesterol", selectedRecord.getCholesterol());
+                            intent.putExtra("magnesium", selectedRecord.getMagnesium());
+                            intent.putExtra("potassium", selectedRecord.getPotassium());
+
+                            startActivity(intent);
+                        }
+                    }
+                    return true;
+                }
+                return false;
+            }
+        });
+    }
+
+    /**
+     * Retrieves the nutritional record associated with a specific meal image.
+     *
+     * @param imageUrl The URL of the meal image to search for
+     * @return The matching NutritionalRecord, or null if no match is found
+     * @throws IllegalArgumentException if imageUrl is null
+     */
+    private NutritionalRecord getNutritionalRecordForImage(String imageUrl) {
+        // This function assumes you have some way to get the nutritional record for the selected image.
+        // If you already have a list of NutritionalRecords, you can iterate over them to find the corresponding record.
+        // Here's a simple loop assuming `records` is the list of all nutritional records:
+
+        if (imageUrl == null) {
+            throw new IllegalArgumentException("Image URL cannot be null");
+        }
+        for (NutritionalRecord record : records) {
+            if (record.getImage() != null && record.getImage().equals(imageUrl)) {
+                return record;
+            }
+        }
+        return null;
     }
 
     private static class MealsAdapter extends RecyclerView.Adapter<MealsAdapter.MealsViewHolder> {
