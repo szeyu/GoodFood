@@ -3,6 +3,7 @@ package com.hmir.goodfood;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -17,6 +18,8 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.hmir.goodfood.callbacks.OnRecipeDeletedCallback;
 import com.hmir.goodfood.utilities.FavouriteRecipeHelper;
+
+import java.util.List;
 
 /**
  * Activity for displaying detailed information about a recipe.
@@ -38,7 +41,18 @@ public class DisplayActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_display);
+        ImageButton backButton = findViewById(R.id.backButton);
+        if (backButton != null) {
+            backButton.setOnClickListener(v -> {
+                Log.d(TAG, "Back button clicked");
+                finish();
+            });
+        } else {
+            Log.e(TAG, "Back button not found in the layout.");
+        }
+
 
         initializeViews();
         setupToolbar();
@@ -140,13 +154,27 @@ public class DisplayActivity extends AppCompatActivity {
      * @param item The recipe item to display
      */
     private void displayRecipeDetails(@NonNull Item item) {
+        // Set recipe name
         recipeNameTextView.setText(item.getName());
 
-        String ingredients = String.join("\n", item.getIngredients());
-        recipeIngredientsTextView.setText(getString(R.string.ingredients_format, ingredients));
+        // Format ingredients with bullet points
+        StringBuilder ingredientsText = new StringBuilder();
+        for (String ingredient : item.getIngredients()) {
+            ingredientsText.append("• ").append(ingredient).append("\n");
+        }
+        recipeIngredientsTextView.setText(ingredientsText.toString().trim());
 
-        String steps = String.join("\n", item.getSteps());
-        recipeStepsTextView.setText(getString(R.string.steps_format, steps));
+        // Format steps with numbers and reduced spacing
+        StringBuilder stepsText = new StringBuilder();
+        List<String> steps = item.getSteps();
+        for (int i = 0; i < steps.size(); i++) {
+            String step = steps.get(i);
+// Remove any existing numbers at the start
+            String cleanStep = step.replaceFirst("^\\d+\\.", "").trim();
+// Add our own number format
+            stepsText.append(i + 1).append(". ").append(cleanStep).append("\n");
+        }
+        recipeStepsTextView.setText(stepsText.toString().trim());
     }
 
     /**

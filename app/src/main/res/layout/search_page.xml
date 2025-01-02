@@ -34,7 +34,7 @@
         android:layout_width="295dp"
         android:layout_height="49dp"
         android:layout_marginStart="56dp"
-        android:layout_marginTop="72dp"
+        android:layout_marginTop="48dp"
         android:background="@drawable/search_box_background"
         android:ems="10"
         android:fontFamily="@font/poppins"
@@ -74,10 +74,10 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/listResults"
-        android:layout_width="312dp"
-        android:layout_height="354dp"
-        android:layout_marginStart="68dp"
-        android:layout_marginTop="52dp"
+        android:layout_width="380dp"
+        android:layout_height="351dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="40dp"
         android:fitsSystemWindows="false"
         android:padding="16dp"
         android:scrollbarThumbVertical="@drawable/scrollbar_thumb"
