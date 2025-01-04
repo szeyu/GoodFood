@@ -60,6 +60,7 @@ public class ThisMonthFragment extends Fragment {
         exceedMonthlyCalorieImg = view.findViewById(R.id.exceedMonthCalorie);
         rvMonthlyMealsHistory.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         avgtextview = view.findViewById(R.id.avgtext);
+        MonthlynutrientIntakeInfoButton = view.findViewById(R.id.thisMonthNutrientIntakeInfoButton);
         fetchThisMonthData();
 
         return view;
@@ -110,6 +111,29 @@ public class ThisMonthFragment extends Fragment {
                         daysInMonth++;
                     }
                 }
+                // Define recommended daily allowances (RDAs)
+                float rdaProtein = 50f; // Example values
+                float rdaCarbs = 300f;
+                float rdaFat = 70f;
+                float rdaSodium = 2300f;
+                float rdaCalcium = 1000f;
+                float rdaCholesterol = 300f;
+                float rdaMagnesium = 400f;
+                float rdaIron = 18f;
+                float rdaPotassium = 3500f;
+
+                // Check for exceeded nutrients
+                List<String> exceededNutrients = new ArrayList<>();
+                if (totalProtein > rdaProtein) exceededNutrients.add("Protein");
+                if (totalCarbs > rdaCarbs) exceededNutrients.add("Carbohydrates");
+                if (totalFat > rdaFat) exceededNutrients.add("Fat");
+                if (totalSodium > rdaSodium) exceededNutrients.add("Sodium");
+                if (totalCalcium > rdaCalcium) exceededNutrients.add("Calcium");
+                if (totalCholesterol > rdaCholesterol) exceededNutrients.add("Cholesterol");
+                if (totalMagnesium > rdaMagnesium) exceededNutrients.add("Magnesium");
+                if (totalIron > rdaIron) exceededNutrients.add("Iron");
+                if (totalPotassium > rdaPotassium) exceededNutrients.add("Potassium");
+                MonthlynutrientIntakeInfoButton.setOnClickListener(v -> showNutrientExceedDialog(exceededNutrients));
 
                 if (daysInMonth > 0) {
                     // Update calorie intake (average for the month)
@@ -134,7 +158,10 @@ public class ThisMonthFragment extends Fragment {
             }
         });
     }
-
+    private void showNutrientExceedDialog(List<String> exceededNutrients) {
+        NutrientExceedDialogFragment dialog = new NutrientExceedDialogFragment(exceededNutrients);
+        dialog.show(getChildFragmentManager(), "NutrientExceedDialog");
+    }
     private void updateCalorieIntake(double totalCalories, int daysInMonth) {
         setupProgressBar();
 

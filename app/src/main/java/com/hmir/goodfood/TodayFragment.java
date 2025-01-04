@@ -54,7 +54,7 @@ public class TodayFragment extends Fragment {
         barChartNutrition = view.findViewById(R.id.todayBarChart);
         rvMealsHistory = view.findViewById(R.id.rv_meals_history);
         exceedImageView = view.findViewById(R.id.HOMEdizzyface);
-
+        TdynutrientIntakeInfoButton = view.findViewById(R.id.todayNutrientIntakeInfoButton);
         rvMealsHistory.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
 
         fetchTodayData();
@@ -103,6 +103,29 @@ public class TodayFragment extends Fragment {
                         }
                     }
                 }
+                // Define recommended daily allowances (RDAs)
+                float rdaProtein = 50f; // Example values
+                float rdaCarbs = 300f;
+                float rdaFat = 70f;
+                float rdaSodium = 2300f;
+                float rdaCalcium = 1000f;
+                float rdaCholesterol = 300f;
+                float rdaMagnesium = 400f;
+                float rdaIron = 18f;
+                float rdaPotassium = 3500f;
+
+                // Check for exceeded nutrients
+                List<String> exceededNutrients = new ArrayList<>();
+                if (totalProtein > rdaProtein) exceededNutrients.add("Protein");
+                if (totalCarbs > rdaCarbs) exceededNutrients.add("Carbohydrates");
+                if (totalFat > rdaFat) exceededNutrients.add("Fat");
+                if (totalSodium > rdaSodium) exceededNutrients.add("Sodium");
+                if (totalCalcium > rdaCalcium) exceededNutrients.add("Calcium");
+                if (totalCholesterol > rdaCholesterol) exceededNutrients.add("Cholesterol");
+                if (totalMagnesium > rdaMagnesium) exceededNutrients.add("Magnesium");
+                if (totalIron > rdaIron) exceededNutrients.add("Iron");
+                if (totalPotassium > rdaPotassium) exceededNutrients.add("Potassium");
+                TdynutrientIntakeInfoButton.setOnClickListener(v -> showNutrientExceedDialog(exceededNutrients));
                 updateCalorieIntake(totalCalories);
                 //updateNutritionChart(totalProtein, totalCarbs, totalFat, totalSodium, totalIron, totalCalcium, totalCholesterol, totalMagnesium, totalPotassium);
                 updateMealsHistory(mealImages);
@@ -131,7 +154,10 @@ public class TodayFragment extends Fragment {
             }
         });
     }
-
+    private void showNutrientExceedDialog(List<String> exceededNutrients) {
+        NutrientExceedDialogFragment dialog = new NutrientExceedDialogFragment(exceededNutrients);
+        dialog.show(getChildFragmentManager(), "NutrientExceedDialog");
+    }
     private void updateCalorieIntake(double totalCalories) {
         setupProgressBar();
 
