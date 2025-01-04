@@ -1,6 +1,7 @@
 package com.hmir.goodfood;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -10,6 +11,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.github.mikephil.charting.charts.BarChart;
@@ -28,13 +30,34 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * HomePage Activity - Main dashboard of the GoodFood application.
+ * Displays user's nutritional information, daily calorie intake, and monthly statistics.
+ */
 public class HomePage extends AppCompatActivity {
+    private static final String TAG = "HomePage";
+    private static final int MAX_DAILY_CALORIES = 1000;
+    private static final String DATE_FORMAT = "yyyy-MM-dd";
+    private static final String MONTH_FORMAT = "yyyy-MM";
+    private static final String SHARED_PREFS_NAME = "UserPreferences";
+
+    // UI Components
     private TextView tvCalorieIntake;
     private ProgressBar progressCalorieIntake;
     private TextView caloriePercentageText;
     private ImageView exceedImageView;
-    private UserHelper userHelper = new UserHelper();
-    private BarChart MonthlyBarChart;
+    private BarChart monthlyBarChart;
+    private TextView tvUsername;
+    private ImageView ivProfile;
+
+    // Data Helper
+    private final UserHelper userHelper = new UserHelper();
+
+    // Nutrient Names
+    private final String[] nutrientNames = {
+            "Protein", "Carbs", "Fat", "Sodium", "Iron",
+            "Calcium", "Cholesterol", "Magnesium", "Potassium"
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,238 +65,326 @@ public class HomePage extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_home_page);
 
+        initializeViews();
+        setupUserProfile();
+        loadNutritionalData();
+    }
+
+    /**
+     * Initializes all UI components
+     */
+    private void initializeViews() {
+        tvUsername = findViewById(R.id.TVNameHomePage);
         tvCalorieIntake = findViewById(R.id.HOMEtv_calorie_intake);
         progressCalorieIntake = findViewById(R.id.HOMEtodayProgressBar);
         exceedImageView = findViewById(R.id.HOMEdizzyface);
         caloriePercentageText = findViewById(R.id.HOMEpercentage_cal);
-        MonthlyBarChart = findViewById(R.id.HOMEthisMonthBarChart);
+        monthlyBarChart = findViewById(R.id.HOMEthisMonthBarChart);
+        ivProfile = findViewById(R.id.IVProfile);
+    }
+
+    /**
+     * Sets up user profile from SharedPreferences
+     */
+    private void setupUserProfile() {
+        SharedPreferences prefs = getSharedPreferences(SHARED_PREFS_NAME, MODE_PRIVATE);
+        String username = prefs.getString("Username", "Guest");
+        tvUsername.setText(username);
+    }
+
+    /**
+     * Loads both daily and monthly nutritional data
+     */
+    private void loadNutritionalData() {
         fetchTodayData();
         fetchThisMonthData();
     }
 
+    /**
+     * Fetches today's nutritional data
+     */
     private void fetchTodayData() {
         userHelper.fetchAllUserNutritionalRecords(new UserHelper.OnRecordListFetchedCallback() {
             @Override
             public void onRecordListFetched(List<NutritionalRecord> records) {
-                String todayDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
-
-                double totalCalories = 0;
-
-                for (NutritionalRecord record : records) {
-                    String recordDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-                            .format(record.getDate_time().toDate());
-
-                    if (recordDate.equals(todayDate)) {
-                        totalCalories += record.getCalories();
-                    }
-                }
-                updateProgressBar(totalCalories);
+                processTodayData(records);
             }
+
             @Override
             public void onError(Exception e) {
-                if (e != null) {
-                    // Show the error message in a Toast
-                    String errorMessage = e.getMessage();
-
-                    // Show a Toast with the error message (if it's too long, you can shorten it)
-                    Toast.makeText(HomePage.this, "Error: " + errorMessage, Toast.LENGTH_LONG).show();
-                } else {
-                    Toast.makeText(HomePage.this, "Unknown error occurred", Toast.LENGTH_LONG).show();
-                }
-
-                // Optionally, show a generic failure message to the user
-                Toast.makeText(HomePage.this, "Failed to load nutritional data. Please try again later.", Toast.LENGTH_LONG).show();
+                handleError(e, "Error loading today's data");
             }
         });
     }
 
+    /**
+     * Processes today's nutritional records
+     */
+    private void processTodayData(List<NutritionalRecord> records) {
+        String todayDate = new SimpleDateFormat(DATE_FORMAT, Locale.getDefault())
+                .format(new Date());
+
+        double totalCalories = records.stream()
+                .filter(record -> {
+                    String recordDate = new SimpleDateFormat(DATE_FORMAT, Locale.getDefault())
+                            .format(record.getDate_time().toDate());
+                    return recordDate.equals(todayDate);
+                })
+                .mapToDouble(NutritionalRecord::getCalories)
+                .sum();
+
+        updateProgressBar(totalCalories);
+    }
+
+    /**
+     * Updates the calorie progress bar and related UI elements
+     */
+    private void updateProgressBar(double totalCalories) {
+        int progress = calculateProgress(totalCalories);
+        updateCalorieDisplay(totalCalories, progress);
+    }
+
+    /**
+     * Calculates the progress percentage based on total calories.
+     * @param totalCalories The total calories consumed
+     * @return The calculated progress percentage (0-100)
+     */
+    private int calculateProgress(double totalCalories) {
+        return Math.min((int) ((totalCalories / MAX_DAILY_CALORIES) * 100), 100);
+    }
+
+    /**
+     * Updates the calorie display UI components.
+     * @param totalCalories The total calories to display
+     * @param progress The progress percentage (0-100)
+     */
+    private void updateCalorieDisplay(double totalCalories, int progress) {
+        tvCalorieIntake.setText(String.format(Locale.getDefault(),
+                "Calories: %.0f/%d", totalCalories, MAX_DAILY_CALORIES));
+        progressCalorieIntake.setProgress(progress);
+
+        if (totalCalories > MAX_DAILY_CALORIES) {
+            exceedImageView.setVisibility(View.VISIBLE);
+            caloriePercentageText.setVisibility(View.GONE);
+        } else {
+            exceedImageView.setVisibility(View.GONE);
+            caloriePercentageText.setText(progress + "%");
+            caloriePercentageText.setVisibility(View.VISIBLE);
+        }
+    }
+
+    /**
+     * Fetches monthly nutritional data
+     */
     private void fetchThisMonthData() {
         userHelper.fetchAllUserNutritionalRecords(new UserHelper.OnRecordListFetchedCallback() {
             @Override
             public void onRecordListFetched(List<NutritionalRecord> records) {
-                String currentMonth = new SimpleDateFormat("yyyy-MM", Locale.getDefault()).format(new Date());
-
-                float totalProtein = 0;
-                float totalCarbs = 0;
-                float totalFat = 0;
-                float totalSodium = 0;
-                float totalCalcium = 0;
-                float totalCholesterol = 0;
-                float totalMagnesium = 0;
-                float totalIron = 0;
-                float totalPotassium = 0;
-                int daysInMonth = 0;
-
-                for (NutritionalRecord record : records) {
-                    String recordMonth = new SimpleDateFormat("yyyy-MM", Locale.getDefault())
-                            .format(record.getDate_time().toDate());
-
-                    if (recordMonth.equals(currentMonth)) {
-                        totalProtein += record.getProtein();
-                        totalCarbs += record.getCarbs();
-                        totalFat += record.getFat();
-                        totalSodium += record.getSodium();
-                        totalIron += record.getIron();
-                        totalCalcium += record.getCalcium();
-                        totalCholesterol += record.getCholesterol();
-                        totalMagnesium += record.getMagnesium();
-                        totalPotassium += record.getPotassium();
-
-                        // Count number of days in the current month
-                        daysInMonth++;
-                    }
-                }
-
-                if (daysInMonth > 0) {
-                    // Update nutrition chart (average for the month)
-                    updateNutritionChart(totalProtein, totalCarbs, totalFat, totalSodium, totalIron, totalCalcium, totalCholesterol, totalMagnesium, totalPotassium, daysInMonth);
-                } else {
-                    Toast.makeText(HomePage.this, "No records found for this month", Toast.LENGTH_LONG).show();
-                }
+                processMonthlyData(records);
             }
 
             @Override
             public void onError(Exception e) {
-                // Handle error the same way as in TodayFragment
-                if (e != null) {
-                    Toast.makeText(HomePage.this, "Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
-                } else {
-                    Toast.makeText(HomePage.this, "Unknown error occurred", Toast.LENGTH_LONG).show();
-                }
+                handleError(e, "Error loading monthly data");
             }
         });
     }
 
-    private void updateProgressBar(double totalCalories) {
-        setupProgressBar();
+    /**
+     * Processes monthly nutritional records
+     */
+    private void processMonthlyData(List<NutritionalRecord> records) {
+        String currentMonth = new SimpleDateFormat(MONTH_FORMAT, Locale.getDefault())
+                .format(new Date());
 
-        // Check if totalCalories exceeds 1000 and adjust the progress bar and percentage text accordingly
-        int progress;
-        String percentageText;
+        MonthlyNutrients nutrients = calculateMonthlyNutrients(records, currentMonth);
 
-        if (totalCalories > 1000) {
-            progress = 100; // Set progress to 100%
-            // Display the image when exceeding 100%
-            exceedImageView.setVisibility(View.VISIBLE); // Make the image visible
-            caloriePercentageText.setVisibility(View.GONE);
+        if (nutrients.daysInMonth > 0) {
+            updateNutritionChart(nutrients);
         } else {
-            progress = (int) ((totalCalories / 1000) * 100); // Calculate the progress percentage
-            percentageText = progress + "%"; // Display the actual progress
-            caloriePercentageText.setText(percentageText);
-            exceedImageView.setVisibility(View.GONE); // Hide the image
+            Toast.makeText(this, "No records found for this month", Toast.LENGTH_LONG).show();
         }
-        tvCalorieIntake.setText(String.format("Calories: %.0f/1000", totalCalories));
-        progressCalorieIntake.setProgress(progress);
     }
 
-    private void setupProgressBar() {
-        progressCalorieIntake = findViewById(R.id.HOMEtodayProgressBar);
-        caloriePercentageText = findViewById(R.id.HOMEpercentage_cal);
+    /**
+     * Data class to hold monthly nutrient totals
+     */
+    private static class MonthlyNutrients {
+        float protein;
+        float carbs;
+        float fat;
+        float sodium;
+        float iron;
+        float calcium;
+        float cholesterol;
+        float magnesium;
+        float potassium;
+        int daysInMonth;
     }
 
-    private void updateNutritionChart(float protein, float carbs, float fat, float sodium, float iron, float calcium, float cholesterol, float magnesium, float potassium, int daysInMonth) {
-        Log.d("ThisMonthFragment", "updateNutritionChart called with values: protein=" + protein + ", carbs=" + carbs + ", fat=" + fat);
+    /**
+     * Calculates monthly nutrient totals from nutritional records.
+     * @param records List of nutritional records
+     * @param currentMonth The current month in yyyy-MM format
+     * @return MonthlyNutrients object containing the calculated totals
+     */
+    private MonthlyNutrients calculateMonthlyNutrients(List<NutritionalRecord> records,
+                                                       String currentMonth) {
+        MonthlyNutrients nutrients = new MonthlyNutrients();
 
-        if (MonthlyBarChart == null) {
-            Log.e("ThisMonthFragment", "Bar chart view is null.");
+        records.stream()
+                .filter(record -> {
+                    String recordMonth = new SimpleDateFormat(MONTH_FORMAT, Locale.getDefault())
+                            .format(record.getDate_time().toDate());
+                    return recordMonth.equals(currentMonth);
+                })
+                .forEach(record -> {
+                    nutrients.protein += record.getProtein();
+                    nutrients.carbs += record.getCarbs();
+                    nutrients.fat += record.getFat();
+                    nutrients.sodium += record.getSodium();
+                    nutrients.iron += record.getIron();
+                    nutrients.calcium += record.getCalcium();
+                    nutrients.cholesterol += record.getCholesterol();
+                    nutrients.magnesium += record.getMagnesium();
+                    nutrients.potassium += record.getPotassium();
+                    nutrients.daysInMonth++;
+                });
+
+        return nutrients;
+    }
+
+    /**
+     * Updates the nutrition chart with monthly averages
+     */
+    private void updateNutritionChart(MonthlyNutrients nutrients) {
+        if (monthlyBarChart == null) {
+            Log.e(TAG, "Bar chart view is null.");
             return;
         }
 
-        // Calculate averages for each nutrient
-        float avgProtein = protein / daysInMonth;
-        float avgCarbs = carbs / daysInMonth;
-        float avgFat = fat / daysInMonth;
-        float avgSodium = sodium / daysInMonth;
-        float avgIron = iron / daysInMonth;
-        float avgCalcium = calcium / daysInMonth;
-        float avgCholesterol = cholesterol / daysInMonth;
-        float avgMagnesium = magnesium / daysInMonth;
-        float avgPotassium = potassium / daysInMonth;
+        ArrayList<BarEntry> entries = createBarEntries(nutrients);
+        setupBarChart(entries);
+    }
 
-        // Dummy data for testing
+    /**
+     * Creates bar entries from the monthly nutrients data.
+     * @param nutrients The monthly nutrients data
+     * @return ArrayList of BarEntry objects representing the nutrient values
+     */
+    private ArrayList<BarEntry> createBarEntries(MonthlyNutrients nutrients) {
         ArrayList<BarEntry> entries = new ArrayList<>();
-        entries.add(new BarEntry(0, avgProtein));
-        entries.add(new BarEntry(1, avgCarbs));
-        entries.add(new BarEntry(2, avgFat));
-        entries.add(new BarEntry(3, avgSodium));
-        entries.add(new BarEntry(4, avgIron));
-        entries.add(new BarEntry(5, avgCalcium));
-        entries.add(new BarEntry(6, avgCholesterol));
-        entries.add(new BarEntry(7, avgMagnesium));
-        entries.add(new BarEntry(8, avgPotassium));
-
-        // Names for each bar
-        final String[] barNames = {
-                "Protein", "Carbs", "Fat", "Sodium", "Iron", "Calcium", "Cholesterol", "Magnesium", "Potassium"
+        float[] values = {
+                nutrients.protein / nutrients.daysInMonth,
+                nutrients.carbs / nutrients.daysInMonth,
+                nutrients.fat / nutrients.daysInMonth,
+                nutrients.sodium / nutrients.daysInMonth,
+                nutrients.iron / nutrients.daysInMonth,
+                nutrients.calcium / nutrients.daysInMonth,
+                nutrients.cholesterol / nutrients.daysInMonth,
+                nutrients.magnesium / nutrients.daysInMonth,
+                nutrients.potassium / nutrients.daysInMonth
         };
 
+        for (int i = 0; i < values.length; i++) {
+            entries.add(new BarEntry(i, values[i]));
+        }
+
+        return entries;
+    }
+
+    /**
+     * Sets up the bar chart with the provided entries.
+     * Configures the dataset, appearance, and listeners.
+     * @param entries The bar entries to display in the chart
+     */
+    private void setupBarChart(ArrayList<BarEntry> entries) {
         BarDataSet dataSet = new BarDataSet(entries, "Nutrients");
-        dataSet.setColor(getResources().getColor(R.color.yellow)); // Use a simple color for now
+        dataSet.setColor(getResources().getColor(R.color.yellow));
+        dataSet.setDrawValues(true);
+
         BarData barData = new BarData(dataSet);
+        monthlyBarChart.setData(barData);
+        configureBarChartAppearance();
+        setupBarChartListener();
+    }
 
-        MonthlyBarChart.setData(barData);
+    /**
+     * Configures the visual appearance of the bar chart.
+     * Sets up grid lines, axes, labels, and animation properties.
+     */
+    private void configureBarChartAppearance() {
+        monthlyBarChart.getAxisLeft().setDrawGridLines(false);
+        monthlyBarChart.getAxisRight().setDrawGridLines(false);
+        monthlyBarChart.getXAxis().setDrawGridLines(false);
+        monthlyBarChart.getAxisLeft().setDrawAxisLine(false);
+        monthlyBarChart.getAxisRight().setDrawAxisLine(false);
+        monthlyBarChart.getXAxis().setDrawAxisLine(false);
+        monthlyBarChart.getXAxis().setEnabled(false);
+        monthlyBarChart.getAxisLeft().setDrawLabels(true);
+        monthlyBarChart.getAxisRight().setEnabled(false);
+        monthlyBarChart.getXAxis().setGranularity(1f);
+        monthlyBarChart.getLegend().setEnabled(false);
+        monthlyBarChart.setDescription(null);
+        monthlyBarChart.animateY(1000);
+    }
 
-        // Disable gridlines
-        MonthlyBarChart.getAxisLeft().setDrawGridLines(false);
-        MonthlyBarChart.getAxisRight().setDrawGridLines(false);
-        MonthlyBarChart.getXAxis().setDrawGridLines(false);
-
-        // Disable axis lines
-        MonthlyBarChart.getAxisLeft().setDrawAxisLine(false);
-        MonthlyBarChart.getAxisRight().setDrawAxisLine(false);
-        MonthlyBarChart.getXAxis().setDrawAxisLine(false);
-
-        // Hide X-axis index number
-        MonthlyBarChart.getXAxis().setEnabled(false);
-        // Add chart value selected listener
-        MonthlyBarChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
+    /**
+     * Sets up the bar chart listener for handling user interactions.
+     * Displays a toast message when a bar is selected.
+     */
+    private void setupBarChartListener() {
+        monthlyBarChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
             @Override
             public void onValueSelected(Entry e, Highlight h) {
-                int index = (int) e.getX(); // Get the index of the clicked bar
-                String barName = barNames[index]; // Get the corresponding name from the barNames array
-
-                // Display the selected bar's name (you can use a Toast, Snackbar, or TextView)
-                Toast.makeText(HomePage.this, "Selected: " + barName, Toast.LENGTH_SHORT).show();
+                int index = (int) e.getX();
+                Toast.makeText(HomePage.this,
+                        "Selected: " + nutrientNames[index],
+                        Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onNothingSelected() {
-                // Optional: Action to perform when nothing is selected
+                // Optional implementation
             }
         });
-
-        // Customize the Y-axis labels (optional)
-        MonthlyBarChart.getAxisLeft().setDrawLabels(true);
-        MonthlyBarChart.getAxisRight().setEnabled(false); // Hide Y-axis on the right
-        MonthlyBarChart.getXAxis().setGranularity(1f); // For proper spacing between bars
-
-        // Set a more modern and clean appearance (optional)
-        MonthlyBarChart.getLegend().setEnabled(false); // Disable the legend if not needed
-        MonthlyBarChart.setDescription(null);  // Hide description
-
-        // Add animations (optional)
-        MonthlyBarChart.animateY(1000);
-        //show the values above bars
-        dataSet.setDrawValues(true);
-
-        MonthlyBarChart.invalidate(); // Refresh the chart
-        Log.d("ThisMonthFragment", "updateNutritionChart completed successfully.");
     }
 
+    /**
+     * Handles navigation and error events
+     */
     public void toSearchPage(View view) {
-        Intent intent = new Intent(HomePage.this, SearchActivity.class);
-        startActivity(intent);
+        startActivity(new Intent(this, SearchActivity.class));
     }
 
-    public void toTodayStats(View view){
+    public void toTodayStats(View view) {
         Intent intent = new Intent(this, DashboardActivity.class);
         intent.putExtra("code", "today");
         startActivity(intent);
     }
 
-    public void toThisMonthStats (View view){
+    public void toThisMonthStats(View view) {
         Intent intent = new Intent(this, DashboardActivity.class);
         intent.putExtra("code", "month");
         startActivity(intent);
+    }
+
+    /**
+     * Refreshes the user profile data from SharedPreferences.
+     * Updates the UI with the latest user information.
+     */
+    public void refreshProfileData() {
+        setupUserProfile();
+    }
+
+    /**
+     * Handles error conditions and displays appropriate messages.
+     * @param e The exception that occurred
+     * @param message The base error message to display
+     */
+    private void handleError(Exception e, String message) {
+        String errorMessage = e != null ? e.getMessage() : "Unknown error occurred";
+        Log.e(TAG, message + ": " + errorMessage, e);
+        Toast.makeText(this, "Error: " + errorMessage, Toast.LENGTH_LONG).show();
     }
 }

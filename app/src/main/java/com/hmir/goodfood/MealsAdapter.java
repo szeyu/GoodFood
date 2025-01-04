@@ -13,10 +13,18 @@ import com.hmir.goodfood.R;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * RecyclerView adapter for displaying meal images in a horizontal scrollable list.
+ * Handles the loading and display of meal images using Glide library.
+ *
+ * <p>This adapter implements view recycling for efficient memory usage
+ * and smooth scrolling performance.</p>
+ *
+ * @see RecyclerView.Adapter
+ * @see MealsViewHolder
+ */
 public class MealsAdapter extends RecyclerView.Adapter<MealsAdapter.MealsViewHolder> {
-
     private final List<String> mealImages; // List of meal image URLs or URIs
-
     // Constructor to initialize the list of meal images
     public MealsAdapter(List<String> mealImages) {
         // Defensive copy to prevent external modification
@@ -48,7 +56,10 @@ public class MealsAdapter extends RecyclerView.Adapter<MealsAdapter.MealsViewHol
         return mealImages.size();
     }
 
-    // ViewHolder class to hold the view elements for each item in the RecyclerView
+    /**
+     * ViewHolder class for meal image items.
+     * Caches view references for efficient recycling.
+     */
     public static class MealsViewHolder extends RecyclerView.ViewHolder {
 
         private final ImageView imageView;

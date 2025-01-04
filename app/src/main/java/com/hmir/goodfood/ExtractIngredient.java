@@ -2,7 +2,9 @@ package com.hmir.goodfood;
 
 import static com.hmir.goodfood.utilities.FileUtil.readBase64FromFile;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -21,6 +23,7 @@ import com.hmir.goodfood.callbacks.NutritionCallback;
 import com.hmir.goodfood.models.GeminiApiResponse;
 import com.hmir.goodfood.models.GeminiRequestBody;
 import com.hmir.goodfood.services.GeminiApiService;
+import com.hmir.goodfood.utilities.User;
 
 
 import java.io.File;
@@ -44,6 +47,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
  * the nutritional content of those ingredients.
  */
 public class ExtractIngredient extends AppCompatActivity {
+    // Assuming health_labels is part of the User object, you can pass it as part of the prompt.
+    // Assuming you have a User class with a method to get health labels
 
     private static final String GEMINI_API_BASE_URL = "https://generativelanguage.googleapis.com/";
     private static final String GEMINI_API_KEY = BuildConfig.GEMINI_API_KEY;
@@ -230,6 +235,7 @@ public class ExtractIngredient extends AppCompatActivity {
             String ingredientsFromTextView = IngredientTextView.getText().toString().trim();
 
             if (!ingredientsFromTextView.isEmpty()) {
+
                 searchRecipes(ingredientsFromTextView);  // Call the method to search for recipes with the ingredients from the TextView
             } else {
                 Toast.makeText(ExtractIngredient.this, "No ingredients to search recipes for", Toast.LENGTH_SHORT).show();
@@ -243,6 +249,16 @@ public class ExtractIngredient extends AppCompatActivity {
      * @param ingredients The ingredients to search for recipes.
      */
     private void searchRecipes(String ingredients) {
+        // Retrieve the user's health labels dynamically (from SharedPreferences or User object)
+        SharedPreferences sharedPreferences = getSharedPreferences("UserPreferences", MODE_PRIVATE);
+        String healthLabels = sharedPreferences.getString("DietTypes", ""); // Change "HealthLabels" to "DietTypes"
+        Log.d("HealthLabels", "Retrieved health labels: " + healthLabels);  // Log to check the value
+
+        // If no health labels, you can set a default message or leave it empty
+        if (healthLabels.isEmpty()) {
+            healthLabels = "No specific dietary restrictions"; // Default message if no health labels are available
+        }
+
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
         logging.setLevel(HttpLoggingInterceptor.Level.BODY);
 
@@ -258,12 +274,15 @@ public class ExtractIngredient extends AppCompatActivity {
 
         GeminiApiService service = retrofit.create(GeminiApiService.class);
 
-        // Improved prompt with ingredients explicitly mentioned
-        String prompt = "Based on the following ingredients: " + ingredients + ", suggest a list of recipes. " +
+        // Construct the prompt dynamically with the user's health labels
+        String prompt = "Based on the following ingredients: " + ingredients + " and considering the user's health labels: " +
+                healthLabels + ", suggest a list of recipes. " +
                 "For each recipe, provide the name, ingredients, and cooking steps in this format:\n" +
                 "- Recipe Name: <recipe_name>\n" +
                 "  Ingredients: <ingredient_1, ingredient_2, ...>\n" +
                 "  Steps: <step_1, step_2, ...>";
+        // Log the prompt to see what is being sent
+        Log.d("RecipeSearchPrompt", "Prompt being sent: " + prompt);
 
         GeminiRequestBody requestBody = createGeminiRequestBody(prompt);
         String jsonBody = new Gson().toJson(requestBody);
@@ -298,6 +317,11 @@ public class ExtractIngredient extends AppCompatActivity {
             }
         });
     }
+
+
+
+
+
 
     /**
      * Parses a string of recipes text into a list of Recipe objects.

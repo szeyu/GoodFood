@@ -25,11 +25,13 @@
         android:name="com.hmir.goodfood.EditProfileFragment"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:background="@color/white"
+        android:backgroundTint="@color/white"
         android:fitsSystemWindows="true"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/fragmentContainerView3"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/toolbar"
-        app:layout_constraintBottom_toTopOf="@id/fragmentContainerView3" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar" />
 
     <!-- Bottom Navigation Fragment -->
     <androidx.fragment.app.FragmentContainerView
