@@ -185,6 +185,18 @@ public class TodayFragment extends Fragment {
             }
         });
     }
+
+    /**
+     * Displays a dialog showing the list of nutrients that have exceeded their recommended daily values.
+     * If the provided list is empty, shows a congratulatory message instead.
+     *
+     * This method creates and shows a {@link NutrientExceedDialogFragment} using the child fragment manager.
+     * The dialog will remain visible until dismissed by the user.
+     *
+     * @param exceededNutrients A list of nutrient names that have exceeded their recommended levels.
+     *                         Pass an empty list if no nutrients have exceeded their limits.
+     * @see NutrientExceedDialogFragment
+     */
     private void showNutrientExceedDialog(List<String> exceededNutrients) {
         NutrientExceedDialogFragment dialog = new NutrientExceedDialogFragment(exceededNutrients);
         dialog.show(getChildFragmentManager(), "NutrientExceedDialog");
