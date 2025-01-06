@@ -2,6 +2,7 @@ package com.hmir.goodfood;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -21,6 +22,8 @@ public class RecipeListActivity extends AppCompatActivity implements RecipeAdapt
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recipe_list);
+        ImageButton backButton = findViewById(R.id.backButton);
+        backButton.setOnClickListener(v -> finish());
 
         // Retrieve the list of recipes passed from the previous activity
         List<Recipe> recipes = getIntent().getParcelableArrayListExtra("recipes");

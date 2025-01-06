@@ -6,44 +6,68 @@
     android:layout_height="match_parent"
     android:padding="16dp">
 
-
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="16dp">
+        android:clipToPadding="false"
+        android:paddingBottom="80dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:layout_editor_absoluteY="109dp">
 
         <LinearLayout
-            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
             <!-- Recipe Name -->
+
+            <!-- Ingredients Section -->
             <TextView
                 android:id="@+id/recipeName"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingBottom="8dp"
-                android:textColor="#020200"
+                android:layout_width="match_parent"
+                android:layout_height="49dp"
+                android:layout_marginBottom="24dp"
+                android:gravity="center"
+                android:textColor="#000000"
                 android:textSize="24sp"
                 android:textStyle="bold" />
 
-            <!-- Ingredients -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:text="Ingredients"
+                android:textColor="#000000"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
             <TextView
                 android:id="@+id/recipeIngredients"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="16sp"
-                android:textColor="#000000"
-                android:paddingBottom="8dp" />
+                android:layout_marginBottom="24dp"
+                android:lineSpacingExtra="8dp"
+                android:textColor="#666666"
+                android:textSize="16sp" />
 
-            <!-- Steps -->
+            <!-- Steps Section -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:text="Instructions"
+                android:textColor="#000000"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
             <TextView
                 android:id="@+id/recipeSteps"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="16sp"
-                android:textColor="#000000"
-                android:paddingBottom="8dp" />
+                android:lineSpacingExtra="4dp"
+                android:textColor="#666666"
+                android:textSize="16sp" />
 
         </LinearLayout>
     </ScrollView>
@@ -52,13 +76,26 @@
         android:id="@+id/fab_delete"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
         android:layout_margin="16dp"
-        android:layout_marginBottom="16dp"
+        android:backgroundTint="#FF5722"
         android:contentDescription="Delete Recipe"
         android:src="@android:drawable/ic_delete"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:tint="#FFFFFF" />
+
+    <ImageButton
+        android:id="@+id/backButton"
+        android:layout_width="77dp"
+        android:layout_height="57dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="back"
+        android:padding="8dp"
+        android:rotationY="-180"
+        android:src="@drawable/arrow"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+
+
